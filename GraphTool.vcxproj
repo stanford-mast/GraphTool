@@ -14,7 +14,7 @@
     <ClInclude Include="include\Graph.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Graph.cpp" />
+    <ClCompile Include="source\Graph.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>
