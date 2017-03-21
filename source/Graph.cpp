@@ -12,55 +12,44 @@
 
 #include "Graph.h"
 
+#include <cstddef>
+
 using namespace GraphTool;
-
-
-// -------- INTERNAL FUNCTIONS --------------------------------------------- //
-
-/// Built-in comparator for producing an ascending ordering of vertices.
-/// @param [in] first First vertex to compare.
-/// @param [in] second Second vertex to compare.
-/// @return `true` if `first < second`, `false` otherwise.
-static bool CompareVerticesAscending(TVertexID first, TVertexID second)
-{
-    return (first < second);
-}
-
-/// Built-in comparator for producing a descending ordering of vertices.
-/// @param [in] first First vertex to compare.
-/// @param [in] second Second vertex to compare.
-/// @return `true` if `first > second`, `false` otherwise.
-static bool CompareVerticesDescending(TVertexID first, TVertexID second)
-{
-    return (first > second);
-}
 
 
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "Graph.h" for documentation.
 
 Graph::Graph() {
-    // Nothing special to do here.
+    // Nothing to do here.
 }
 
 // --------
 
 Graph::~Graph() {
-    // Nothing special to do here.
+    // Nothing to do here.
 }
 
 
 // -------- INSTANCE METHODS ----------------------------------------------- //
 // See "Graph.h" for documentation.
 
-void Graph::SortVerticesAscending(void)
+void Graph::AddEdges(void* buffer, size_t count)
 {
-    this->SortVertices(&CompareVerticesAscending);
+    this->AddInEdges(buffer, count);
+    this->AddOutEdges(buffer, count);
 }
 
 // --------
 
-void Graph::SortVerticesDescending(void)
+size_t Graph::GetExportRecommendedInEdgeBufferSizeWithOptions(uint64_t options)
 {
-    this->SortVertices(&CompareVerticesDescending);
+    return (this->GetMaximumIndegree() * this->GetExportEdgeSizeWithOptions(options));
+}
+
+// --------
+
+size_t Graph::GetExportRecommendedOutEdgeBufferSizeWithOptions(uint64_t options)
+{
+    return (this->GetMaximumOutdegree() * this->GetExportEdgeSizeWithOptions(options));
 }
