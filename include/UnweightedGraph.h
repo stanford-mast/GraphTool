@@ -15,6 +15,7 @@
 
 #include "Graph.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <set>

@@ -13,6 +13,7 @@
 #include "Graph.h"
 
 #include <cstddef>
+#include <cstdint>
 
 using namespace GraphTool;
 

@@ -14,6 +14,7 @@
 #include "UnweightedGraph.h"
 
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <set>
 
