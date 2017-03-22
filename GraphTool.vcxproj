@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Graph.h" />
+    <ClInclude Include="include\UnweightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Graph.cpp" />
+    <ClCompile Include="source\UnweightedGraph.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>
