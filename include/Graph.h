@@ -27,7 +27,7 @@ namespace GraphTool
     /// Specifies the type to use for counting edges.
     typedef uint64_t TEdgeCount;
     
-    /// Interface specification for an object type used to represent a graph.
+    /// Base class for all object types that are used to represent a graph.
     /// Because graph implementations differ significantly, common functionality is limited.
     class Graph
     {
@@ -35,10 +35,10 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 
         /// Default constructor.
-        Graph();
+        Graph(void);
 
         /// Default destructor.
-        virtual ~Graph();
+        virtual ~Graph(void);
 
 
         // -------- ABSTRACT INSTANCE METHODS -------------------------------------- //
@@ -89,6 +89,14 @@ namespace GraphTool
         /// Retrieves and returns the out-degree of the vertex with the largest out-degree.
         /// @return Highest out-degree in the graph.
         virtual TVertexCount GetMaximumOutdegree(void) = 0;
+        
+        /// Retrieves and returns the number of edges in the graph.
+        /// @return Number of edges in the graph.
+        virtual TEdgeCount GetNumEdges(void) = 0;
+
+        /// Retrieves and returns the number of vertices in the graph.
+        /// @return Number of vertices in the graph.
+        virtual TVertexCount GetNumVertices(void) = 0;
         
         /// Retrieves and returns the in-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.

@@ -65,7 +65,7 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 
         /// Default constructor.
-        UnweightedGraph();
+        UnweightedGraph(void);
 
 
         // -------- CONCRETE INSTANCE METHODS -------------------------------------- //
@@ -78,6 +78,8 @@ namespace GraphTool
         virtual size_t GetExportEdgeSizeWithOptions(uint64_t options);
         virtual TVertexCount GetMaximumIndegree(void);
         virtual TVertexCount GetMaximumOutdegree(void);
+        virtual TEdgeCount GetNumEdges(void);
+        virtual TVertexCount GetNumVertices(void);
         virtual TVertexCount GetVertexIndegree(TVertexID vertex);
         virtual TVertexCount GetVertexOutdegree(TVertexID vertex);
         virtual void RemoveEdge(TVertexID fromVertex, TVertexID toVertex);

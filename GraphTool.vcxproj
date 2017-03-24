@@ -11,11 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\Graph.h" />
+    <ClInclude Include="include\GraphReader.h" />
     <ClInclude Include="include\UnweightedGraph.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\BinaryEdgeListReader.cpp" />
     <ClCompile Include="source\Graph.cpp" />
+    <ClCompile Include="source\GraphReader.cpp" />
     <ClCompile Include="source\UnweightedGraph.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

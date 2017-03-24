@@ -24,7 +24,8 @@ using namespace GraphTool;
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "UnweightedGraph.h" for documentation.
 
-UnweightedGraph::UnweightedGraph() : Graph(), verticesByDestination(), verticesBySource() {
+UnweightedGraph::UnweightedGraph(void) : Graph(), verticesByDestination(), verticesBySource()
+{
     // Nothing to do here.
 }
 
@@ -165,6 +166,23 @@ TVertexCount UnweightedGraph::GetMaximumOutdegree(void)
 }
 
 // --------
+
+TEdgeCount UnweightedGraph::GetNumEdges(void)
+{
+    TEdgeCount numEdges = 0;
+
+    for (auto it = verticesByDestination.cbegin(); it != verticesByDestination.cend(); ++it)
+        numEdges += it->second.size();
+
+    return numEdges;
+}
+
+// --------
+
+TVertexCount UnweightedGraph::GetNumVertices(void)
+{
+    return this->verticesByDestination.size();
+}
 
 TVertexCount UnweightedGraph::GetVertexIndegree(TVertexID vertex)
 {

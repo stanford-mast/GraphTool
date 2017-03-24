@@ -21,13 +21,15 @@ using namespace GraphTool;
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "Graph.h" for documentation.
 
-Graph::Graph() {
+Graph::Graph(void)
+{
     // Nothing to do here.
 }
 
 // --------
 
-Graph::~Graph() {
+Graph::~Graph(void)
+{
     // Nothing to do here.
 }
 

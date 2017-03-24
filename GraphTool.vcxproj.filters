@@ -21,12 +21,24 @@
     <ClInclude Include="include\UnweightedGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BinaryEdgeListReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\UnweightedGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GraphReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\BinaryEdgeListReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
