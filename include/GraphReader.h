@@ -13,9 +13,9 @@
 
 #pragma once
 
-#include <Graph.h>
+#include "Graph.h"
+#include "Types.h"
 
-#include <cstdint>
 #include <cstddef>
 #include <cstdio>
 #include <string>

@@ -11,8 +11,10 @@
  *   binary edge list files.
  *****************************************************************************/
 
+#include "EdgeIndex.h"
 #include "BinaryEdgeListReader.h"
 #include "Graph.h"
+#include "Types.h"
 #include "UnweightedGraph.h"
 
 #include <cstdint>
@@ -60,8 +62,8 @@ FILE* BinaryEdgeListReader::OpenAndInitializeGraphFile(const std::string& filena
 
 TEdgeCount BinaryEdgeListReader::ReadEdgesToBuffer(FILE* graphfile, void* buf, size_t size)
 {
-    const size_t edgeSize = sizeof(UnweightedGraph::SEdge);
-    const size_t edgeCount = (size / sizeof(UnweightedGraph::SEdge));
+    const size_t edgeSize = sizeof(UnweightedGraph::SEdgeBufferData);
+    const size_t edgeCount = (size / sizeof(UnweightedGraph::SEdgeBufferData));
     
     return (TEdgeCount)fread(buf, edgeSize, edgeCount, graphfile);
 }

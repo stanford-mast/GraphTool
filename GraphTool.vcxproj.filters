@@ -27,6 +27,12 @@
     <ClInclude Include="include\BinaryEdgeListReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\EdgeIndex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Graph.cpp">

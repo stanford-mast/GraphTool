@@ -11,6 +11,8 @@
  *   weights.
  *****************************************************************************/
 
+#include "Graph.h"
+#include "Types.h"
 #include "UnweightedGraph.h"
 
 #include <cstddef>
@@ -24,7 +26,7 @@ using namespace GraphTool;
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "UnweightedGraph.h" for documentation.
 
-UnweightedGraph::UnweightedGraph(void) : Graph(), verticesByDestination(), verticesBySource()
+UnweightedGraph::UnweightedGraph(void) : Graph(), edgesByDestination(), edgesBySource()
 {
     // Nothing to do here.
 }
@@ -35,20 +37,20 @@ UnweightedGraph::UnweightedGraph(void) : Graph(), verticesByDestination(), verti
 
 void UnweightedGraph::AddInEdges(void* buffer, size_t count)
 {
-    UnweightedGraph::SEdge* edges = (UnweightedGraph::SEdge*)buffer;
+    UnweightedGraph::SEdgeBufferData* edges = (UnweightedGraph::SEdgeBufferData*)buffer;
 
     for (uint64_t i = 0; i < count; ++i)
-        this->verticesByDestination[edges[i].destinationVertex].insert(edges[i].sourceVertex);
+        this->edgesByDestination.InsertEdge(edges[i].destinationVertex, UnweightedEdgeIndex::Edge(edges[i].sourceVertex));
 }
 
 // --------
 
 void UnweightedGraph::AddOutEdges(void* buffer, size_t count)
 {
-    UnweightedGraph::SEdge* edges = (UnweightedGraph::SEdge*)buffer;
+    UnweightedGraph::SEdgeBufferData* edges = (UnweightedGraph::SEdgeBufferData*)buffer;
 
     for (uint64_t i = 0; i < count; ++i)
-        this->verticesBySource[edges[i].sourceVertex].insert(edges[i].destinationVertex);
+        this->edgesBySource.InsertEdge(edges[i].sourceVertex, UnweightedEdgeIndex::Edge(edges[i].destinationVertex));
 }
 
 // --------
@@ -57,31 +59,7 @@ TEdgeCount UnweightedGraph::ExportVertexInEdges(void* buffer, TVertexID vertex, 
 {
     TEdgeCount numEdgesWritten = 0;
 
-    if (0 < this->verticesByDestination.count(vertex))
-    {
-        std::set<TVertexID>& inedges = this->verticesByDestination.at(vertex);
-        TVertexID* ptr = (TVertexID*)buffer;
-
-        for (auto it = inedges.cbegin(); it != inedges.cend(); ++it)
-        {
-            numEdgesWritten += 1;
-
-            // Write out the source vertex ID, unless it is to be skipped.
-            // Once done, advance the buffer pointer to the next element.
-            if (!(options & UnweightedGraph::kExportOptionsExcludeSource))
-            {
-                *ptr = *it;
-                ptr = &ptr[1];
-            }
-
-            // Same as above for the destination vertex ID.
-            if (!(options & UnweightedGraph::kExportOptionsExcludeDestination))
-            {
-                *ptr = vertex;
-                ptr = &ptr[1];
-            }
-        }
-    }
+    // TODO
     
     return numEdgesWritten;
 }
@@ -92,31 +70,7 @@ TEdgeCount UnweightedGraph::ExportVertexOutEdges(void* buffer, TVertexID vertex,
 {
     TEdgeCount numEdgesWritten = 0;
 
-    if (0 < this->verticesBySource.count(vertex))
-    {
-        std::set<TVertexID>& outedges = this->verticesBySource.at(vertex);
-        TVertexID* ptr = (TVertexID*)buffer;
-
-        for (auto it = outedges.cbegin(); it != outedges.cend(); ++it)
-        {
-            numEdgesWritten += 1;
-
-            // Write out the source vertex ID, unless it is to be skipped.
-            // Once done, advance the buffer pointer to the next element.
-            if (!(options & UnweightedGraph::kExportOptionsExcludeSource))
-            {
-                *ptr = vertex;
-                ptr = &ptr[1];
-            }
-
-            // Same as above for the destination vertex ID.
-            if (!(options & UnweightedGraph::kExportOptionsExcludeDestination))
-            {
-                *ptr = *it;
-                ptr = &ptr[1];
-            }
-        }
-    }
+    // TODO
 
     return numEdgesWritten;
 }
@@ -133,115 +87,70 @@ size_t UnweightedGraph::GetExportEdgeSizeWithOptions(uint64_t options)
 
 // --------
 
-TVertexCount UnweightedGraph::GetMaximumIndegree(void)
+TEdgeCount UnweightedGraph::GetMaximumIndegree(void)
 {
-    TVertexCount indegreeMax = 0;
+    TVertexID highestDegreeVertex = 0;
+    TEdgeCount highestDegree = 0;
     
-    for (auto it = verticesByDestination.cbegin(); it != verticesByDestination.cend(); ++it)
-    {
-        TVertexCount indegreeCurr = it->second.size();
-
-        if (indegreeCurr > indegreeMax)
-            indegreeMax = indegreeCurr;
-    }
+    this->edgesByDestination.GetHighestDegreeInfo(highestDegreeVertex, highestDegree);
     
-    return indegreeMax;
+    return highestDegree;
 }
 
 // --------
 
-TVertexCount UnweightedGraph::GetMaximumOutdegree(void)
+TEdgeCount UnweightedGraph::GetMaximumOutdegree(void)
 {
-    TVertexCount outdegreeMax = 0;
+    TVertexID highestDegreeVertex = 0;
+    TEdgeCount highestDegree = 0;
 
-    for (auto it = verticesBySource.cbegin(); it != verticesBySource.cend(); ++it)
-    {
-        TVertexCount outdegreeCurr = it->second.size();
+    this->edgesBySource.GetHighestDegreeInfo(highestDegreeVertex, highestDegree);
 
-        if (outdegreeCurr > outdegreeMax)
-            outdegreeMax = outdegreeCurr;
-    }
-
-    return outdegreeMax;
+    return highestDegree;
 }
 
 // --------
 
 TEdgeCount UnweightedGraph::GetNumEdges(void)
 {
-    TEdgeCount numEdges = 0;
-
-    for (auto it = verticesByDestination.cbegin(); it != verticesByDestination.cend(); ++it)
-        numEdges += it->second.size();
-
-    return numEdges;
+    return this->edgesByDestination.GetNumEdges();
 }
 
 // --------
 
 TVertexCount UnweightedGraph::GetNumVertices(void)
 {
-    return this->verticesByDestination.size();
+    const TVertexCount numDestinationVertices = this->edgesByDestination.GetNumIndexedVertices();
+    const TVertexCount numSourceVertices = this->edgesBySource.GetNumIndexedVertices();
+    const TVertexCount numVertices = ((numDestinationVertices > numSourceVertices) ? numDestinationVertices : numSourceVertices);
+    
+    return numVertices;
 }
 
-TVertexCount UnweightedGraph::GetVertexIndegree(TVertexID vertex)
+TEdgeCount UnweightedGraph::GetVertexIndegree(TVertexID vertex)
 {
-    TVertexCount indegree = 0;
-    
-    if (0 < this->verticesByDestination.count(vertex))
-        indegree = this->verticesByDestination.at(vertex).size();
-    
-    return indegree;
+    return this->edgesByDestination.GetVertexDegree(vertex);
 }
 
 // --------
 
-TVertexCount UnweightedGraph::GetVertexOutdegree(TVertexID vertex)
+TEdgeCount UnweightedGraph::GetVertexOutdegree(TVertexID vertex)
 {
-    TVertexCount outdegree = 0;
-
-    if (0 < this->verticesBySource.count(vertex))
-        outdegree = this->verticesBySource.at(vertex).size();
-
-    return outdegree;
+    return this->edgesBySource.GetVertexDegree(vertex);
 }
 
 // --------
 
 void UnweightedGraph::RemoveEdge(TVertexID fromVertex, TVertexID toVertex)
 {
-    // Remove the edge from the source vertex data structure.
-    if (0 < this->verticesBySource.count(fromVertex))
-    {
-        this->verticesBySource.at(fromVertex).erase(toVertex);
-
-        // If the source vertex now has no out-edges, remove it from the index as well.
-        if (0 == this->verticesBySource.at(fromVertex).size())
-            this->verticesBySource.erase(fromVertex);
-    }
-
-    // Remove the edge from the destination vertex data structure.
-    if (0 < this->verticesByDestination.count(toVertex))
-    {
-        this->verticesByDestination.at(toVertex).erase(fromVertex);
-
-        // If the destination vertex now has no in-edges, remove it from the index as well.
-        if (0 == this->verticesByDestination.at(toVertex).size())
-            this->verticesByDestination.erase(toVertex);
-    }
+    this->edgesByDestination.RemoveEdge(toVertex, fromVertex);
+    this->edgesBySource.RemoveEdge(fromVertex, toVertex);
 }
 
 // --------
 
 void UnweightedGraph::RemoveVertex(TVertexID vertex)
 {
-    // Remove the vertex from the source vertex data structure.
-    this->verticesBySource.erase(vertex);
-    for (auto it = this->verticesBySource.begin(); it != this->verticesBySource.end(); ++it)
-        it->second.erase(vertex);
-    
-    // Remove the vertex from the destination vertex data structure.
-    this->verticesByDestination.erase(vertex);
-    for (auto it = this->verticesByDestination.begin(); it != this->verticesByDestination.end(); ++it)
-        it->second.erase(vertex);
+    this->edgesByDestination.RemoveVertex(vertex);
+    this->edgesBySource.RemoveVertex(vertex);
 }

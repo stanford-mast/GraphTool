@@ -13,6 +13,7 @@
 
 #include "Graph.h"
 #include "GraphReader.h"
+#include "Types.h"
 
 #include <cstdint>
 #include <cstddef>
@@ -40,27 +41,11 @@ void GraphReader::EdgeConsumer(void* arg)
         // Check for termination.
         if (0 == readSpec->counts[currentBufferIndex])
             break;
-
+        
         // Read the buffer into the graph.
-        if (spindleGetLocalThreadCount() > 1)
+        for (TEdgeCount i = spindleGetLocalThreadID(); i < readSpec->counts[currentBufferIndex]; i += spindleGetLocalThreadCount())
         {
-            switch (spindleGetLocalThreadID())
-            {
-            case 0:
-                readSpec->graph->AddInEdges(readSpec->bufs[currentBufferIndex], readSpec->counts[currentBufferIndex]);
-                break;
-
-            case 1:
-                readSpec->graph->AddOutEdges(readSpec->bufs[currentBufferIndex], readSpec->counts[currentBufferIndex]);
-                break;
-
-            default:
-                break;
-            }
-        }
-        else
-        {
-            readSpec->graph->AddEdges(readSpec->bufs[currentBufferIndex], readSpec->counts[currentBufferIndex]);
+            // TODO: Consume the edge at the specified index.
         }
 
         // Switch to the other buffer to consume in parallel with edge production.
@@ -148,7 +133,7 @@ Graph* GraphReader::ReadGraphFromFile(const std::string& filename)
     taskSpec[1].func = &EdgeConsumer;
     taskSpec[1].arg = (void*)&readSpec;
     taskSpec[1].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
-    taskSpec[1].numThreads = 2;
+    taskSpec[1].numThreads = 0;
     taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
 
     // Launch the graph read task.

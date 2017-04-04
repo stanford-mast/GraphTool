@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include <Graph.h>
-#include <GraphReader.h>
+#include "Graph.h"
+#include "GraphReader.h"
 
 #include <cstdint>
 #include <cstddef>

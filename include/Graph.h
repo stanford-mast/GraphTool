@@ -12,21 +12,14 @@
 
 #pragma once
 
+#include "Types.h"
+
 #include <cstddef>
 #include <cstdint>
 
 
 namespace GraphTool
 {
-    /// Specifies the type to use for identifying vertices.
-    typedef uint64_t TVertexID;
-
-    /// Specifies the type to use for counting vertices.
-    typedef uint64_t TVertexCount;
-
-    /// Specifies the type to use for counting edges.
-    typedef uint64_t TEdgeCount;
-    
     /// Base class for all object types that are used to represent a graph.
     /// Because graph implementations differ significantly, common functionality is limited.
     class Graph
@@ -84,11 +77,11 @@ namespace GraphTool
         
         /// Retrieves and returns the in-degree of the vertex with the largest in-degree.
         /// @return Highest in-degree in the graph.
-        virtual TVertexCount GetMaximumIndegree(void) = 0;
+        virtual TEdgeCount GetMaximumIndegree(void) = 0;
         
         /// Retrieves and returns the out-degree of the vertex with the largest out-degree.
         /// @return Highest out-degree in the graph.
-        virtual TVertexCount GetMaximumOutdegree(void) = 0;
+        virtual TEdgeCount GetMaximumOutdegree(void) = 0;
         
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
@@ -101,12 +94,12 @@ namespace GraphTool
         /// Retrieves and returns the in-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.
-        virtual TVertexCount GetVertexIndegree(TVertexID vertex) = 0;
+        virtual TEdgeCount GetVertexIndegree(TVertexID vertex) = 0;
         
         /// Retrieves and returns the out-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return Out-degree of the specified vertex. 0 is returned if the vertex has no out-edges or does not exist.
-        virtual TVertexCount GetVertexOutdegree(TVertexID vertex) = 0;
+        virtual TEdgeCount GetVertexOutdegree(TVertexID vertex) = 0;
         
         /// Removes an edge from the graph.
         /// @param [in] fromVertex Identifies the source vertex of the edge.

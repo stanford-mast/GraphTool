@@ -14,7 +14,9 @@
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\GraphReader.h" />
+    <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\UnweightedGraph.h" />
+    <ClInclude Include="include\EdgeIndex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\BinaryEdgeListReader.cpp" />
@@ -75,7 +77,7 @@
       <ObjectFileName>$(IntDir)%(Filename)%(Extension).obj</ObjectFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Silo.lib;Spindle.lib;Topo.lib;libhwloc-5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Silo-Debug.lib;Spindle-Debug.lib;Topo-Debug.lib;libhwloc-5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

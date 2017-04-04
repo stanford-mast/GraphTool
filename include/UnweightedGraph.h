@@ -14,6 +14,8 @@
 #pragma once
 
 #include "Graph.h"
+#include "Types.h"
+#include "EdgeIndex.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -42,7 +44,7 @@ namespace GraphTool
         
         /// Specifies the structure of edge data expected in incoming buffers.
         /// Used when adding edges to the graph.
-        struct SEdge
+        struct SEdgeBufferData
         {
             TVertexID sourceVertex;                                         ///< Identifier of the source vertex.
             TVertexID destinationVertex;                                    ///< Identifier of the destination vertex.
@@ -52,13 +54,13 @@ namespace GraphTool
     private:
         // -------- INSTANCE VARIABLES --------------------------------------------- //
 
-        /// Destination-grouped vertex data structure.
+        /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
-        std::map<TVertexID, std::set<TVertexID>> verticesByDestination;
+        UnweightedEdgeIndex edgesByDestination;
 
         /// Source-grouped vertex data structure.
         /// Maps from a source vertex ID to a set of vertices to which out-edges exist.
-        std::map<TVertexID, std::set<TVertexID>> verticesBySource;
+        UnweightedEdgeIndex edgesBySource;
 
 
     public:
@@ -76,12 +78,12 @@ namespace GraphTool
         virtual TEdgeCount ExportVertexInEdges(void* buffer, TVertexID vertex, uint64_t options);
         virtual TEdgeCount ExportVertexOutEdges(void* buffer, TVertexID vertex, uint64_t options);
         virtual size_t GetExportEdgeSizeWithOptions(uint64_t options);
-        virtual TVertexCount GetMaximumIndegree(void);
-        virtual TVertexCount GetMaximumOutdegree(void);
+        virtual TEdgeCount GetMaximumIndegree(void);
+        virtual TEdgeCount GetMaximumOutdegree(void);
         virtual TEdgeCount GetNumEdges(void);
         virtual TVertexCount GetNumVertices(void);
-        virtual TVertexCount GetVertexIndegree(TVertexID vertex);
-        virtual TVertexCount GetVertexOutdegree(TVertexID vertex);
+        virtual TEdgeCount GetVertexIndegree(TVertexID vertex);
+        virtual TEdgeCount GetVertexOutdegree(TVertexID vertex);
         virtual void RemoveEdge(TVertexID fromVertex, TVertexID toVertex);
         virtual void RemoveVertex(TVertexID vertex);
     };
