@@ -25,4 +25,20 @@ namespace GraphTool
 
     /// Specifies the type to use for counting edges.
     typedef uint64_t TEdgeCount;
+
+    /// Represents an individual edge within a buffer.
+    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+    template <typename TEdgeData> struct SEdgeBufferData
+    {
+        TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
+        TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.
+        TEdgeData edgeData;
+    };
+
+    /// Represents an individual edge within a buffer, specialized for unweighted graphs.
+    template <> struct SEdgeBufferData<void>
+    {
+        TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
+        TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.
+    };
 }

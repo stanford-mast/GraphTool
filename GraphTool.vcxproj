@@ -11,18 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\BinaryEdgeListReader.h" />
-    <ClInclude Include="include\Graph.h" />
-    <ClInclude Include="include\GraphReader.h" />
+    <ClInclude Include="include\Graph.hpp" />
+    <ClInclude Include="include\GraphReader.hpp" />
     <ClInclude Include="include\Types.h" />
-    <ClInclude Include="include\UnweightedGraph.h" />
-    <ClInclude Include="include\EdgeIndex.h" />
+    <ClInclude Include="include\EdgeIndex.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\BinaryEdgeListReader.cpp" />
-    <ClCompile Include="source\Graph.cpp" />
-    <ClCompile Include="source\GraphReader.cpp" />
-    <ClCompile Include="source\UnweightedGraph.cpp" />
+    <ClCompile Include="source\Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>

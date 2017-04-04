@@ -6,7 +6,7 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file EdgeIndex.h
+ * @file EdgeIndex.hpp
  *   Implementation of a templated data structure that holds edges in a form
  *   indexed by the vertex at one end.
  *****************************************************************************/
@@ -32,19 +32,19 @@ namespace GraphTool
 
         /// Data associated with the edge, such as a weight.
         TEdgeData edgeData;
-        
-        
+
+
         // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 
-        /// Enables implicit conversion to this type from a vertex identifier.
-        SEdge(TVertexID vertex) : vertex(vertex), edgeData()
+        /// Default constructor.
+        SEdge(void) : vertex(), edgeData()
         {
             // Nothing to do here.
         }
         
         
         // -------- OPERATORS ------------------------------------------------------ //
-        
+
         /// Compares this instance with another.
         /// Equality is only determined by vertex, not by edge data.
         /// @param [in] other Reference to the other instance.
@@ -52,6 +52,25 @@ namespace GraphTool
         inline bool operator==(const SEdge& other)
         {
             return (this->vertex == other.vertex);
+        }
+        
+        
+        // -------- INSTANCE METHODS ----------------------------------------------- //
+        
+        /// Fills information in this structure from edge buffer data, using the destination vertex.
+        /// @param [in] edgeBuffer Edge buffer data to use.
+        inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<TEdgeData>& edgeBuffer)
+        {
+            this->vertex = edgeBuffer.destinationVertex;
+            this->edgeData = edgeBuffer.edgeData;
+        }
+        
+        /// Fills information in this structure from edge buffer data, using the source vertex.
+        /// @param [in] edgeBuffer Edge buffer data to use.
+        inline void FillFromSourceEdgeBuffer(SEdgeBufferData<TEdgeData>& edgeBuffer)
+        {
+            this->vertex = edgeBuffer.sourceVertex;
+            this->edgeData = edgeBuffer.edgeData;
         }
     };
 
@@ -63,18 +82,24 @@ namespace GraphTool
         /// Identifier of one end of the edge. The other end is inferred from position within the index.
         TVertexID vertex;
 
-        
+
         // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        
+        /// Default constructor.
+        SEdge(void) : vertex()
+        {
+            // Nothing to do here.
+        }
         
         /// Enables implicit conversion to this type from a vertex identifier.
         SEdge(TVertexID vertex) : vertex(vertex)
         {
             // Nothing to do here.
         }
-
-
+        
+        
         // -------- OPERATORS ------------------------------------------------------ //
-
+        
         /// Compares this instance with another.
         /// Equality is only determined by vertex, not by edge data.
         /// @param [in] other Reference to the other instance.
@@ -82,6 +107,23 @@ namespace GraphTool
         inline bool operator==(const SEdge& other)
         {
             return (this->vertex == other.vertex);
+        }
+        
+                
+        // -------- INSTANCE METHODS ----------------------------------------------- //
+
+        /// Fills information in this structure from edge buffer data, using the destination vertex.
+        /// @param [in] edgeBuffer Edge buffer data to use.
+        inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<void>& edgeBuffer)
+        {
+            this->vertex = edgeBuffer.destinationVertex;
+        }
+
+        /// Fills information in this structure from edge buffer data, using the source vertex.
+        /// @param [in] edgeBuffer Edge buffer data to use.
+        inline void FillFromSourceEdgeBuffer(SEdgeBufferData<void>& edgeBuffer)
+        {
+            this->vertex = edgeBuffer.sourceVertex;
         }
     };
     
@@ -114,7 +156,7 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 
         /// Default constructor.
-        EdgeIndex()
+        EdgeIndex(void)
         {
             // Nothing to do here.
         }
@@ -242,7 +284,7 @@ namespace GraphTool
                 it->second.remove(vertex);
         }
     };
-
+    
     /// Convenience class for edge indices that do not require edges to have any data, such as weights, associated with them.
     class UnweightedEdgeIndex : public EdgeIndex<void>
     {
