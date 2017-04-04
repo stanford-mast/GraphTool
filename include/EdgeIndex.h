@@ -15,7 +15,6 @@
 
 #include "Types.h"
 
-#include <iterator>
 #include <map>
 #include <list>
 
