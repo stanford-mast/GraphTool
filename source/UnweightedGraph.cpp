@@ -120,12 +120,14 @@ TEdgeCount UnweightedGraph::GetNumEdges(void)
 
 TVertexCount UnweightedGraph::GetNumVertices(void)
 {
-    const TVertexCount numDestinationVertices = this->edgesByDestination.GetNumIndexedVertices();
-    const TVertexCount numSourceVertices = this->edgesBySource.GetNumIndexedVertices();
-    const TVertexCount numVertices = ((numDestinationVertices > numSourceVertices) ? numDestinationVertices : numSourceVertices);
+    TVertexCount numVertices = 0;
+
+    // TODO
     
     return numVertices;
 }
+
+// --------
 
 TEdgeCount UnweightedGraph::GetVertexIndegree(TVertexID vertex)
 {
