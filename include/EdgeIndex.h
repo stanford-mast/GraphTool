@@ -97,10 +97,10 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS ----------------------------------------------- //
         
         /// Alias for the templated type of edge data to store.
-        typedef SEdge<TEdgeData> Edge;
+        typedef SEdge<TEdgeData> TEdge;
         
         /// Alias for the container type to use to store edges within each index bucket.
-        typedef std::list<Edge> EdgeList;
+        typedef std::list<TEdge> TEdgeList;
         
         
     private:
@@ -108,7 +108,7 @@ namespace GraphTool
         
         /// Main data structure, indexed by one end of each edge.
         /// Maps from a vertex identifier to a list of edges connected to it.
-        std::map <TVertexID, EdgeList> vertexIndex;
+        std::map <TVertexID, TEdgeList> vertexIndex;
         
         
     public:
@@ -132,7 +132,7 @@ namespace GraphTool
         /// Inserts a single edge into the indexed data structure.
         /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.
         /// @param [in] edgeInfo Individual edge information, including both the other end of the edge and edge data.
-        void InsertEdge(TVertexID indexedVertex, Edge& edgeInfo)
+        void InsertEdge(TVertexID indexedVertex, TEdge& edgeInfo)
         {
             vertexIndex[indexedVertex].push_back(edgeInfo);
         }
@@ -142,7 +142,7 @@ namespace GraphTool
         /// @param [out] begin Iterator to fill with the beginning iterator of the edge list.
         /// @param [out] end Iterator to fill with the end iterator of the edge list.
         /// @return `true` if iterators were filled, `false` otherwise (for example, if the degree of the vertex is 0, then no iterators would be filled).
-        bool GetEdgesForVertex(TVertexID indexedVertex, typename EdgeList::const_iterator& begin, typename EdgeList::const_iterator& end)
+        bool GetEdgesForVertex(TVertexID indexedVertex, typename TEdgeList::const_iterator& begin, typename TEdgeList::const_iterator& end)
         {
             bool gotEdges = false;
             
@@ -244,6 +244,19 @@ namespace GraphTool
         }
     };
 
-    /// Convenience alias of the EdgeIndex template for edges that have no data other than topology data.
-    typedef EdgeIndex<void> UnweightedEdgeIndex;
+    /// Convenience class for edge indices that do not require edges to have any data, such as weights, associated with them.
+    class UnweightedEdgeIndex : public EdgeIndex<void>
+    {
+    public:
+        // -------- INSTANCE METHODS ----------------------------------------------- //
+
+        /// Inserts a single edge into the indexed data structure.
+        /// Convenience method that allows simpler syntax for unweighted graphs such that an indexed and other vertex can be specified directly.
+        /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.
+        /// @param [in] otherVertex Other end of the edge to insert.
+        inline void InsertEdge(TVertexID indexedVertex, TVertexID otherVertex)
+        {
+            EdgeIndex<void>::InsertEdge(indexedVertex, (EdgeIndex<void>::TEdge)otherVertex);
+        }
+    };
 }

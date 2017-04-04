@@ -38,9 +38,9 @@ UnweightedGraph::UnweightedGraph(void) : Graph(), edgesByDestination(), edgesByS
 void UnweightedGraph::AddInEdges(void* buffer, size_t count)
 {
     UnweightedGraph::SEdgeBufferData* edges = (UnweightedGraph::SEdgeBufferData*)buffer;
-
+    
     for (uint64_t i = 0; i < count; ++i)
-        this->edgesByDestination.InsertEdge(edges[i].destinationVertex, UnweightedEdgeIndex::Edge(edges[i].sourceVertex));
+        this->edgesByDestination.InsertEdge(edges[i].destinationVertex, edges[i].sourceVertex);
 }
 
 // --------
@@ -50,7 +50,7 @@ void UnweightedGraph::AddOutEdges(void* buffer, size_t count)
     UnweightedGraph::SEdgeBufferData* edges = (UnweightedGraph::SEdgeBufferData*)buffer;
 
     for (uint64_t i = 0; i < count; ++i)
-        this->edgesBySource.InsertEdge(edges[i].sourceVertex, UnweightedEdgeIndex::Edge(edges[i].destinationVertex));
+        this->edgesBySource.InsertEdge(edges[i].sourceVertex, edges[i].destinationVertex);
 }
 
 // --------
