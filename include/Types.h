@@ -32,7 +32,7 @@ namespace GraphTool
     {
         TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
         TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.
-        TEdgeData edgeData;
+        TEdgeData edgeData;                                                 ///< Edge data, such as a weight.
     };
 
     /// Represents an individual edge within a buffer, specialized for unweighted graphs.
