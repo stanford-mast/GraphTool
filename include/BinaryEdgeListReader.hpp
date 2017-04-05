@@ -1,15 +1,15 @@
 /*****************************************************************************
-* GraphTool
-*   Tools for manipulating graphs.
-*****************************************************************************
-* Authored by Samuel Grossman
-* Department of Electrical Engineering, Stanford University
-* Copyright (c) 2016-2017
-*************************************************************************//**
-* @file BinaryEdgeListReader.hpp
-*   Implementation of an object capable of reading from graphs represented
-*   in binary edge list format.
-*****************************************************************************/
+ * GraphTool
+ *   Tools for manipulating graphs.
+ *****************************************************************************
+ * Authored by Samuel Grossman
+ * Department of Electrical Engineering, Stanford University
+ * Copyright (c) 2016-2017
+ *************************************************************************//**
+ * @file BinaryEdgeListReader.hpp
+ *   Implementation of an object capable of reading from graphs represented
+ *   in binary edge list format.
+ *****************************************************************************/
 
 #pragma once
 

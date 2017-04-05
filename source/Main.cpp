@@ -14,6 +14,7 @@
 #include "EdgeIndex.hpp"
 #include "Graph.hpp"
 #include "GraphReader.hpp"
+#include "TextEdgeListReader.hpp"
 #include "Types.h"
 
 using namespace GraphTool;

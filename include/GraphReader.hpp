@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <cstdio>
+#include <silo.h>
 #include <spindle.h>
 #include <string>
 
@@ -46,7 +47,9 @@ namespace GraphTool
         struct SGraphReadSpec
         {
             FILE* file;
-            EdgeIndex<TEdgeData>* edgeIndices;
+            Graph<TEdgeData>* graph;
+            EdgeIndex<TEdgeData>* edgeIndicesByDestination;
+            EdgeIndex<TEdgeData>* edgeIndicesBySource;
             GraphReader<TEdgeData>* reader;
             SEdgeBufferData<TEdgeData>* bufs[2];
             TEdgeCount counts[2];
@@ -61,26 +64,84 @@ namespace GraphTool
         static void EdgeConsumer(void* arg)
         {
             SGraphReadSpec* readSpec = (SGraphReadSpec*)arg;
-            uint8_t currentBufferIndex = 0ull;
+            uint32_t currentIndex = 0;
 
+            // Allocate each thread's edge index. Only one thread needs to do this.
+            if (0 == spindleGetLocalThreadID())
+            {
+                readSpec->edgeIndicesByDestination = new EdgeIndex<TEdgeData>[spindleGetLocalThreadCount()];
+                readSpec->edgeIndicesBySource = new EdgeIndex<TEdgeData>[spindleGetLocalThreadCount()];
+            }
+
+            spindleBarrierLocal();
+
+            // Iteratively consume edges that the edge producer loads into the edge buffers.
             while (true)
             {
                 // Wait for the buffer to be filled with edges.
                 spindleBarrierGlobal();
 
                 // Check for termination.
-                if (0 == readSpec->counts[currentBufferIndex])
+                if (0 == readSpec->counts[currentIndex])
                     break;
 
                 // Read the buffer into the graph.
-                for (TEdgeCount i = spindleGetLocalThreadID(); i < readSpec->counts[currentBufferIndex]; i += spindleGetLocalThreadCount())
+                for (TEdgeCount i = spindleGetLocalThreadID(); i < readSpec->counts[currentIndex]; i += spindleGetLocalThreadCount())
                 {
-                    // TODO: Consume the edge at the specified index.
+                    // Add each edge assigned to this thread to the edge index.
+                    SEdge<TEdgeData> edgeInfo;
+                    
+                    edgeInfo.FillFromDestinationEdgeBuffer(readSpec->bufs[currentIndex][i]);
+                    readSpec->edgeIndicesBySource[spindleGetLocalThreadID()].InsertEdge(readSpec->bufs[currentIndex][i].sourceVertex, edgeInfo);
+
+                    edgeInfo.vertex = readSpec->bufs[currentIndex][i].sourceVertex;
+                    readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].InsertEdge(readSpec->bufs[currentIndex][i].destinationVertex, edgeInfo);
                 }
 
                 // Switch to the other buffer to consume in parallel with edge production.
-                currentBufferIndex = (~currentBufferIndex) & 1ull;
+                currentIndex = (~currentIndex) & 1;
             }
+            
+            // Merge all edge indices together into a single final edge index.
+            // This will be done using a parallel tree merge pattern.
+            // The value of this variable is an indicator of the current level of the tree.
+            // Each iteration it is multiplied by two to indicate the number of consecutive edge indices that end up being merged together.
+            currentIndex = 2;
+
+            while (currentIndex < (spindleGetLocalThreadCount() << 1))
+            {
+                const uint32_t selectionMask = currentIndex - 1;
+                const uint32_t mergeWithOffset = (currentIndex >> 1);
+                
+                spindleBarrierLocal();
+
+                // Only some threads are active during the current iteration.
+                // This formula is equivalent to checking if the local thread ID is divisible by the current tree level index.
+                // Additionally parallelize across source and destination vertex indices.
+                switch (spindleGetLocalThreadID() & selectionMask)
+                {
+                case 0:
+                    if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
+                    break;
+                
+                case 1:
+                    if ((spindleGetLocalThreadID() -1 + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset]);
+                    break;
+                
+                default:
+                    break;
+                }
+
+                currentIndex <<= 1;
+            }
+
+            spindleBarrierLocal();
+
+            // Merging complete. Set the graph to have the merged edges.
+            if (0 == spindleGetLocalThreadID())
+                readSpec->graph->SetEdgeIndices(readSpec->edgeIndicesByDestination[0], readSpec->edgeIndicesBySource[0]);
         }
         
         /// Controls the production of edges from a graph file to a buffer, for use as a Spindle task function.
@@ -89,7 +150,7 @@ namespace GraphTool
         static void EdgeProducer(void* arg)
         {
             SGraphReadSpec* readSpec = (SGraphReadSpec*)arg;
-            uint8_t currentBufferIndex = 0ull;
+            uint32_t currentBufferIndex = 0ull;
 
             while (true)
             {
@@ -104,7 +165,7 @@ namespace GraphTool
                     break;
 
                 // Switch to the other buffer to read from file during a consumption operation.
-                currentBufferIndex = (~currentBufferIndex) & 1ull;
+                currentBufferIndex = (~currentBufferIndex) & 1;
             }
         }
         
@@ -125,7 +186,7 @@ namespace GraphTool
         }
         
         
-    protected:
+    private:
         // -------- ABSTRACT INSTANCE METHODS -------------------------------------- //
         
         /// Opens and performs any initial file reading tasks required to prepare the graph file for reading of edges.
@@ -159,7 +220,7 @@ namespace GraphTool
             Graph<TEdgeData>* graph = new Graph<TEdgeData>();
 
             // Allocate some buffers for read data.
-            void* bufs[] = { (void*)(new uint8_t[kGraphReadBufferSize]), (void*)(new uint8_t[kGraphReadBufferSize]) };
+            SEdgeBufferData<TEdgeData>* bufs[] = { (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
 
             // Define the graph read task.
             SGraphReadSpec readSpec;

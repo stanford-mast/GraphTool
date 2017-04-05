@@ -14,6 +14,7 @@
     <ClInclude Include="include\BinaryEdgeListReader.hpp" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.hpp" />
+    <ClInclude Include="include\TextEdgeListReader.hpp" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\EdgeIndex.hpp" />
   </ItemGroup>
