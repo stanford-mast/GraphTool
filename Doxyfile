@@ -812,6 +812,7 @@ FILE_PATTERNS          = *.asm \
                          *.c \
                          *.cpp \
                          *.h \
+                         *.hpp \
                          *.inc \
                          *.md \
                          *.s \
