@@ -55,49 +55,6 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS ----------------------------------------------- //
         
-        /// Reads edges from a buffer and adds them to the graph.
-        /// Specific format is as specified by the subclass that performs the import operation.
-        /// This is a convenience method that calls both #AddInEdges and #AddOutEdges in sequence.
-        /// @param [in] edges Buffer containing edges to read.
-        /// @param [in] count Number of edges contained within the buffer, size determined by the implementation.
-        void AddEdges(SEdgeBufferData<TEdgeData>* edges, size_t count)
-        {
-            this->AddInEdges(edges, count);
-            this->AddOutEdges(edges, count);
-        }
-        
-        /// Reads edges from a buffer and adds them to the part of the graph that stores in-edges.
-        /// Both this method and #AddOutEdges should be called on the same buffer to ensure data structure consistency.
-        /// This method is exposed directly to facilitate parallel buffer consumption for both in-edges and out-edges.
-        /// Otherwise, use #AddEdges instead.
-        /// @param [in] edges Buffer containing edges to read.
-        /// @param [in] count Number of edges contained within the buffer, size determined by the implementation.
-        void AddInEdges(SEdgeBufferData<TEdgeData>* edges, size_t count)
-        {
-            for (uint64_t i = 0; i < count; ++i)
-            {
-                EdgeIndex<TEdgeData>::TEdge edgeInfo;
-                edgeInfo.FillFromSourceEdgeBuffer(edges[i]);
-                this->edgesByDestination.InsertEdge(edges[i].destinationVertex, edgeInfo);
-            }
-        }
-        
-        /// Reads edges from a buffer and adds them to the part of the graph that stores out-edges.
-        /// Both this method and #AddInEdges should be called on the same buffer to ensure data structure consistency.
-        /// This method is exposed directly to facilitate parallel buffer consumption for both in-edges and out-edges.
-        /// Otherwise, use #AddEdges instead.
-        /// @param [in] edges Buffer containing edges to read.
-        /// @param [in] count Number of edges contained within the buffer, size determined by the implementation.
-        void AddOutEdges(SEdgeBufferData<TEdgeData>* edges, size_t count)
-        {
-            for (uint64_t i = 0; i < count; ++i)
-            {
-                EdgeIndex<TEdgeData>::TEdge edgeInfo;
-                edgeInfo.FillFromDestinationEdgeBuffer(edges[i]);
-                this->edgesBySource.InsertEdge(edges[i].sourceVertex, edgeInfo);
-            }
-        }
-        
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
         TEdgeCount GetNumEdges(void)
@@ -144,6 +101,17 @@ namespace GraphTool
         {
             this->edgesByDestination.RemoveVertex(vertex);
             this->edgesBySource.RemoveVertex(vertex);
+        }
+
+        /// Replaces the existing graph edge indices with those provided.
+        /// Implemented internally as a swap, so the provided edge indices will be empty when done.
+        /// It is up to the caller to generate proper and consistent data structures, as this method does no checking.
+        /// @param [in,out] replacementEdgesByDestination Edge data structure containing new edges to set, indexed by destination vertex.
+        /// @param [in,out] replacementEdgesBySource Edge data structure containing new edges to set, indexed by source vertex.
+        void SetEdgeIndices(EdgeIndex<TEdgeData>& replacementEdgesByDestination, EdgeIndex<TEdgeData>& replacementEdgesBySource)
+        {
+            edgesByDestination.SetEdges(replacementEdgesByDestination);
+            edgesBySource.SetEdges(replacementEdgesBySource);
         }
     };
 }

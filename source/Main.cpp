@@ -10,6 +10,7 @@
  *   Program entry point.
  *****************************************************************************/
 
+#include "BinaryEdgeListReader.hpp"
 #include "EdgeIndex.hpp"
 #include "Graph.hpp"
 #include "GraphReader.hpp"

@@ -283,21 +283,14 @@ namespace GraphTool
             for (auto it = vertexIndex.begin(); it != vertexIndex.end(); ++it)
                 it->second.remove(vertex);
         }
-    };
-    
-    /// Convenience class for edge indices that do not require edges to have any data, such as weights, associated with them.
-    class UnweightedEdgeIndex : public EdgeIndex<void>
-    {
-    public:
-        // -------- INSTANCE METHODS ----------------------------------------------- //
 
-        /// Inserts a single edge into the indexed data structure.
-        /// Convenience method that allows simpler syntax for unweighted graphs such that an indexed and other vertex can be specified directly.
-        /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.
-        /// @param [in] otherVertex Other end of the edge to insert.
-        inline void InsertEdge(TVertexID indexedVertex, TVertexID otherVertex)
+        /// Replaces all edges contained in the current data structure with those contained in the supplied replacement.
+        /// Internally implemented as a swap, so the replacement data structure will be cleared during this process.
+        /// @param [in,out] replacementEdges Replacement edge data structure.
+        void SetEdges(EdgeIndex<TEdgeData>& replacementEdges)
         {
-            EdgeIndex<void>::InsertEdge(indexedVertex, (EdgeIndex<void>::TEdge)otherVertex);
+            vertexIndex.clear();
+            std::swap(vertexIndex, replacementEdges.vertexIndex);
         }
     };
 }

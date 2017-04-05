@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\BinaryEdgeListReader.hpp" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.hpp" />
     <ClInclude Include="include\Types.h" />

@@ -8,11 +8,12 @@
  *************************************************************************//**
  * @file GraphReader.hpp
  *   Declaration of the common interface to objects capable of interpreting
- *   graph files of various formats.
+ *   graph files of various formats, templated by edge data type.
  *****************************************************************************/
 
 #pragma once
 
+#include "EdgeIndex.hpp"
 #include "Graph.hpp"
 #include "Types.h"
 
@@ -45,7 +46,7 @@ namespace GraphTool
         struct SGraphReadSpec
         {
             FILE* file;
-            Graph<TEdgeData>* graph;
+            EdgeIndex<TEdgeData>* edgeIndices;
             GraphReader<TEdgeData>* reader;
             SEdgeBufferData<TEdgeData>* bufs[2];
             TEdgeCount counts[2];
@@ -131,7 +132,7 @@ namespace GraphTool
         /// @param [in] filename File name of the file to be opened for reading.
         /// @return File handle for the opened file.
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename) = 0;
-
+        
         /// Reads the next set of edges from the specified graph file into the specified buffer.
         /// Size is supplied in bytes, and the subclass should use this to determine how many edges to read.
         /// @param [in] graphfile File handle for the open graph file.
