@@ -26,7 +26,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class Graph
     {
-    public:
+    private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
         
         /// Destination-grouped edge data structure.
@@ -38,6 +38,7 @@ namespace GraphTool
         EdgeIndex<TEdgeData> edgesBySource;
         
         
+    public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
