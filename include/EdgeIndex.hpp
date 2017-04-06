@@ -216,6 +216,30 @@ namespace GraphTool
             }
         }
 
+        /// Retrieves and returns the vertex identifier of the lowest-identified vertex in the index.
+        /// @param [out] lowestIndexedVertex Vertex identifier of the lowest-identified vertex in the index.
+        /// @return `false` if the index is empty and thus no information is available, `true` otherwise.
+        bool GetIndexLowerBound(TVertexID& lowestIndexedVertex)
+        {
+            if (vertexIndex.empty())
+                return false;
+            
+            lowestIndexedVertex = vertexIndex.cbegin()->first;
+            return true;
+        }
+        
+        /// Retrieves and returns the vertex identifier of the highest-identified vertex in the index.
+        /// @param [out] highestIndexedVertex Vertex identifier of the highest-identified vertex in the index.
+        /// @return `false` if the index is empty and thus no information is available, `true` otherwise.
+        bool GetIndexUpperBound(TVertexID& highestIndexedVertex)
+        {
+            if (vertexIndex.empty())
+                return false;
+            
+            highestIndexedVertex = vertexIndex.crbegin()->first;
+            return true;
+        }
+        
         /// Retrieves and returns the total number of edges in this data structure.
         /// @return Total number of edges.
         TEdgeCount GetNumEdges(void)

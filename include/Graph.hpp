@@ -67,8 +67,16 @@ namespace GraphTool
         /// @return Number of vertices in the graph.
         TVertexCount GetNumVertices(void)
         {
-            // TODO
-            return 0;
+            TVertexCount numDestinationVertices = 0;
+            TVertexCount numSourceVertices = 0;
+
+            bool destinationHasVertices = this->edgesByDestination.GetIndexUpperBound(numDestinationVertices);
+            bool sourceHasVertices = this->edgesBySource.GetIndexUpperBound(numSourceVertices);
+
+            numDestinationVertices = (destinationHasVertices ? numDestinationVertices + 1 : 0);
+            numSourceVertices = (sourceHasVertices ? numSourceVertices + 1 : 0);
+            
+            return (numDestinationVertices > numSourceVertices ? numDestinationVertices : numSourceVertices);
         }
         
         /// Retrieves and returns the in-degree of the specified vertex.
