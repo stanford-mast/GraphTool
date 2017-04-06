@@ -27,7 +27,7 @@ namespace GraphTool
     template <typename TEdgeData> class Graph
     {
     public:
-        // -------- INSTANCE VARIABLES --------------------------------------------- //
+        // -------- INSTANCE VARIABLES ------------------------------------- //
         
         /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
@@ -38,7 +38,7 @@ namespace GraphTool
         EdgeIndex<TEdgeData> edgesBySource;
         
         
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
         Graph(void) : edgesByDestination(), edgesBySource()
@@ -53,7 +53,7 @@ namespace GraphTool
         }
 
 
-        // -------- INSTANCE METHODS ----------------------------------------------- //
+        // -------- INSTANCE METHODS --------------------------------------- //
         
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.

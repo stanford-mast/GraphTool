@@ -33,7 +33,7 @@ namespace GraphTool
     template <typename TEdgeData> class GraphReader
     {   
     public:
-        // -------- CONSTANTS ------------------------------------------------------ //
+        // -------- CONSTANTS ---------------------------------------------- //
         
         /// Specifies the size in bytes of each read buffer to use when reading data from the file.
         /// Two buffers are created, 64MB each by default.
@@ -41,7 +41,7 @@ namespace GraphTool
         
         
     private:
-        // -------- TYPE DEFINITIONS ----------------------------------------------- //
+        // -------- TYPE DEFINITIONS --------------------------------------- //
 
         /// Provides all information needed to specify a graph read operation.
         struct SGraphReadSpec
@@ -56,7 +56,7 @@ namespace GraphTool
         };
         
         
-        // -------- CLASS METHODS -------------------------------------------------- //
+        // -------- CLASS METHODS ------------------------------------------ //
 
         /// Controls the consumption of edges from a buffer to a graph object, for use as a Spindle task function.
         /// Should be called by either one or two threads.
@@ -155,7 +155,7 @@ namespace GraphTool
             while (true)
             {
                 // Fill the buffer with edges.
-                readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], kGraphReadBufferSize);
+                readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdgeBufferData<void>)));
 
                 // Synchronize with consumers.
                 spindleBarrierGlobal();
@@ -171,7 +171,7 @@ namespace GraphTool
         
         
     public:
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
         GraphReader(void)
@@ -187,7 +187,7 @@ namespace GraphTool
         
         
     private:
-        // -------- ABSTRACT INSTANCE METHODS -------------------------------------- //
+        // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
         
         /// Opens and performs any initial file reading tasks required to prepare the graph file for reading of edges.
         /// @param [in] filename File name of the file to be opened for reading.
@@ -198,13 +198,13 @@ namespace GraphTool
         /// Size is supplied in bytes, and the subclass should use this to determine how many edges to read.
         /// @param [in] graphfile File handle for the open graph file.
         /// @param [in] buf Buffer to which to read edge data.
-        /// @param [in] size Size of the buffer, in bytes.
+        /// @param [in] count Number of edges that the buffer can hold.
         /// @return Number of edges read to the buffer.
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<TEdgeData>* buf, size_t size) = 0;
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<TEdgeData>* buf, size_t count) = 0;
         
 
     public:
-        // -------- INSTANCE METHODS ----------------------------------------------- //
+        // -------- INSTANCE METHODS --------------------------------------- //
         
         /// Reads a graph from the specified file.
         /// @param [in] filename File name of the file to be read.

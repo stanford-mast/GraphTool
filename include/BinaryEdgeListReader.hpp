@@ -23,7 +23,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class BinaryEdgeListReader : public GraphReader<TEdgeData>
     {
-        // -------- CONCRETE INSTANCE METHODS -------------------------------------- //
+        // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphReader.hpp" for documentation.
         
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename)
@@ -42,13 +42,9 @@ namespace GraphTool
 
         // --------
 
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<TEdgeData>* buf, size_t size)
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<TEdgeData>* buf, size_t count)
         {
-            const size_t edgeSize = sizeof(SEdgeBufferData<TEdgeData>);
-            const size_t edgeCount = (size / edgeSize);
-
-            // Simple binary read is all that is required.
-            return (TEdgeCount)fread(buf, edgeSize, edgeCount, graphfile);
+            return (TEdgeCount)fread(buf, sizeof(SEdgeBufferData<TEdgeData>), count, graphfile);
         }
     };
 }

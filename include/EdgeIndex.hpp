@@ -43,7 +43,7 @@ namespace GraphTool
         }
         
         
-        // -------- OPERATORS ------------------------------------------------------ //
+        // -------- OPERATORS ---------------------------------------------- //
 
         /// Compares this instance with another.
         /// Equality is only determined by vertex, not by edge data.
@@ -55,7 +55,7 @@ namespace GraphTool
         }
         
         
-        // -------- INSTANCE METHODS ----------------------------------------------- //
+        // -------- INSTANCE METHODS --------------------------------------- //
         
         /// Fills information in this structure from edge buffer data, using the destination vertex.
         /// @param [in] edgeBuffer Edge buffer data to use.
@@ -77,13 +77,13 @@ namespace GraphTool
     /// Represents an individual edge within an edge index data structure, specialized for unweighted graphs.
     template <> struct SEdge<void>
     {
-        // -------- INSTANCE VARIABLES --------------------------------------------- //
+        // -------- INSTANCE VARIABLES ------------------------------------- //
 
         /// Identifier of one end of the edge. The other end is inferred from position within the index.
         TVertexID vertex;
 
 
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
         
         /// Default constructor.
         SEdge(void) : vertex()
@@ -98,7 +98,7 @@ namespace GraphTool
         }
         
         
-        // -------- OPERATORS ------------------------------------------------------ //
+        // -------- OPERATORS ---------------------------------------------- //
         
         /// Compares this instance with another.
         /// Equality is only determined by vertex, not by edge data.
@@ -110,7 +110,7 @@ namespace GraphTool
         }
         
                 
-        // -------- INSTANCE METHODS ----------------------------------------------- //
+        // -------- INSTANCE METHODS --------------------------------------- //
 
         /// Fills information in this structure from edge buffer data, using the destination vertex.
         /// @param [in] edgeBuffer Edge buffer data to use.
@@ -135,7 +135,7 @@ namespace GraphTool
     template <typename TEdgeData> class EdgeIndex
     {
     public:
-        // -------- TYPE DEFINITIONS ----------------------------------------------- //
+        // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the templated type of edge data to store.
         typedef SEdge<TEdgeData> TEdge;
@@ -145,7 +145,7 @@ namespace GraphTool
         
         
     private:
-        // -------- INSTANCE VARIABLES --------------------------------------------- //
+        // -------- INSTANCE VARIABLES ------------------------------------- //
         
         /// Main data structure, indexed by one end of each edge.
         /// Maps from a vertex identifier to a list of edges connected to it.
@@ -153,7 +153,7 @@ namespace GraphTool
         
         
     public:
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
         EdgeIndex(void)
@@ -168,7 +168,7 @@ namespace GraphTool
         }
 
 
-        // -------- INSTANCE METHODS ----------------------------------------------- //
+        // -------- INSTANCE METHODS --------------------------------------- //
         
         /// Inserts a single edge into the indexed data structure.
         /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.

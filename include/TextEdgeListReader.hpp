@@ -26,7 +26,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class TextEdgeListReader : public GraphReader<TEdgeData>
     {
-        // -------- ABSTRACT INSTANCE METHODS -------------------------------------- //
+        // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
 
         /// Parses edge data from the given string.
         /// Actual expected string format is determined by the type of data of interest, which would need to be specified by subclasses.
@@ -36,7 +36,7 @@ namespace GraphTool
         virtual bool ParseEdgeData(const char* edgeDataString, TEdgeData& edgeData) = 0;
         
         
-        // -------- CONCRETE INSTANCE METHODS -------------------------------------- //
+        // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphReader.hpp" for documentation.
 
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename)
@@ -102,7 +102,7 @@ namespace GraphTool
     /// Reader object class for graphs represented in text edge list format, specialized for unweighted graphs.
     template <> class TextEdgeListReader<void> : public GraphReader<void>
     {
-        // -------- CONCRETE INSTANCE METHODS -------------------------------------- //
+        // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphReader.hpp" for documentation.
 
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename)
@@ -124,13 +124,11 @@ namespace GraphTool
 
         // --------
 
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<void>* buf, size_t size)
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* graphfile, SEdgeBufferData<void>* buf, size_t count)
         {
-            const size_t edgeSize = sizeof(SEdgeBufferData<void>);
-            const size_t edgeCount = (size / edgeSize);
             TEdgeCount numEdgesRead = 0;
 
-            while (numEdgesRead < edgeCount)
+            while (numEdgesRead < count)
             {
                 char linebuf[1024];
                 char* currpos = &linebuf[0];
