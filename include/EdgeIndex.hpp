@@ -142,6 +142,120 @@ namespace GraphTool
         
         /// Alias for the container type to use to store edges within each index bucket.
         typedef std::list<TEdge> TEdgeList;
+
+        /// Enables read-only access to all edges in this index, forward direction only.
+        /// Accumulates and exposes data from multiple sources, so not a standard iterator type.
+        class ConstIterator
+        {
+        private:
+            // -------- INSTANCE VARIABLES --------------------------------- //
+
+            /// Reference to the associated edge index.
+            const std::map<TVertexID, TEdgeList>* vertexIndex;
+            
+            /// Top-level iterator, iterates through the vertex index.
+            typename std::map<TVertexID, TEdgeList>::const_iterator indexIterator;
+            
+            /// Second-level iterator, iterates through the edges of each vertex in the index.
+            typename TEdgeList::const_iterator vertexIterator;
+            
+            
+            // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
+            
+            /// Initialization constructor. Can only be invoked by a class-level factory method.
+            ConstIterator(const std::map<TVertexID, TEdgeList>* vertexIndex, typename std::map<TVertexID, TEdgeList>::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
+            {
+                // Nothing to do here.
+            }
+            
+            
+        public:
+            // -------- CLASS METHODS -------------------------------------- //
+            
+            /// Creates and returns an iterator to the beginning of the specified index.
+            /// @param [in] vertexIndex Pointer to the vertex index of interest.
+            /// @returns Read-only iterator to the beginning of the index.
+            static ConstIterator ConstIteratorBegin(const std::map<TVertexID, TEdgeList>* vertexIndex)
+            {
+                auto indexIterator = vertexIndex->cbegin();
+                auto vertexIterator = indexIterator->second.cbegin();
+
+                return ConstIterator(vertexIndex, indexIterator, vertexIterator);
+            }
+            
+            /// Creates and returns an iterator to the past-the-end element of the specified index.
+            /// @param [in] vertexIndex Pointer to the vertex index of interest.
+            /// @returns Read-only iterator to the past-the-end element of the index.
+            static ConstIterator ConstIteratorEnd(const std::map<TVertexID, TEdgeList>* vertexIndex)
+            {
+                auto indexIterator = vertexIndex->cend();
+                auto vertexIterator = (--(vertexIndex->cend()))->second.cend();
+
+                return ConstIterator(vertexIndex, indexIterator, vertexIterator);
+            }
+            
+            
+            // -------- OPERATORS ------------------------------------------ //
+            
+            /// Compares this instance with another for equality.
+            /// @param [in] other Reference to the other instance.
+            /// @return `true` if this instance is equal to the other instance, `false` otherwise.
+            inline bool operator==(const ConstIterator& other)
+            {
+                return ((this->indexIterator == other.indexIterator) && (this->vertexIterator == other.vertexIterator));
+            }
+
+            /// Compares this instance with another for inequality.
+            /// @param [in] other Reference to the other instance.
+            /// @return `true` if this instance is different from the other instance, `false` otherwise.
+            inline bool operator!=(const ConstIterator& other)
+            {
+                return ((this->indexIterator != other.indexIterator) || (this->vertexIterator != other.vertexIterator));
+            }
+
+            /// Prefix-increments this instance by advancing it to the next position.
+            /// @return This instance after it has been advanced.
+            inline ConstIterator& operator++(void)
+            {
+                ++(this->vertexIterator);
+
+                if (this->indexIterator->second.cend() == this->vertexIterator)
+                {
+                    ++(this->indexIterator);
+                    
+                    if (vertexIndex->cend() != this->indexIterator)
+                        this->vertexIterator = this->indexIterator->second.cbegin();
+                }
+
+                return *this;
+            }
+
+            /// Postfix-increments this instance by advancing it to the next position.
+            /// @return This instance before it has been advanced.
+            inline ConstIterator operator++(int)
+            {
+                ConstIterator beforeIncrement = *this;
+                ++(*this);
+                return beforeIncrement;
+            }
+            
+            
+            // -------- INSTANCE METHODS ----------------------------------- //
+
+            /// Retrieves and returns the vertex identifier of one end of the edge, namely the indexed vertex, at this iterator's current position.
+            /// @return Identifier of the indexed vertex.
+            inline TVertexID GetIndexedVertexID(void)
+            {
+                return this->indexIterator->first;
+            }
+
+            /// Retrieves and returns the vertex identifier of the second end of the edge, namely the other vertex and any edge data, at this iterator's current position.
+            /// @return Information on the other end of the edge.
+            inline const TEdge& GetOtherEdgeInfo(void)
+            {
+                return *(this->vertexIterator);
+            }
+        };
         
         
     private:
@@ -149,7 +263,7 @@ namespace GraphTool
         
         /// Main data structure, indexed by one end of each edge.
         /// Maps from a vertex identifier to a list of edges connected to it.
-        std::map <TVertexID, TEdgeList> vertexIndex;
+        std::map<TVertexID, TEdgeList> vertexIndex;
         
         
     public:
@@ -161,21 +275,21 @@ namespace GraphTool
             // Nothing to do here.
         }
         
-        /// Default destructor.
-        virtual ~EdgeIndex()
-        {
-            // Nothing to do here.
-        }
-
-
+        
         // -------- INSTANCE METHODS --------------------------------------- //
         
-        /// Inserts a single edge into the indexed data structure.
-        /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.
-        /// @param [in] edgeInfo Individual edge information, including both the other end of the edge and edge data.
-        void InsertEdge(TVertexID indexedVertex, TEdge& edgeInfo)
+        /// Creates and returns an iterator to the beginning of this edge index.
+        /// @returns Read-only iterator to the beginning of the index.
+        inline ConstIterator ConstIteratorBegin(void)
         {
-            vertexIndex[indexedVertex].push_back(edgeInfo);
+            return ConstIterator::ConstIteratorBegin(&(this->vertexIndex));
+        }
+
+        /// Creates and returns an iterator to the past-the-end element of this edge index.
+        /// @returns Read-only iterator to the end of the index.
+        inline ConstIterator ConstIteratorEnd(void)
+        {
+            return ConstIterator::ConstIteratorEnd(&(this->vertexIndex));
         }
         
         /// Accesses edges for the specified indexed vertex by providing iterators to the start and end of the corresponding edge list.
@@ -271,6 +385,21 @@ namespace GraphTool
                 vertexDegree = vertexIndex.at(indexedVertex).size();
 
             return vertexDegree;
+        }
+        
+        /// Inserts a single edge into the indexed data structure.
+        /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being inserted.
+        /// @param [in] edgeInfo Individual edge information, including both the other end of the edge and edge data.
+        void InsertEdge(TVertexID indexedVertex, TEdge& edgeInfo)
+        {
+            vertexIndex[indexedVertex].push_back(edgeInfo);
+        }
+        
+        /// Specifies if this edge index is empty (i.e. contains no edges).
+        /// @return `true` if empty, `false` otherwise.
+        bool IsEmpty(void)
+        {
+            return vertexIndex.empty();
         }
         
         /// Merges this index with the other index by inserting all edges from the other index into this one.

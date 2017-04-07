@@ -26,6 +26,13 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class Graph
     {
+    public:
+        // -------- TYPE DEFINITIONS --------------------------------------- //
+
+        /// Convenience alias for read-only iterators over edges.
+        typedef typename EdgeIndex<TEdgeData>::ConstIterator ConstEdgeIterator;
+        
+        
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
         
@@ -47,18 +54,32 @@ namespace GraphTool
             // Nothing to do here.
         }
 
-        /// Default destructor.
-        virtual ~Graph(void)
-        {
-            // Nothing to do here.
-        }
-
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
+        inline ConstEdgeIterator ConstIteratorBeginDestination(void)
+        {
+            return edgesByDestination.ConstIteratorBegin();
+        }
+
+        inline ConstEdgeIterator ConstIteratorBeginSource(void)
+        {
+            return edgesBySource.ConstIteratorBegin();
+        }
+
+        inline ConstEdgeIterator ConstIteratorEndDestination(void)
+        {
+            return edgesByDestination.ConstIteratorEnd();
+        }
+
+        inline ConstEdgeIterator ConstIteratorEndSource(void)
+        {
+            return edgesBySource.ConstIteratorEnd();
+        }
+        
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
-        TEdgeCount GetNumEdges(void)
+        inline TEdgeCount GetNumEdges(void)
         {
             return this->edgesBySource.GetNumEdges();
         }
@@ -82,7 +103,7 @@ namespace GraphTool
         /// Retrieves and returns the in-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.
-        TEdgeCount GetVertexIndegree(TVertexID vertex)
+        inline TEdgeCount GetVertexIndegree(TVertexID vertex)
         {
             return this->edgesByDestination.GetVertexDegree(vertex);
         }
@@ -90,7 +111,7 @@ namespace GraphTool
         /// Retrieves and returns the out-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return Out-degree of the specified vertex. 0 is returned if the vertex has no out-edges or does not exist.
-        TEdgeCount GetVertexOutdegree(TVertexID vertex)
+        inline TEdgeCount GetVertexOutdegree(TVertexID vertex)
         {
             return this->edgesBySource.GetVertexDegree(vertex);
         }

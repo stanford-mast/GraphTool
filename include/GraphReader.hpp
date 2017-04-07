@@ -32,7 +32,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class GraphReader
     {   
-    public:
+    private:
         // -------- CONSTANTS ---------------------------------------------- //
         
         /// Specifies the size in bytes of each read buffer to use when reading data from the file.
@@ -40,7 +40,6 @@ namespace GraphTool
         static const size_t kGraphReadBufferSize = (64ull * 1024ull * 1024ull);
         
         
-    private:
         // -------- TYPE DEFINITIONS --------------------------------------- //
 
         /// Provides all information needed to specify a graph read operation.
@@ -175,12 +174,6 @@ namespace GraphTool
 
         /// Default constructor.
         GraphReader(void)
-        {
-            // Nothing to do here.
-        }
-
-        /// Default destructor.
-        virtual ~GraphReader()
         {
             // Nothing to do here.
         }
