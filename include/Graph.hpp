@@ -57,22 +57,30 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
-        inline ConstEdgeIterator ConstIteratorBeginDestination(void)
+        /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by destination vertex.
+        /// @return Iterator, as described.
+        inline ConstEdgeIterator ConstIteratorDestinationBegin(void)
         {
             return edgesByDestination.ConstIteratorBegin();
         }
 
-        inline ConstEdgeIterator ConstIteratorBeginSource(void)
-        {
-            return edgesBySource.ConstIteratorBegin();
-        }
-
-        inline ConstEdgeIterator ConstIteratorEndDestination(void)
+        /// Obtains a read-only iterator to the end of this graph's edges, grouped by destination vertex.
+        /// @return Iterator, as described.
+        inline ConstEdgeIterator ConstIteratorDestinationEnd(void)
         {
             return edgesByDestination.ConstIteratorEnd();
         }
 
-        inline ConstEdgeIterator ConstIteratorEndSource(void)
+        /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by source vertex.
+        /// @return Iterator, as described.
+        inline ConstEdgeIterator ConstIteratorSourceBegin(void)
+        {
+            return edgesBySource.ConstIteratorBegin();
+        }
+        
+        /// Obtains a read-only iterator to the end of this graph's edges, grouped by source vertex.
+        /// @return Iterator, as described.
+        inline ConstEdgeIterator ConstIteratorSourceEnd(void)
         {
             return edgesBySource.ConstIteratorEnd();
         }

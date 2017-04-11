@@ -20,6 +20,9 @@ namespace GraphTool
     /// Specifies the type to use for identifying vertices.
     typedef uint64_t TVertexID;
 
+    /// Specifies the type to use for identifying edges.
+    typedef uint64_t TEdgeID;
+
     /// Specifies the type to use for counting vertices.
     typedef uint64_t TVertexCount;
 

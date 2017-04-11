@@ -32,9 +32,13 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class GraphReader
     {   
-    private:
+    public:
         // -------- CONSTANTS ---------------------------------------------- //
         
+        /// Indicates that a read operation resulted in an error.
+        static const TEdgeCount kGraphReadError = (TEdgeCount)(~0ull);
+        
+    private:
         /// Specifies the size in bytes of each read buffer to use when reading data from the file.
         /// Two buffers are created, 64MB each by default.
         static const size_t kGraphReadBufferSize = (64ull * 1024ull * 1024ull);
@@ -45,13 +49,14 @@ namespace GraphTool
         /// Provides all information needed to specify a graph read operation.
         struct SGraphReadSpec
         {
-            FILE* file;
-            Graph<TEdgeData>* graph;
-            EdgeIndex<TEdgeData>* edgeIndicesByDestination;
-            EdgeIndex<TEdgeData>* edgeIndicesBySource;
-            GraphReader<TEdgeData>* reader;
-            SEdgeBufferData<TEdgeData>* bufs[2];
-            TEdgeCount counts[2];
+            FILE* file;                                                     ///< File handle.
+            Graph<TEdgeData>* graph;                                        ///< Graph object to be filled.
+            EdgeIndex<TEdgeData>* edgeIndicesByDestination;                 ///< Array of destination-grouped edge indices. One is created per thread.
+            EdgeIndex<TEdgeData>* edgeIndicesBySource;                      ///< Array of source-grouped edge indices. One is created per thread.
+            GraphReader<TEdgeData>* reader;                                 ///< Graph reader object.
+            SEdgeBufferData<TEdgeData>* bufs[2];                            ///< Edge data buffers.
+            TEdgeCount counts[2];                                           ///< Edge data buffer counts.
+            TEdgeCount totalEdgesRead;                                      ///< Set to the total number of edges read, or kGraphReadError in the event of an error.
         };
         
         
@@ -64,8 +69,9 @@ namespace GraphTool
         {
             SGraphReadSpec* readSpec = (SGraphReadSpec*)arg;
             uint32_t currentIndex = 0;
+            uint64_t totalEdgesRead = 0ull;
 
-            // Allocate each thread's edge index. Only one thread needs to do this.
+            // Allocate each thread's edge index and initialize the edge counter. Only one thread needs to do this.
             if (0 == spindleGetLocalThreadID())
             {
                 readSpec->edgeIndicesByDestination = new EdgeIndex<TEdgeData>[spindleGetLocalThreadCount()];
@@ -83,19 +89,28 @@ namespace GraphTool
                 // Check for termination.
                 if (0 == readSpec->counts[currentIndex])
                     break;
-
+                
+                // Check for I/O errors.
+                if (kGraphReadError == readSpec->counts[currentIndex])
+                    return;
+                
                 // Read the buffer into the graph.
                 for (TEdgeCount i = spindleGetLocalThreadID(); i < readSpec->counts[currentIndex]; i += spindleGetLocalThreadCount())
                 {
                     // Add each edge assigned to this thread to the edge index.
-                    SEdge<TEdgeData> edgeInfo;
+                    Edge<TEdgeData> edgeInfo;
                     
                     edgeInfo.FillFromDestinationEdgeBuffer(readSpec->bufs[currentIndex][i]);
+                    edgeInfo.seq = totalEdgesRead + i;
                     readSpec->edgeIndicesBySource[spindleGetLocalThreadID()].InsertEdge(readSpec->bufs[currentIndex][i].sourceVertex, edgeInfo);
 
                     edgeInfo.vertex = readSpec->bufs[currentIndex][i].sourceVertex;
+                    edgeInfo.seq = totalEdgesRead + i;
                     readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].InsertEdge(readSpec->bufs[currentIndex][i].destinationVertex, edgeInfo);
                 }
+
+                // Update the total number of edges read so far.
+                totalEdgesRead += readSpec->counts[currentIndex];
 
                 // Switch to the other buffer to consume in parallel with edge production.
                 currentIndex = (~currentIndex) & 1;
@@ -105,6 +120,7 @@ namespace GraphTool
             // This will be done using a parallel tree merge pattern.
             // The value of this variable is an indicator of the current level of the tree.
             // Each iteration it is multiplied by two to indicate the number of consecutive edge indices that end up being merged together.
+            // At the end, all edges are merged into the graph, and within each indexed vertex edges will appear in the same order as they appeared in the input file.
             currentIndex = 2;
 
             while (currentIndex < (spindleGetLocalThreadCount() << 1))
@@ -117,22 +133,19 @@ namespace GraphTool
                 // Only some threads are active during the current iteration.
                 // This formula is equivalent to checking if the local thread ID is divisible by the current tree level index.
                 // Additionally parallelize across source and destination vertex indices.
-                switch (spindleGetLocalThreadID() & selectionMask)
+                // File ordering is preserved using the sequence number field of each edge.
+                // Since each individual index is already sorted by sequence number just by virtue of reading the file in order, merging by sequence number produces the correct order.
+                if (0 == (spindleGetLocalThreadID() & selectionMask))
                 {
-                case 0:
                     if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
-                    break;
-                
-                case 1:
-                    if ((spindleGetLocalThreadID() -1 + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset]);
-                    break;
-                
-                default:
-                    break;
+                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdgesBySeq(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
                 }
-
+                else if (selectionMask == (spindleGetLocalThreadID() & selectionMask))
+                {
+                    if ((spindleGetLocalThreadID() - selectionMask + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionMask].MergeEdgesBySeq(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionMask + mergeWithOffset]);
+                }
+                
                 currentIndex <<= 1;
             }
 
@@ -151,16 +164,30 @@ namespace GraphTool
             SGraphReadSpec* readSpec = (SGraphReadSpec*)arg;
             uint32_t currentBufferIndex = 0ull;
 
+            // Initialize the total edges read counter.
+            readSpec->totalEdgesRead = 0;
+
             while (true)
             {
                 // Fill the buffer with edges.
                 readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdgeBufferData<void>)));
 
+                // Check for any I/O errors.
+                // If any are present, indicate this to the consumer threads.
+                // If not, just update the total number of edges read.
+                if (ferror(readSpec->file))
+                {
+                    readSpec->counts[currentBufferIndex] = kGraphReadError;
+                    readSpec->totalEdgesRead = kGraphReadError;
+                }
+                else
+                    readSpec->totalEdgesRead += readSpec->counts[currentBufferIndex];
+
                 // Synchronize with consumers.
                 spindleBarrierGlobal();
 
                 // Check for termination.
-                if (0 == readSpec->counts[currentBufferIndex])
+                if (0 == readSpec->counts[currentBufferIndex] || kGraphReadError == readSpec->counts[currentBufferIndex])
                     break;
 
                 // Switch to the other buffer to read from file during a consumption operation.
@@ -201,16 +228,14 @@ namespace GraphTool
         
         /// Reads a graph from the specified file.
         /// @param [in] filename File name of the file to be read.
-        /// @return Graph object, or NULL in the event of an error.
-        Graph<TEdgeData>* ReadGraphFromFile(const std::string& filename)
+        /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
+        /// @return Number of edges read, or kGraphReadError in the event of an error.
+        TEdgeCount ReadGraphFromFile(const std::string& filename, Graph<TEdgeData>& graph)
         {
             // First, open the file.
             FILE* graphfile = this->OpenAndInitializeGraphFile(filename);
             if (NULL == graphfile)
-                return NULL;
-
-            // Next, allocate the graph object.
-            Graph<TEdgeData>* graph = new Graph<TEdgeData>();
+                return __LINE__;
 
             // Allocate some buffers for read data.
             SEdgeBufferData<TEdgeData>* bufs[] = { (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
@@ -219,12 +244,13 @@ namespace GraphTool
             SGraphReadSpec readSpec;
 
             readSpec.file = graphfile;
-            readSpec.graph = graph;
+            readSpec.graph = &graph;
             readSpec.reader = this;
             readSpec.bufs[0] = bufs[0];
             readSpec.bufs[1] = bufs[1];
             readSpec.counts[0] = 0;
             readSpec.counts[1] = 0;
+            readSpec.totalEdgesRead = 0;
 
             // Define the parallelization strategy.
             SSpindleTaskSpec taskSpec[2];
@@ -233,13 +259,13 @@ namespace GraphTool
             taskSpec[0].arg = (void*)&readSpec;
             taskSpec[0].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[0].numThreads = 1;
-            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferPhysical;
+            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferLogical;
 
             taskSpec[1].func = &EdgeConsumer;
             taskSpec[1].arg = (void*)&readSpec;
             taskSpec[1].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[1].numThreads = 0;
-            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
+            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
 
             // Launch the graph read task.
             spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
@@ -249,7 +275,7 @@ namespace GraphTool
             delete[] bufs[0];
             delete[] bufs[1];
 
-            return graph;
+            return readSpec.totalEdgesRead;
         }
     };
 }

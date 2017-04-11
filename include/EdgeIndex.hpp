@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "Edge.hpp"
 #include "Types.h"
 
 #include <map>
@@ -21,112 +22,6 @@
 
 namespace GraphTool
 {
-    /// Represents an individual edge within an edge index data structure.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct SEdge
-    {
-        // -------- INSTANCE VARIABLES --------------------------------------------- //
-
-        /// Identifier of one end of the edge. The other end is inferred from position within the index.
-        TVertexID vertex;
-
-        /// Data associated with the edge, such as a weight.
-        TEdgeData edgeData;
-
-
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
-
-        /// Default constructor.
-        SEdge(void) : vertex(), edgeData()
-        {
-            // Nothing to do here.
-        }
-        
-        
-        // -------- OPERATORS ---------------------------------------------- //
-
-        /// Compares this instance with another.
-        /// Equality is only determined by vertex, not by edge data.
-        /// @param [in] other Reference to the other instance.
-        /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const SEdge& other)
-        {
-            return (this->vertex == other.vertex);
-        }
-        
-        
-        // -------- INSTANCE METHODS --------------------------------------- //
-        
-        /// Fills information in this structure from edge buffer data, using the destination vertex.
-        /// @param [in] edgeBuffer Edge buffer data to use.
-        inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<TEdgeData>& edgeBuffer)
-        {
-            this->vertex = edgeBuffer.destinationVertex;
-            this->edgeData = edgeBuffer.edgeData;
-        }
-        
-        /// Fills information in this structure from edge buffer data, using the source vertex.
-        /// @param [in] edgeBuffer Edge buffer data to use.
-        inline void FillFromSourceEdgeBuffer(SEdgeBufferData<TEdgeData>& edgeBuffer)
-        {
-            this->vertex = edgeBuffer.sourceVertex;
-            this->edgeData = edgeBuffer.edgeData;
-        }
-    };
-
-    /// Represents an individual edge within an edge index data structure, specialized for unweighted graphs.
-    template <> struct SEdge<void>
-    {
-        // -------- INSTANCE VARIABLES ------------------------------------- //
-
-        /// Identifier of one end of the edge. The other end is inferred from position within the index.
-        TVertexID vertex;
-
-
-        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
-        
-        /// Default constructor.
-        SEdge(void) : vertex()
-        {
-            // Nothing to do here.
-        }
-        
-        /// Enables implicit conversion to this type from a vertex identifier.
-        SEdge(TVertexID vertex) : vertex(vertex)
-        {
-            // Nothing to do here.
-        }
-        
-        
-        // -------- OPERATORS ---------------------------------------------- //
-        
-        /// Compares this instance with another.
-        /// Equality is only determined by vertex, not by edge data.
-        /// @param [in] other Reference to the other instance.
-        /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const SEdge& other)
-        {
-            return (this->vertex == other.vertex);
-        }
-        
-                
-        // -------- INSTANCE METHODS --------------------------------------- //
-
-        /// Fills information in this structure from edge buffer data, using the destination vertex.
-        /// @param [in] edgeBuffer Edge buffer data to use.
-        inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<void>& edgeBuffer)
-        {
-            this->vertex = edgeBuffer.destinationVertex;
-        }
-
-        /// Fills information in this structure from edge buffer data, using the source vertex.
-        /// @param [in] edgeBuffer Edge buffer data to use.
-        inline void FillFromSourceEdgeBuffer(SEdgeBufferData<void>& edgeBuffer)
-        {
-            this->vertex = edgeBuffer.sourceVertex;
-        }
-    };
-    
     /// Holds edges within an indexed data structure.
     /// Represents graph topology data and can hold edge data, such as weights, as well.
     /// This indexed data structure represents unidirectional edges but does not specify the direction.
@@ -138,7 +33,7 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the templated type of edge data to store.
-        typedef SEdge<TEdgeData> TEdge;
+        typedef Edge<TEdgeData> TEdge;
         
         /// Alias for the container type to use to store edges within each index bucket.
         typedef std::list<TEdge> TEdgeList;
@@ -151,7 +46,7 @@ namespace GraphTool
             // -------- INSTANCE VARIABLES --------------------------------- //
 
             /// Reference to the associated edge index.
-            const std::map<TVertexID, TEdgeList>* vertexIndex;
+            const std::map<TVertexID, TEdgeList>* const vertexIndex;
             
             /// Top-level iterator, iterates through the vertex index.
             typename std::map<TVertexID, TEdgeList>::const_iterator indexIterator;
@@ -401,18 +296,28 @@ namespace GraphTool
         {
             return vertexIndex.empty();
         }
-        
-        /// Merges this index with the other index by inserting all edges from the other index into this one.
+
+        /// Merges the contents of the other index with this one by moving all the edges from the other index into this one, maintaining an existing sorted order.
+        /// Expects both indices to be in some sorted order already, according to the predicate passed in.
         /// When completed, the other edge index is empty.
+        /// @tparam TCompare Functon object or function pointer that implements the predicate.
         /// @param [in] other Edge index whose edges are to be merged into this one.
-        void MergeEdges(EdgeIndex<TEdgeData>& other)
+        /// @param [in] comparator Instance of the predicate.
+        template <typename TCompare> void MergeEdges(EdgeIndex<TEdgeData>& other, TCompare comparator)
         {
             for (auto it = other.vertexIndex.begin(); it != other.vertexIndex.end(); ++it)
-                vertexIndex[it->first].splice(vertexIndex[it->first].end(), it->second);
+                vertexIndex[it->first].merge(it->second, comparator);
 
             other.vertexIndex.clear();
         }
 
+        /// Merges the contents of the other index with this one, using sequence number as the comparison predicate.
+        /// @param [in] other Edge index whose edges are to be merged into this one.
+        inline void MergeEdgesBySeq(EdgeIndex<TEdgeData>& other)
+        {
+            MergeEdges(other, EdgeCompareLessBySeq<TEdgeData>());
+        }
+        
         /// Removes a single edge from the indexed data structure.
         /// @param [in] indexedVertex Identifier of the vertex in the index with which to associate the edge being removed.
         /// @param [in] otherVertex Identifier of the vertex on the other end of the edge.
@@ -444,6 +349,18 @@ namespace GraphTool
         {
             vertexIndex.clear();
             std::swap(vertexIndex, replacementEdges.vertexIndex);
+        }
+        
+        /// Splices the contents of the other index onto this one by moving all edges from the other index to this one, without regard for order.
+        /// Does not attempt to sort, and does not expect either edge index to have been sorted prior to this operation.
+        /// When completed, the other edge index is empty.
+        /// @param [in] other Edge index whose edges are to be merged into this one.
+        void SpliceEdges(EdgeIndex<TEdgeData>& other)
+        {
+            for (auto it = other.vertexIndex.begin(); it != other.vertexIndex.end(); ++it)
+                vertexIndex[it->first].splice(vertexIndex[it->first].end(), it->second);
+            
+            other.vertexIndex.clear();
         }
     };
 }
