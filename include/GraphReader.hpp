@@ -135,15 +135,20 @@ namespace GraphTool
                 // Additionally parallelize across source and destination vertex indices.
                 // File ordering is preserved using the sequence number field of each edge.
                 // Since each individual index is already sorted by sequence number just by virtue of reading the file in order, merging by sequence number produces the correct order.
-                if (0 == (spindleGetLocalThreadID() & selectionMask))
+                switch (spindleGetLocalThreadID() & selectionMask)
                 {
-                    if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdgesBySeq(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
-                }
-                else if (selectionMask == (spindleGetLocalThreadID() & selectionMask))
-                {
-                    if ((spindleGetLocalThreadID() - selectionMask + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionMask].MergeEdgesBySeq(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionMask + mergeWithOffset]);
+                    case 0:
+                        if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
+                            readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdgesBySeq(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
+                        break;
+                        
+                    case 1:
+                        if ((spindleGetLocalThreadID() - 1 + mergeWithOffset) < spindleGetLocalThreadCount())
+                            readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdgesBySeq(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset]);
+                        break;
+                        
+                    default:
+                        break;
                 }
                 
                 currentIndex <<= 1;
@@ -259,13 +264,13 @@ namespace GraphTool
             taskSpec[0].arg = (void*)&readSpec;
             taskSpec[0].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[0].numThreads = 1;
-            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferLogical;
+            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferPhysical;
 
             taskSpec[1].func = &EdgeConsumer;
             taskSpec[1].arg = (void*)&readSpec;
             taskSpec[1].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[1].numThreads = 0;
-            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
+            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
 
             // Launch the graph read task.
             spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);

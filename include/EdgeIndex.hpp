@@ -143,7 +143,14 @@ namespace GraphTool
             {
                 return this->indexIterator->first;
             }
-
+            
+            /// Retrieves and returns the vertex identifier of one end of the edge, namely the non-indexed vertex, at this iterator's current position.
+            /// @return Identifier of the indexed vertex.
+            inline TVertexID GetOtherVertexID(void)
+            {
+                return this->vertexIterator->vertex;
+            }
+            
             /// Retrieves and returns the vertex identifier of the second end of the edge, namely the other vertex and any edge data, at this iterator's current position.
             /// @return Information on the other end of the edge.
             inline const TEdge& GetOtherEdgeInfo(void)
