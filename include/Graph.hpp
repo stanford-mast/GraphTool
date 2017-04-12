@@ -59,42 +59,42 @@ namespace GraphTool
         
         /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by destination vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorDestinationBegin(void)
+        inline ConstEdgeIterator ConstIteratorDestinationBegin(void) const
         {
             return edgesByDestination.ConstIteratorBegin();
         }
 
         /// Obtains a read-only iterator to the end of this graph's edges, grouped by destination vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorDestinationEnd(void)
+        inline ConstEdgeIterator ConstIteratorDestinationEnd(void) const
         {
             return edgesByDestination.ConstIteratorEnd();
         }
 
         /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by source vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorSourceBegin(void)
+        inline ConstEdgeIterator ConstIteratorSourceBegin(void) const
         {
             return edgesBySource.ConstIteratorBegin();
         }
         
         /// Obtains a read-only iterator to the end of this graph's edges, grouped by source vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorSourceEnd(void)
+        inline ConstEdgeIterator ConstIteratorSourceEnd(void) const
         {
             return edgesBySource.ConstIteratorEnd();
         }
         
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
-        inline TEdgeCount GetNumEdges(void)
+        inline TEdgeCount GetNumEdges(void) const
         {
             return this->edgesBySource.GetNumEdges();
         }
 
         /// Retrieves and returns the number of vertices in the graph.
         /// @return Number of vertices in the graph.
-        TVertexCount GetNumVertices(void)
+        TVertexCount GetNumVertices(void) const
         {
             TVertexCount numDestinationVertices = 0;
             TVertexCount numSourceVertices = 0;
@@ -111,7 +111,7 @@ namespace GraphTool
         /// Retrieves and returns the in-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.
-        inline TEdgeCount GetVertexIndegree(TVertexID vertex)
+        inline TEdgeCount GetVertexIndegree(TVertexID vertex) const
         {
             return this->edgesByDestination.GetVertexDegree(vertex);
         }
@@ -119,7 +119,7 @@ namespace GraphTool
         /// Retrieves and returns the out-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return Out-degree of the specified vertex. 0 is returned if the vertex has no out-edges or does not exist.
-        inline TEdgeCount GetVertexOutdegree(TVertexID vertex)
+        inline TEdgeCount GetVertexOutdegree(TVertexID vertex) const
         {
             return this->edgesBySource.GetVertexDegree(vertex);
         }

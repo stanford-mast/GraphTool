@@ -52,7 +52,7 @@ namespace GraphTool
         /// Equality is only determined by vertex, not by edge data.
         /// @param [in] other Reference to the other instance.
         /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const Edge& other)
+        inline bool operator==(const Edge& other) const
         {
             return (this->vertex == other.vertex);
         }
@@ -130,7 +130,7 @@ namespace GraphTool
         /// Equality is only determined by vertex, not by edge data.
         /// @param [in] other Reference to the other instance.
         /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const Edge& other)
+        inline bool operator==(const Edge& other) const
         {
             return (this->vertex == other.vertex);
         }
@@ -175,7 +175,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> struct EdgeCompareLessBySeq
     {
-        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second)
+        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
         {
             return (first.seq < second.seq);
         }
@@ -185,7 +185,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> struct EdgeCompareLessByVertex
     {
-        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second)
+        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
         {
             return (first.vertex < second.vertex);
         }

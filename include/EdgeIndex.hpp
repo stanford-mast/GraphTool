@@ -38,6 +38,9 @@ namespace GraphTool
         /// Alias for the container type to use to store edges within each index bucket.
         typedef std::list<TEdge> TEdgeList;
 
+        /// Alias for the container type used to implement the top-level vertex index.
+        typedef std::map<TVertexID, TEdgeList> TVertexIndex;
+
         /// Enables read-only access to all edges in this index, forward direction only.
         /// Accumulates and exposes data from multiple sources, so not a standard iterator type.
         class ConstIterator
@@ -46,10 +49,10 @@ namespace GraphTool
             // -------- INSTANCE VARIABLES --------------------------------- //
 
             /// Reference to the associated edge index.
-            const std::map<TVertexID, TEdgeList>* vertexIndex;
+            const TVertexIndex* vertexIndex;
             
             /// Top-level iterator, iterates through the vertex index.
-            typename std::map<TVertexID, TEdgeList>::const_iterator indexIterator;
+            typename TVertexIndex::const_iterator indexIterator;
             
             /// Second-level iterator, iterates through the edges of each vertex in the index.
             typename TEdgeList::const_iterator vertexIterator;
@@ -66,7 +69,7 @@ namespace GraphTool
             
         private:
             /// Initialization constructor. Can only be invoked by a class-level factory method.
-            ConstIterator(const std::map<TVertexID, TEdgeList>* vertexIndex, typename std::map<TVertexID, TEdgeList>::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
+            ConstIterator(const TVertexIndex* vertexIndex, typename TVertexIndex::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
             {
                 // Nothing to do here.
             }
@@ -78,7 +81,7 @@ namespace GraphTool
             /// Creates and returns an iterator to the beginning of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @returns Read-only iterator to the beginning of the index.
-            static ConstIterator ConstIteratorBegin(const std::map<TVertexID, TEdgeList>* vertexIndex)
+            static ConstIterator ConstIteratorBegin(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cbegin();
                 auto vertexIterator = indexIterator->second.cbegin();
@@ -89,7 +92,7 @@ namespace GraphTool
             /// Creates and returns an iterator to the past-the-end element of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @returns Read-only iterator to the past-the-end element of the index.
-            static ConstIterator ConstIteratorEnd(const std::map<TVertexID, TEdgeList>* vertexIndex)
+            static ConstIterator ConstIteratorEnd(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cend();
                 auto vertexIterator = (--(vertexIndex->cend()))->second.cend();
@@ -103,7 +106,7 @@ namespace GraphTool
             /// Compares this instance with another for equality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-            inline bool operator==(const ConstIterator& other)
+            inline bool operator==(const ConstIterator& other) const
             {
                 return ((this->indexIterator == other.indexIterator) && (this->vertexIterator == other.vertexIterator));
             }
@@ -111,14 +114,14 @@ namespace GraphTool
             /// Compares this instance with another for inequality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is different from the other instance, `false` otherwise.
-            inline bool operator!=(const ConstIterator& other)
+            inline bool operator!=(const ConstIterator& other) const
             {
                 return ((this->indexIterator != other.indexIterator) || (this->vertexIterator != other.vertexIterator));
             }
 
             /// Prefix-increments this instance by advancing it to the next position.
             /// @return This instance after it has been advanced.
-            inline ConstIterator& operator++(void)
+            ConstIterator& operator++(void)
             {
                 ++(this->vertexIterator);
 
@@ -135,33 +138,56 @@ namespace GraphTool
 
             /// Postfix-increments this instance by advancing it to the next position.
             /// @return This instance before it has been advanced.
-            inline ConstIterator operator++(int)
+            ConstIterator operator++(int)
             {
                 ConstIterator beforeIncrement = *this;
                 ++(*this);
                 return beforeIncrement;
             }
+
+            /// Advances this iterator by the specified number of positions.
+            /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
+            /// @param [in] numPositions Number of positions by which to advance this iteartor.
+            ConstIterator& operator+=(const TEdgeCount numPositions)
+            {
+                ConstIterator endIter = ConstIteratorEnd(this->vertexIndex);
+
+                for (TEdgeCount i = 0; i < numPositions && *this != endIter; ++i)
+                    ++(*this);
+
+                return *this;
+            }
+
+            /// Advances a copy of this iterator by the specified number of positions.
+            /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
+            /// @param [in] numPositions Number of positions by which to advance this iterator.
+            ConstIterator operator+(const TEdgeCount numPositions) const
+            {
+                ConstIterator result = *this;
+                result += numPositions;
+                return result;
+            }
             
             
             // -------- INSTANCE METHODS ----------------------------------- //
-
+            
             /// Retrieves and returns the vertex identifier of one end of the edge, namely the indexed vertex, at this iterator's current position.
             /// @return Identifier of the indexed vertex.
-            inline TVertexID GetIndexedVertexID(void)
+            inline TVertexID GetIndexedVertexID(void) const
             {
                 return this->indexIterator->first;
             }
             
             /// Retrieves and returns the vertex identifier of one end of the edge, namely the non-indexed vertex, at this iterator's current position.
             /// @return Identifier of the indexed vertex.
-            inline TVertexID GetOtherVertexID(void)
+            inline TVertexID GetOtherVertexID(void) const
             {
                 return this->vertexIterator->vertex;
             }
             
             /// Retrieves and returns the vertex identifier of the second end of the edge, namely the other vertex and any edge data, at this iterator's current position.
             /// @return Information on the other end of the edge.
-            inline const TEdge& GetOtherEdgeInfo(void)
+            inline const TEdge& GetOtherEdgeInfo(void) const
             {
                 return *(this->vertexIterator);
             }
@@ -173,7 +199,7 @@ namespace GraphTool
         
         /// Main data structure, indexed by one end of each edge.
         /// Maps from a vertex identifier to a list of edges connected to it.
-        std::map<TVertexID, TEdgeList> vertexIndex;
+        TVertexIndex vertexIndex;
         
         
     public:
@@ -190,14 +216,14 @@ namespace GraphTool
         
         /// Creates and returns an iterator to the beginning of this edge index.
         /// @returns Read-only iterator to the beginning of the index.
-        inline ConstIterator ConstIteratorBegin(void)
+        inline ConstIterator ConstIteratorBegin(void) const
         {
             return ConstIterator::ConstIteratorBegin(&(this->vertexIndex));
         }
 
         /// Creates and returns an iterator to the past-the-end element of this edge index.
         /// @returns Read-only iterator to the end of the index.
-        inline ConstIterator ConstIteratorEnd(void)
+        inline ConstIterator ConstIteratorEnd(void) const
         {
             return ConstIterator::ConstIteratorEnd(&(this->vertexIndex));
         }
@@ -207,7 +233,7 @@ namespace GraphTool
         /// @param [out] begin Iterator to fill with the beginning iterator of the edge list.
         /// @param [out] end Iterator to fill with the end iterator of the edge list.
         /// @return `true` if iterators were filled, `false` otherwise (for example, if the degree of the vertex is 0, then no iterators would be filled).
-        bool GetEdgesForVertex(TVertexID indexedVertex, typename TEdgeList::const_iterator& begin, typename TEdgeList::const_iterator& end)
+        bool GetEdgesForVertex(TVertexID indexedVertex, typename TEdgeList::const_iterator& begin, typename TEdgeList::const_iterator& end) const
         {
             bool gotEdges = false;
             
@@ -225,7 +251,7 @@ namespace GraphTool
         /// Retrieves and returns information about the vertex of highest degree.
         /// @param [out] highestDegreeVertex Vertex identifier of the vertex with the highest degree.
         /// @param [out] highestDegree Degree of the vertex with the highest degree.
-        void GetHighestDegreeInfo(TVertexID& highestDegreeVertex, TEdgeCount& highestDegree)
+        void GetHighestDegreeInfo(TVertexID& highestDegreeVertex, TEdgeCount& highestDegree) const
         {
             highestDegreeVertex = 0;
             highestDegree = 0;
@@ -243,7 +269,7 @@ namespace GraphTool
         /// Retrieves and returns the vertex identifier of the lowest-identified vertex in the index.
         /// @param [out] lowestIndexedVertex Vertex identifier of the lowest-identified vertex in the index.
         /// @return `false` if the index is empty and thus no information is available, `true` otherwise.
-        bool GetIndexLowerBound(TVertexID& lowestIndexedVertex)
+        bool GetIndexLowerBound(TVertexID& lowestIndexedVertex) const
         {
             if (vertexIndex.empty())
                 return false;
@@ -255,7 +281,7 @@ namespace GraphTool
         /// Retrieves and returns the vertex identifier of the highest-identified vertex in the index.
         /// @param [out] highestIndexedVertex Vertex identifier of the highest-identified vertex in the index.
         /// @return `false` if the index is empty and thus no information is available, `true` otherwise.
-        bool GetIndexUpperBound(TVertexID& highestIndexedVertex)
+        bool GetIndexUpperBound(TVertexID& highestIndexedVertex) const
         {
             if (vertexIndex.empty())
                 return false;
@@ -266,7 +292,7 @@ namespace GraphTool
         
         /// Retrieves and returns the total number of edges in this data structure.
         /// @return Total number of edges.
-        TEdgeCount GetNumEdges(void)
+        TEdgeCount GetNumEdges(void) const
         {
             TEdgeCount numEdges = 0;
 
@@ -278,7 +304,7 @@ namespace GraphTool
 
         /// Retrieves and returns the number of vertices in the index.
         /// @return Total number of indexed vertices.
-        TVertexCount GetNumIndexedVertices(void)
+        TVertexCount GetNumIndexedVertices(void) const
         {
             return vertexIndex.size();
         }
@@ -287,7 +313,7 @@ namespace GraphTool
         /// This is determined by querying the number of vertices in the edge list of the specified vertex in the index.
         /// @param [in] indexedVertex Identifier of the vertex of interest.
         /// @return Degree of the specified vertex, which could be 0.
-        TEdgeCount GetVertexDegree(TVertexID indexedVertex)
+        TEdgeCount GetVertexDegree(TVertexID indexedVertex) const
         {
             TVertexCount vertexDegree = 0;
 
