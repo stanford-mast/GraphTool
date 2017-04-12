@@ -190,4 +190,7 @@ namespace GraphTool
             return (first.vertex < second.vertex);
         }
     };
+
+    /// Convenience alias for edges that do not use edge data or weights.
+    typedef Edge<void> UnweightedEdge;
 }

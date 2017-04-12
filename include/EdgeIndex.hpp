@@ -378,4 +378,7 @@ namespace GraphTool
             other.vertexIndex.clear();
         }
     };
+
+    /// Convenience alias for edge indices that do not use edge data or weights.
+    typedef EdgeIndex<void> UnweightedEdgeIndex;
 }

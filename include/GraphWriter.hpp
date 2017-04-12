@@ -61,7 +61,11 @@ namespace GraphTool
                 return false;
             
             // Next, write out the graph.
-            return WriteGraphContentToFile(graphfile, graph, groupedByDestination);
+            bool result = WriteGraphContentToFile(graphfile, graph, groupedByDestination);
+
+            // Close the file and return the result.
+            fclose(graphfile);
+            return result;
         }
     };
 }

@@ -16,6 +16,9 @@
 #include "GraphReader.hpp"
 #include "Types.h"
 
+#include <cstdio>
+#include <cstdlib>
+
 
 namespace GraphTool
 {
@@ -47,4 +50,7 @@ namespace GraphTool
             return (TEdgeCount)fread(buf, sizeof(SEdgeBufferData<TEdgeData>), count, graphfile);
         }
     };
+
+    /// Convenience alias for reading graphs that do not use edge data or weights.
+    typedef BinaryEdgeListReader<void> UnweightedBinaryEdgeListReader;
 }

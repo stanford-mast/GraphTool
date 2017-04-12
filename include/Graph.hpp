@@ -152,4 +152,7 @@ namespace GraphTool
             edgesBySource.SetEdges(replacementEdgesBySource);
         }
     };
+
+    /// Convenience alias for graphs that do not use edge data or weights.
+    typedef Graph<void> UnweightedGraph;
 }

@@ -17,6 +17,7 @@
     <ClInclude Include="include\GraphReader.hpp" />
     <ClInclude Include="include\GraphWriter.hpp" />
     <ClInclude Include="include\TextEdgeListReader.hpp" />
+    <ClInclude Include="include\TextEdgeListWriter.hpp" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\EdgeIndex.hpp" />
   </ItemGroup>
