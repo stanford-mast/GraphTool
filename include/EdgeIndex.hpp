@@ -46,7 +46,7 @@ namespace GraphTool
             // -------- INSTANCE VARIABLES --------------------------------- //
 
             /// Reference to the associated edge index.
-            const std::map<TVertexID, TEdgeList>* const vertexIndex;
+            const std::map<TVertexID, TEdgeList>* vertexIndex;
             
             /// Top-level iterator, iterates through the vertex index.
             typename std::map<TVertexID, TEdgeList>::const_iterator indexIterator;
@@ -55,8 +55,16 @@ namespace GraphTool
             typename TEdgeList::const_iterator vertexIterator;
             
             
+        public:
             // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
             
+            /// Default constructor.
+            ConstIterator() : vertexIndex(), indexIterator(), vertexIterator()
+            {
+                // Nothing to do here.
+            }
+            
+        private:
             /// Initialization constructor. Can only be invoked by a class-level factory method.
             ConstIterator(const std::map<TVertexID, TEdgeList>* vertexIndex, typename std::map<TVertexID, TEdgeList>::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
             {

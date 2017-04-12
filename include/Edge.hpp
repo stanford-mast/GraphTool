@@ -60,6 +60,26 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
 
+        /// Exports the information from this structure to edge buffer data, using this structure's vertex as a destination vertex.
+        /// @param [in] sourceVertex Source vertex to fill into the edge buffer.
+        /// @param [in] edgeBuffer Edge buffer to which to export.
+        inline void ExportToDestinationEdgeBuffer(TVertexID sourceVertex, SEdgeBufferData<TEdgeData>& edgeBuffer) const
+        {
+            edgeBuffer.sourceVertex = sourceVertex;
+            edgeBuffer.destinationVertex = this->vertex;
+            edgeBuffer.edgeData = this->edgeData;
+        }
+
+        /// Exports the information from this structure to edge buffer data, using this structure's vertex as a source vertex.
+        /// @param [in] destinationVertex Destination vertex to fill into the edge buffer.
+        /// @param [in] edgeBuffer Edge buffer to which to export.
+        inline void ExportToSourceEdgeBuffer(TVertexID destinationVertex, SEdgeBufferData<TEdgeData>& edgeBuffer) const
+        {
+            edgeBuffer.sourceVertex = this->vertex;
+            edgeBuffer.destinationVertex = destinationVertex;
+            edgeBuffer.edgeData = this->edgeData;
+        }
+        
         /// Fills information in this structure from edge buffer data, using the destination vertex.
         /// @param [in] edgeBuffer Edge buffer data to use.
         inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<TEdgeData>& edgeBuffer)
@@ -118,6 +138,24 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
 
+        /// Exports the information from this structure to edge buffer data, using this structure's vertex as a destination vertex.
+        /// @param [in] sourceVertex Source vertex to fill into the edge buffer.
+        /// @param [in] edgeBuffer Edge buffer to which to export.
+        inline void ExportToDestinationEdgeBuffer(TVertexID sourceVertex, SEdgeBufferData<void>& edgeBuffer) const
+        {
+            edgeBuffer.sourceVertex = sourceVertex;
+            edgeBuffer.destinationVertex = this->vertex;
+        }
+
+        /// Exports the information from this structure to edge buffer data, using this structure's vertex as a source vertex.
+        /// @param [in] destinationVertex Destination vertex to fill into the edge buffer.
+        /// @param [in] edgeBuffer Edge buffer to which to export.
+        inline void ExportToSourceEdgeBuffer(TVertexID destinationVertex, SEdgeBufferData<void>& edgeBuffer) const
+        {
+            edgeBuffer.sourceVertex = this->vertex;
+            edgeBuffer.destinationVertex = destinationVertex;
+        }
+        
         /// Fills information in this structure from edge buffer data, using the destination vertex.
         /// @param [in] edgeBuffer Edge buffer data to use.
         inline void FillFromDestinationEdgeBuffer(SEdgeBufferData<void>& edgeBuffer)

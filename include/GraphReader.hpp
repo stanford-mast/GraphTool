@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "Edge.hpp"
 #include "EdgeIndex.hpp"
 #include "Graph.hpp"
 #include "Types.h"
@@ -32,13 +33,9 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class GraphReader
     {   
-    public:
+    private:
         // -------- CONSTANTS ---------------------------------------------- //
         
-        /// Indicates that a read operation resulted in an error.
-        static const TEdgeCount kGraphReadError = (TEdgeCount)(~0ull);
-        
-    private:
         /// Specifies the size in bytes of each read buffer to use when reading data from the file.
         /// Two buffers are created, 64MB each by default.
         static const size_t kGraphReadBufferSize = (64ull * 1024ull * 1024ull);
@@ -56,14 +53,13 @@ namespace GraphTool
             GraphReader<TEdgeData>* reader;                                 ///< Graph reader object.
             SEdgeBufferData<TEdgeData>* bufs[2];                            ///< Edge data buffers.
             TEdgeCount counts[2];                                           ///< Edge data buffer counts.
-            TEdgeCount totalEdgesRead;                                      ///< Set to the total number of edges read, or kGraphReadError in the event of an error.
+            bool readSuccessfulSoFar;                                       ///< Indicates the continued success of the read operation.
         };
         
         
         // -------- CLASS METHODS ------------------------------------------ //
 
         /// Controls the consumption of edges from a buffer to a graph object, for use as a Spindle task function.
-        /// Should be called by either one or two threads.
         /// @param [in] arg Pointer to an instance of #SGraphReadSpec that defines the graph read operation.
         static void EdgeConsumer(void* arg)
         {
@@ -91,7 +87,7 @@ namespace GraphTool
                     break;
                 
                 // Check for I/O errors.
-                if (kGraphReadError == readSpec->counts[currentIndex])
+                if (false == readSpec->readSuccessfulSoFar)
                     return;
                 
                 // Read the buffer into the graph.
@@ -167,10 +163,7 @@ namespace GraphTool
         static void EdgeProducer(void* arg)
         {
             SGraphReadSpec* readSpec = (SGraphReadSpec*)arg;
-            uint32_t currentBufferIndex = 0ull;
-
-            // Initialize the total edges read counter.
-            readSpec->totalEdgesRead = 0;
+            uint32_t currentBufferIndex = 0;
 
             while (true)
             {
@@ -178,21 +171,14 @@ namespace GraphTool
                 readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdgeBufferData<void>)));
 
                 // Check for any I/O errors.
-                // If any are present, indicate this to the consumer threads.
-                // If not, just update the total number of edges read.
                 if (ferror(readSpec->file))
-                {
-                    readSpec->counts[currentBufferIndex] = kGraphReadError;
-                    readSpec->totalEdgesRead = kGraphReadError;
-                }
-                else
-                    readSpec->totalEdgesRead += readSpec->counts[currentBufferIndex];
+                    readSpec->readSuccessfulSoFar = false;
 
                 // Synchronize with consumers.
                 spindleBarrierGlobal();
 
-                // Check for termination.
-                if (0 == readSpec->counts[currentBufferIndex] || kGraphReadError == readSpec->counts[currentBufferIndex])
+                // Check for termination or I/O errors detected previously.
+                if (0 == readSpec->counts[currentBufferIndex] || false == readSpec->readSuccessfulSoFar)
                     break;
 
                 // Switch to the other buffer to read from file during a consumption operation.
@@ -220,7 +206,6 @@ namespace GraphTool
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename) = 0;
         
         /// Reads the next set of edges from the specified graph file into the specified buffer.
-        /// Size is supplied in bytes, and the subclass should use this to determine how many edges to read.
         /// @param [in] graphfile File handle for the open graph file.
         /// @param [in] buf Buffer to which to read edge data.
         /// @param [in] count Number of edges that the buffer can hold.
@@ -240,7 +225,7 @@ namespace GraphTool
             // First, open the file.
             FILE* graphfile = this->OpenAndInitializeGraphFile(filename);
             if (NULL == graphfile)
-                return __LINE__;
+                return false;
 
             // Allocate some buffers for read data.
             SEdgeBufferData<TEdgeData>* bufs[] = { (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
@@ -255,7 +240,7 @@ namespace GraphTool
             readSpec.bufs[1] = bufs[1];
             readSpec.counts[0] = 0;
             readSpec.counts[1] = 0;
-            readSpec.totalEdgesRead = 0;
+            readSpec.readSuccessfulSoFar = true;
 
             // Define the parallelization strategy.
             SSpindleTaskSpec taskSpec[2];
@@ -280,7 +265,7 @@ namespace GraphTool
             delete[] bufs[0];
             delete[] bufs[1];
 
-            return readSpec.totalEdgesRead;
+            return readSpec.readSuccessfulSoFar;
         }
     };
 }
