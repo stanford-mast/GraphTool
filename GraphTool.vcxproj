@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BinaryEdgeListReader.hpp" />
+    <ClInclude Include="include\BinaryEdgeListWriter.hpp" />
     <ClInclude Include="include\Edge.hpp" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.hpp" />

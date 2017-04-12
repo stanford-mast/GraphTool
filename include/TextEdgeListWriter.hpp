@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "Edge.hpp"
 #include "GraphWriter.hpp"
 #include "Types.h"
 
@@ -24,74 +23,59 @@
 
 namespace GraphTool
 {
-    /// Reader object class for graphs represented in text edge list format.
+    /// Writer object class for graphs represented in text edge list format.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class TextEdgeListWriter : public GraphWriter<TEdgeData>
     {
         // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
 
         /// Creates a string from the edge data in the specified edge.
-        /// @param [in] edge Edge of interest.
+        /// @param [in] edgeBuf Edge buffer of interest.
         /// @param [out] edgeDataString String representation of the edge data.
-        virtual void StringFromEdgeData(const Edge<TEdgeData>& edge, std::string& edgeDataString) = 0;
+        virtual void StringFromEdgeData(const SEdgeBufferData<TEdgeData>& edgeBuf, std::string& edgeDataString) = 0;
 
 
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.hpp" for documentation.
 
-        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename, bool groupedByDestination)
+        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename, Graph<TEdgeData>& graph, bool groupedByDestination)
         {
             // This class writes files in text mode.
-            return fopen(filename.c_str(), "w");            
+            FILE* graphfile = fopen(filename.c_str(), "w");
+
+            if (NULL != graphfile)
+            {
+                // Write out the number of vertices and edges in the graph.
+                fprintf(graphfile, "%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
+            }
+
+            return graphfile;
         }
 
         // --------
 
-        virtual bool WriteGraphContentToFile(FILE* graphfile, Graph<TEdgeData>& graph, bool groupedByDestination)
+        virtual void WriteEdgesToFile(FILE* graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, size_t count, bool groupedByDestination)
         {
-            // Write out the number of vertices and edges in the graph.
-            fprintf(graphfile, "%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
-            if (ferror(graphfile)) return false;
-
             // Select an edge grouping based on the passed parameter.
             Graph<TEdgeData>::ConstEdgeIterator iter;
             Graph<TEdgeData>::ConstEdgeIterator end;
 
-            if (groupedByDestination)
-            {
-                iter = graph.ConstIteratorDestinationBegin();
-                end = graph.ConstIteratorDestinationEnd();
-            }
-            else
-            {
-                iter = graph.ConstIteratorSourceBegin();
-                end = graph.ConstIteratorSourceEnd();
-            }
-
             // Write out each edge.
-            for (; iter != end; ++iter)
+            for (size_t i = 0; i < count; ++i)
             {
                 // First, write the source and destination vertices.
-                if (groupedByDestination)
-                    fprintf(graphfile, "%llu %llu", (long long unsigned int)iter.GetOtherVertexID(), (long long unsigned int)iter.GetIndexedVertexID());
-                else
-                    fprintf(graphfile, "%llu %llu", (long long unsigned int)iter.GetIndexedVertexID(), (long long unsigned int)iter.GetOtherVertexID());
+                fprintf(graphfile, "%llu %llu", (long long unsigned int)buf[i].sourceVertex, (long long unsigned int)buf[i].destinationVertex);
 
                 // Next, see if edge data are available for writing.
                 std::string edgeDataString;
-                StringFromEdgeData(iter.GetOtherEdgeInfo(), edgeDataString);
+                StringFromEdgeData(buf[i], edgeDataString);
 
                 if (!edgeDataString.empty())
                     fprintf(graphfile, " %s", edgeDataString.c_str());
 
                 // End the line.
                 fprintf(graphfile, "\n");
-
-                // Check for errors.
-                if (ferror(graphfile)) return false;
             }
-
-            return true;
         }
     };
 
@@ -101,7 +85,7 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See above for documentation.
         
-        virtual void StringFromEdgeData(const Edge<void>& edge, std::string& edgeDataString)
+        virtual void StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, std::string& edgeDataString)
         {
             edgeDataString.clear();
         }
