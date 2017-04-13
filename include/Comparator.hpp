@@ -20,8 +20,8 @@
 namespace GraphTool
 {
     template <typename TEdgeData> class Graph;
-
-
+    
+    
     /// Base class for function objects used to compare edges in a graph.
     /// Subclasses must provide a function call operator to perform the actual comparison.
     /// Functions that use comparators should accept parameters of this type, but concrete implementations should not be derived from it.
@@ -36,7 +36,7 @@ namespace GraphTool
         /// @param [in] first First operand of the comparison.
         /// @param [in] second Second operand of the comparison.
         /// @return `true` if `first` should come before `second` in the ordering, `false` otherwise.
-        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) = 0;
+        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const = 0;
     };
 
     /// Abstract subclass used to mark comparators as not requiring any access to graph state during comparisons.
@@ -77,6 +77,39 @@ namespace GraphTool
         
         /// Initialization constructor, setting all fields.
         StatefulComparator(const Graph<TEdgeData>& graph, bool usingDestinationIndex, TVertexID indexedVertex) : graph(graph), usingDestinationIndex(usingDestinationIndex), indexedVertex(indexedVertex)
+        {
+            // Nothing to do here.
+        }
+    };
+    
+    /// Concrete wrapper class intended to facilitate the use of a comparator object with value-type semantics.
+    /// For internal use only. Not intended to be instantiated used as a base class.
+    template <typename TEdgeData> class WrappedComparator
+    {
+    private:
+        // -------- INSTANCE VARIABLES ------------------------------------- //
+        
+        /// Comparator object, used to provide the actual comparisons.
+        Comparator<TEdgeData>& compare;
+        
+        
+    public:
+        // -------- OPERATORS ---------------------------------------------- //
+        
+        /// Invokes the wrapped comparison operation.
+        /// @param [in] first First operand of the comparison.
+        /// @param [in] second Second operand of the comparison.
+        /// @return `true` if `first` should come before `second` in the ordering, `false` otherwise.
+        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
+        {
+            return compare(first, second);
+        }
+        
+        
+        // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
+        
+        /// Initialization constructor, linking a comparator object to this object.
+        WrappedComparator(Comparator<TEdgeData>& compare) : compare(compare)
         {
             // Nothing to do here.
         }

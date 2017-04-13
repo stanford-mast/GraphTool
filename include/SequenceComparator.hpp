@@ -29,7 +29,7 @@ namespace GraphTool
         // -------- ABSTRACT OPERATORS ------------------------------------- //
         // See "Comparator.hpp" for documentation.
        
-        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second)
+        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
         {
             return (first.seq < second.seq);
         }
@@ -45,7 +45,7 @@ namespace GraphTool
         // -------- ABSTRACT OPERATORS ------------------------------------- //
         // See "Comparator.hpp" for documentation.
 
-        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second)
+        virtual bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
         {
             return (first.seq > second.seq);
         }

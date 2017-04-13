@@ -147,13 +147,13 @@ namespace GraphTool
                 // Since each individual index is already sorted by sequence number just by virtue of reading the file in order, merging by sequence number produces the correct order.
                 if (selectionValueMergeSource == selectionValue)
                 {
-                    if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset], comparator);
+                    if ((spindleGetLocalThreadID() - selectionValueMergeSource + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionValueMergeSource].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - selectionValueMergeSource + mergeWithOffset], comparator);
                 }
                 else if (selectionValueMergeDestination == selectionValue)
                 {
-                    if ((spindleGetLocalThreadID() - 1 + mergeWithOffset) < spindleGetLocalThreadCount())
-                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset], comparator);
+                    if ((spindleGetLocalThreadID() - selectionValueMergeDestination + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() - selectionValueMergeDestination].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() - selectionValueMergeDestination + mergeWithOffset], comparator);
                 }
                 
                 currentIndex <<= 1;

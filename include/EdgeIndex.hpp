@@ -347,8 +347,10 @@ namespace GraphTool
         /// @param [in] comparator Instance of the predicate.
         void MergeEdges(EdgeIndex<TEdgeData>& other, Comparator<TEdgeData>& comparator)
         {
+            WrappedComparator<TEdgeData> compare(comparator);
+            
             for (auto it = other.vertexIndex.begin(); it != other.vertexIndex.end(); ++it)
-                vertexIndex[it->first].merge<Comparator<TEdgeData>&>(it->second, comparator);
+                vertexIndex[it->first].template merge(it->second, compare);
 
             other.vertexIndex.clear();
         }

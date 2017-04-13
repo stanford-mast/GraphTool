@@ -57,8 +57,8 @@ namespace GraphTool
         virtual void WriteEdgesToFile(FILE* graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, size_t count, bool groupedByDestination)
         {
             // Select an edge grouping based on the passed parameter.
-            Graph<TEdgeData>::ConstEdgeIterator iter;
-            Graph<TEdgeData>::ConstEdgeIterator end;
+            typename Graph<TEdgeData>::ConstEdgeIterator iter;
+            typename Graph<TEdgeData>::ConstEdgeIterator end;
 
             // Write out each edge.
             for (size_t i = 0; i < count; ++i)
