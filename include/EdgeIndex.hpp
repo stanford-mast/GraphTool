@@ -350,7 +350,7 @@ namespace GraphTool
             WrappedComparator<TEdgeData> compare(comparator);
             
             for (auto it = other.vertexIndex.begin(); it != other.vertexIndex.end(); ++it)
-                vertexIndex[it->first].template merge(it->second, compare);
+                vertexIndex[it->first].merge(it->second, compare);
 
             other.vertexIndex.clear();
         }
