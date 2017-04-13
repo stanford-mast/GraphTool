@@ -122,9 +122,21 @@ namespace GraphTool
 
             while (currentIndex < (spindleGetLocalThreadCount() << 1))
             {
-                const uint32_t selectionMask = currentIndex - 1;
-                const uint32_t mergeWithOffset = (currentIndex >> 1);
                 SequenceAscendingComparator<TEdgeData> comparator;
+                
+                // Each iteration, the total number of merged indices doubles and hence the number of threads needed halves.
+                const uint32_t selectionMask = currentIndex - 1;
+                const uint32_t selectionValue = spindleGetLocalThreadID() & selectionMask;
+                const uint32_t mergeWithOffset = (currentIndex >> 1);
+
+                // The thread that will do the source merge is the first in the group.
+                const uint32_t selectionValueMergeSource = 0;
+
+                // The thread that will do the destination merge is either going to be the second or third thread in the group.
+                // In the first iteration, or if less than three threads are available, always use the second thread in the group because this is all that is available.
+                // In the subsequent iterations, in which some threads are sitting idle, use the third thread in the group.
+                // This task is created with preference for logical cores, so using the third thread in the group means potentially using a different physical core to merge destinations than to merge sources.
+                const uint32_t selectionValueMergeDestination = (selectionMask < 3 || spindleGetLocalThreadCount() < 3 ? 1 : 2);
 
                 spindleBarrierLocal();
 
@@ -133,20 +145,15 @@ namespace GraphTool
                 // Additionally parallelize across source and destination vertex indices.
                 // File ordering is preserved using the sequence number field of each edge.
                 // Since each individual index is already sorted by sequence number just by virtue of reading the file in order, merging by sequence number produces the correct order.
-                switch (spindleGetLocalThreadID() & selectionMask)
+                if (selectionValueMergeSource == selectionValue)
                 {
-                    case 0:
-                        if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
-                            readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset], comparator);
-                        break;
-                        
-                    case 1:
-                        if ((spindleGetLocalThreadID() - 1 + mergeWithOffset) < spindleGetLocalThreadCount())
-                            readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset], comparator);
-                        break;
-                        
-                    default:
-                        break;
+                    if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset], comparator);
+                }
+                else if (selectionValueMergeDestination == selectionValue)
+                {
+                    if ((spindleGetLocalThreadID() - 1 + mergeWithOffset) < spindleGetLocalThreadCount())
+                        readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset], comparator);
                 }
                 
                 currentIndex <<= 1;
@@ -253,13 +260,13 @@ namespace GraphTool
             taskSpec[0].arg = (void*)&readSpec;
             taskSpec[0].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[0].numThreads = 1;
-            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferPhysical;
+            taskSpec[0].smtPolicy = SpindleSMTPolicyPreferLogical;
 
             taskSpec[1].func = &EdgeConsumer;
             taskSpec[1].arg = (void*)&readSpec;
             taskSpec[1].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
             taskSpec[1].numThreads = 0;
-            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
+            taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
 
             // Launch the graph read task.
             spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
