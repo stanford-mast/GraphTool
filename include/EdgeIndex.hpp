@@ -46,12 +46,12 @@ namespace GraphTool
         /// Not a standard iterator type.
         class ConstVertexIterator
         {
+        private:
             // -------- FRIENDSHIPS -------------------------------------------- //
 
-            friend class ConstEdgeIterator;
+            friend class EdgeIndex<TEdgeData>::ConstEdgeIterator;
             
             
-        private:
             // -------- INSTANCE VARIABLES --------------------------------- //
 
             /// Reference to the associated edge index.
@@ -86,7 +86,10 @@ namespace GraphTool
             static ConstVertexIterator ConstVertexIteratorAt(const TVertexIndex* vertexIndex, const TVertexID vertexID)
             {
                 if (0 != vertexIndex->count(vertexID))
-                    return ConstVertexIterator(vertexIndex, vertexIndex->find(vertexID));
+                {
+                    auto indexIterator = vertexIndex->find(vertexID);
+                    return ConstVertexIterator(vertexIndex, indexIterator);
+                }
                 else
                     return ConstVertexIterator();
             }
@@ -96,7 +99,8 @@ namespace GraphTool
             /// @return Read-only iterator to the beginning of the index.
             static ConstVertexIterator ConstVertexIteratorBegin(const TVertexIndex* vertexIndex)
             {
-                return ConstVertexIterator(vertexIndex, vertexIndex->cbegin());
+                auto indexIterator = vertexIndex->cbegin();
+                return ConstVertexIterator(vertexIndex, indexIterator);
             }
 
             /// Creates and returns an iterator to the past-the-end element of the specified index.
@@ -104,7 +108,8 @@ namespace GraphTool
             /// @return Read-only iterator to the past-the-end element of the index.
             static ConstVertexIterator ConstVertexIteratorEnd(const TVertexIndex* vertexIndex)
             {
-                return ConstVertexIterator(vertexIndex, vertexIndex->cend());
+                auto indexIterator = vertexIndex->cend();
+                return ConstVertexIterator(vertexIndex, indexIterator);
             }
             
             
@@ -400,7 +405,7 @@ namespace GraphTool
         
         /// Creates and returns an iterator to the beginning of the edges corresponding to the specified vertex iterator.
         /// @return Read-only iterator at the specified position, or an invalid iterator if the vertex iterator supplied does not belong to this edge index.
-        inline ConstEdgeIterator ConstEdgeIteratorAt(ConstVertexIterator& vertexIterator) const
+        inline ConstEdgeIterator ConstEdgeIteratorAt(const ConstVertexIterator& vertexIterator) const
         {
             return ConstEdgeIterator::ConstEdgeIteratorAt(*this, vertexIterator);
         }

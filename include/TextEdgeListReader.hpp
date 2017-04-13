@@ -50,8 +50,17 @@ namespace GraphTool
                 char linebuf[1024];
                 
                 // Skip over the two values that indicate the number of edges and vertices in a graph.
-                fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile);
-                fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile);
+                if (NULL == fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile))
+                {
+                    fclose(graphfile);
+                    return NULL;
+                }
+                
+                if (NULL == fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile))
+                {
+                    fclose(graphfile);
+                    return NULL;
+                }
             }
 
             return graphfile;
@@ -73,7 +82,7 @@ namespace GraphTool
                 TVertexID destinationVertex;
 
                 // Read the line into the line buffer and verify that it is a valid edge.
-                fgets(currpos, sizeof(linebuf) / sizeof(linebuf[0]), graphfile);
+                if (NULL == fgets(currpos, sizeof(linebuf) / sizeof(linebuf[0]), graphfile)) break;
                 if (!isdigit((int)*currpos)) continue;
                 if (feof(graphfile) || ferror(graphfile)) break;
 

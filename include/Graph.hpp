@@ -62,7 +62,7 @@ namespace GraphTool
         
         /// Obtains a read-only iterator to the beginning of the in-edges edges that correspond to the supplied destination vertex iterator.
         /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
-        inline ConstEdgeIterator ConstEdgeIteratorDestinationAt(ConstVertexIterator& vertexIterator) const
+        inline ConstEdgeIterator ConstEdgeIteratorDestinationAt(const ConstVertexIterator& vertexIterator) const
         {
             return edgesByDestination.ConstEdgeIteratorAt(vertexIterator);
         }
@@ -83,7 +83,7 @@ namespace GraphTool
 
         /// Obtains a read-only iterator to the beginning of the out-edges edges that correspond to the supplied source vertex iterator.
         /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
-        inline ConstEdgeIterator ConstEdgeIteratorSourceAt(ConstVertexIterator& vertexIterator) const
+        inline ConstEdgeIterator ConstEdgeIteratorSourceAt(const ConstVertexIterator& vertexIterator) const
         {
             return edgesBySource.ConstEdgeIteratorAt(vertexIterator);
         }
