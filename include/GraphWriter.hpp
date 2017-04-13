@@ -173,8 +173,8 @@ namespace GraphTool
             SGraphWriteSpec writeSpec;
 
             writeSpec.file = graphfile;
-            writeSpec.edgesBegin = (groupedByDestination ? graph.ConstIteratorDestinationBegin() : graph.ConstIteratorSourceBegin());
-            writeSpec.edgesEnd = (groupedByDestination ? graph.ConstIteratorDestinationEnd() : graph.ConstIteratorSourceEnd());
+            writeSpec.edgesBegin = (groupedByDestination ? graph.ConstEdgeIteratorDestinationBegin() : graph.ConstEdgeIteratorSourceBegin());
+            writeSpec.edgesEnd = (groupedByDestination ? graph.ConstEdgeIteratorDestinationEnd() : graph.ConstEdgeIteratorSourceEnd());
             writeSpec.writer = this;
             writeSpec.bufs[0] = bufs[0];
             writeSpec.bufs[1] = bufs[1];

@@ -30,7 +30,10 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
 
         /// Convenience alias for read-only iterators over edges.
-        typedef typename EdgeIndex<TEdgeData>::ConstIterator ConstEdgeIterator;
+        typedef typename EdgeIndex<TEdgeData>::ConstEdgeIterator ConstEdgeIterator;
+
+        /// Convenience alias for read-only iterators over indexed verties.
+        typedef typename EdgeIndex<TEdgeData>::ConstVertexIterator ConstVertexIterator;
         
         
     private:
@@ -57,32 +60,88 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
+        /// Obtains a read-only iterator to the beginning of the in-edges edges that correspond to the supplied destination vertex iterator.
+        /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
+        inline ConstEdgeIterator ConstEdgeIteratorDestinationAt(ConstVertexIterator& vertexIterator) const
+        {
+            return edgesByDestination.ConstEdgeIteratorAt(vertexIterator);
+        }
+        
         /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by destination vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorDestinationBegin(void) const
+        inline ConstEdgeIterator ConstEdgeIteratorDestinationBegin(void) const
         {
-            return edgesByDestination.ConstIteratorBegin();
+            return edgesByDestination.ConstEdgeIteratorBegin();
         }
 
         /// Obtains a read-only iterator to the end of this graph's edges, grouped by destination vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorDestinationEnd(void) const
+        inline ConstEdgeIterator ConstEdgeIteratorDestinationEnd(void) const
         {
-            return edgesByDestination.ConstIteratorEnd();
+            return edgesByDestination.ConstEdgeIteratorEnd();
         }
 
+        /// Obtains a read-only iterator to the beginning of the out-edges edges that correspond to the supplied source vertex iterator.
+        /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
+        inline ConstEdgeIterator ConstEdgeIteratorSourceAt(ConstVertexIterator& vertexIterator) const
+        {
+            return edgesBySource.ConstEdgeIteratorAt(vertexIterator);
+        }
+        
         /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by source vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorSourceBegin(void) const
+        inline ConstEdgeIterator ConstEdgeIteratorSourceBegin(void) const
         {
-            return edgesBySource.ConstIteratorBegin();
+            return edgesBySource.ConstEdgeIteratorBegin();
         }
         
         /// Obtains a read-only iterator to the end of this graph's edges, grouped by source vertex.
         /// @return Iterator, as described.
-        inline ConstEdgeIterator ConstIteratorSourceEnd(void) const
+        inline ConstEdgeIterator ConstEdgeIteratorSourceEnd(void) const
         {
-            return edgesBySource.ConstIteratorEnd();
+            return edgesBySource.ConstEdgeIteratorEnd();
+        }
+
+        /// Obtains a read-only iterator to this graph's destination vertices starting with the specified vertex.
+        /// @return Iterator, as described, or an invalid iterator if the supplied vertex is not present in the graph.
+        inline ConstVertexIterator ConstVertexIteratorDestinationAt(const TVertexID vertexID) const
+        {
+            return edgesByDestination.ConstVertexIteratorAt(vertexID);
+        }
+        
+        /// Obtains a read-only iterator to the beginning of this graph's destination vertices.
+        /// @return Iterator, as described.
+        inline ConstVertexIterator ConstVertexIteratorDestinationBegin(void) const
+        {
+            return edgesByDestination.ConstVertexIteratorBegin();
+        }
+
+        /// Obtains a read-only iterator to the end of this graph's destination vertices.
+        /// @return Iterator, as described.
+        inline ConstVertexIterator ConstVertexIteratorDestinationEnd(void) const
+        {
+            return edgesByDestination.ConstVertexIteratorEnd();
+        }
+
+        /// Obtains a read-only iterator to this graph's source vertices starting with the specified vertex.
+        /// @return Iterator, as described, or an invalid iterator if the supplied vertex is not present in the graph.
+        inline ConstVertexIterator ConstVertexIteratorSourceAt(const TVertexID vertexID) const
+        {
+            return edgesBySource.ConstVertexIteratorAt(vertexID);
+        }
+        
+        /// Obtains a read-only iterator to the beginning of this graph's source vertices.
+        /// @return Iterator, as described.
+        inline ConstVertexIterator ConstVertexIteratorSourceBegin(void) const
+        {
+            return edgesBySource.ConstVertexIteratorBegin();
+        }
+
+        /// Obtains a read-only iterator to the end of this graph's source vertices.
+        /// @return Iterator, as described.
+        inline ConstVertexIterator ConstVertexIteratorSourceEnd(void) const
+        {
+            return edgesBySource.ConstVertexIteratorEnd();
         }
         
         /// Retrieves and returns the number of edges in the graph.
