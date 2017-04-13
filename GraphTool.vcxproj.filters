@@ -27,12 +27,6 @@
     <ClInclude Include="include\GraphReader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\BinaryEdgeListReader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TextEdgeListReader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Edge.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -43,6 +37,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BinaryEdgeListWriter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BinaryEdgeListReader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextEdgeListReader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Comparator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SequenceComparator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexComparator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

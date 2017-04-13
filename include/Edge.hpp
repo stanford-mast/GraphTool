@@ -44,20 +44,8 @@ namespace GraphTool
         {
             // Nothing to do here.
         }
-
-
-        // -------- OPERATORS ---------------------------------------------- //
-
-        /// Compares this instance with another.
-        /// Equality is only determined by vertex, not by edge data.
-        /// @param [in] other Reference to the other instance.
-        /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const Edge& other) const
-        {
-            return (this->vertex == other.vertex);
-        }
-
-
+        
+        
         // -------- INSTANCE METHODS --------------------------------------- //
 
         /// Exports the information from this structure to edge buffer data, using this structure's vertex as a destination vertex.
@@ -122,20 +110,8 @@ namespace GraphTool
         {
             // Nothing to do here.
         }
-
-
-        // -------- OPERATORS ---------------------------------------------- //
-
-        /// Compares this instance with another.
-        /// Equality is only determined by vertex, not by edge data.
-        /// @param [in] other Reference to the other instance.
-        /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-        inline bool operator==(const Edge& other) const
-        {
-            return (this->vertex == other.vertex);
-        }
-
-
+        
+        
         // -------- INSTANCE METHODS --------------------------------------- //
 
         /// Exports the information from this structure to edge buffer data, using this structure's vertex as a destination vertex.
@@ -170,27 +146,7 @@ namespace GraphTool
             this->vertex = edgeBuffer.sourceVertex;
         }
     };
-
-    /// Function object for comparing two edges, using a less-than operator, based on their sequence numbers.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct EdgeCompareLessBySeq
-    {
-        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
-        {
-            return (first.seq < second.seq);
-        }
-    };
-
-    /// Function object for comparing two edges, using a less-than operator, based on their vertex identifiers.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct EdgeCompareLessByVertex
-    {
-        inline bool operator()(Edge<TEdgeData>& first, Edge<TEdgeData>& second) const
-        {
-            return (first.vertex < second.vertex);
-        }
-    };
-
+    
     /// Convenience alias for edges that do not use edge data or weights.
     typedef Edge<void> UnweightedEdge;
 }

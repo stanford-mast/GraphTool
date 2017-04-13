@@ -16,6 +16,7 @@
 #include "Edge.hpp"
 #include "EdgeIndex.hpp"
 #include "Graph.hpp"
+#include "SequenceComparator.hpp"
 #include "Types.h"
 
 #include <cstddef>
@@ -123,7 +124,8 @@ namespace GraphTool
             {
                 const uint32_t selectionMask = currentIndex - 1;
                 const uint32_t mergeWithOffset = (currentIndex >> 1);
-                
+                SequenceAscendingComparator<TEdgeData> comparator;
+
                 spindleBarrierLocal();
 
                 // Only some threads are active during the current iteration.
@@ -135,12 +137,12 @@ namespace GraphTool
                 {
                     case 0:
                         if ((spindleGetLocalThreadID() + mergeWithOffset) < spindleGetLocalThreadCount())
-                            readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdgesBySeq(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset]);
+                            readSpec->edgeIndicesByDestination[spindleGetLocalThreadID()].MergeEdges(readSpec->edgeIndicesByDestination[spindleGetLocalThreadID() + mergeWithOffset], comparator);
                         break;
                         
                     case 1:
                         if ((spindleGetLocalThreadID() - 1 + mergeWithOffset) < spindleGetLocalThreadCount())
-                            readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdgesBySeq(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset]);
+                            readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1].MergeEdges(readSpec->edgeIndicesBySource[spindleGetLocalThreadID() - 1 + mergeWithOffset], comparator);
                         break;
                         
                     default:
@@ -201,11 +203,13 @@ namespace GraphTool
         // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
         
         /// Opens and performs any initial file reading tasks required to prepare the graph file for reading of edges.
+        /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] filename File name of the file to be opened for reading.
         /// @return File handle for the opened file.
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename) = 0;
         
         /// Reads the next set of edges from the specified graph file into the specified buffer.
+        /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] graphfile File handle for the open graph file.
         /// @param [in] buf Buffer to which to read edge data.
         /// @param [in] count Number of edges that the buffer can hold.

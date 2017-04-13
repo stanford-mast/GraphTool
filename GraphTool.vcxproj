@@ -14,13 +14,16 @@
     <ClInclude Include="include\BinaryEdgeListReader.hpp" />
     <ClInclude Include="include\BinaryEdgeListWriter.hpp" />
     <ClInclude Include="include\Edge.hpp" />
+    <ClInclude Include="include\Comparator.hpp" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.hpp" />
     <ClInclude Include="include\GraphWriter.hpp" />
+    <ClInclude Include="include\SequenceComparator.hpp" />
     <ClInclude Include="include\TextEdgeListReader.hpp" />
     <ClInclude Include="include\TextEdgeListWriter.hpp" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\EdgeIndex.hpp" />
+    <ClInclude Include="include\VertexComparator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp" />

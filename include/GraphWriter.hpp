@@ -133,6 +133,7 @@ namespace GraphTool
         // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
 
         /// Opens and performs any initial file reading tasks required to prepare the graph file for writing of graph data.
+        /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] filename File name of the file to be opened for writing.
         /// @param [in] graph Graph to be written.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
@@ -140,6 +141,7 @@ namespace GraphTool
         virtual FILE* OpenAndInitializeGraphFile(const std::string& filename, Graph<TEdgeData>& graph, bool groupedByDestination) = 0;
         
         /// Writes edge data from the specified buffer into the specified file.
+        /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] graphfile File handle for the open graph file.
         /// @param [in] graph Graph to be written.
         /// @param [in] buf Buffer from which to read edge data.

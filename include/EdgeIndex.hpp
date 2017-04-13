@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "Comparator.hpp"
 #include "Edge.hpp"
 #include "Types.h"
 
@@ -344,19 +345,12 @@ namespace GraphTool
         /// @tparam TCompare Functon object or function pointer that implements the predicate.
         /// @param [in] other Edge index whose edges are to be merged into this one.
         /// @param [in] comparator Instance of the predicate.
-        template <typename TCompare> void MergeEdges(EdgeIndex<TEdgeData>& other, TCompare comparator)
+        void MergeEdges(EdgeIndex<TEdgeData>& other, Comparator<TEdgeData>& comparator)
         {
             for (auto it = other.vertexIndex.begin(); it != other.vertexIndex.end(); ++it)
-                vertexIndex[it->first].merge(it->second, comparator);
+                vertexIndex[it->first].merge<Comparator<TEdgeData>&>(it->second, comparator);
 
             other.vertexIndex.clear();
-        }
-
-        /// Merges the contents of the other index with this one, using sequence number as the comparison predicate.
-        /// @param [in] other Edge index whose edges are to be merged into this one.
-        inline void MergeEdgesBySeq(EdgeIndex<TEdgeData>& other)
-        {
-            MergeEdges(other, EdgeCompareLessBySeq<TEdgeData>());
         }
         
         /// Removes a single edge from the indexed data structure.
