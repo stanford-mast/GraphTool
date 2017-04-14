@@ -44,12 +44,12 @@ namespace GraphTool
         
         /// Enables read-only access to the indexed vertices in this index, forward direction only.
         /// Not a standard iterator type.
-        class ConstVertexIterator
+        class VertexIterator
         {
         private:
             // -------- FRIENDSHIPS -------------------------------------------- //
 
-            friend class EdgeIndex<TEdgeData>::ConstEdgeIterator;
+            friend class EdgeIndex<TEdgeData>::EdgeIterator;
             
             
             // -------- INSTANCE VARIABLES --------------------------------- //
@@ -65,14 +65,14 @@ namespace GraphTool
             // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
 
             /// Default constructor.
-            ConstVertexIterator() : vertexIndex(NULL), indexIterator()
+            VertexIterator() : vertexIndex(NULL), indexIterator()
             {
                 // Nothing to do here.
             }
 
         private:
             /// Initialization constructor. Can only be invoked by a class-level factory method.
-            ConstVertexIterator(const TVertexIndex* vertexIndex, typename TVertexIndex::const_iterator& indexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator)
+            VertexIterator(const TVertexIndex* vertexIndex, typename TVertexIndex::const_iterator& indexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator)
             {
                 // Nothing to do here.
             }
@@ -83,33 +83,33 @@ namespace GraphTool
             
             /// Creates and returns an iterator to the specified vertex in this edge index, if it exists.
             /// @return Read-only iterator at the specified position, or an invalid iterator if the vertex is not present in the specified edge index.
-            static ConstVertexIterator ConstVertexIteratorAt(const TVertexIndex* vertexIndex, const TVertexID vertexID)
+            static VertexIterator VertexIteratorAt(const TVertexIndex* vertexIndex, const TVertexID vertexID)
             {
                 if (0 != vertexIndex->count(vertexID))
                 {
                     auto indexIterator = vertexIndex->find(vertexID);
-                    return ConstVertexIterator(vertexIndex, indexIterator);
+                    return VertexIterator(vertexIndex, indexIterator);
                 }
                 else
-                    return ConstVertexIterator();
+                    return VertexIterator();
             }
             
             /// Creates and returns an iterator to the beginning of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @return Read-only iterator to the beginning of the index.
-            static ConstVertexIterator ConstVertexIteratorBegin(const TVertexIndex* vertexIndex)
+            static VertexIterator VertexIteratorBegin(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cbegin();
-                return ConstVertexIterator(vertexIndex, indexIterator);
+                return VertexIterator(vertexIndex, indexIterator);
             }
 
             /// Creates and returns an iterator to the past-the-end element of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @return Read-only iterator to the past-the-end element of the index.
-            static ConstVertexIterator ConstVertexIteratorEnd(const TVertexIndex* vertexIndex)
+            static VertexIterator VertexIteratorEnd(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cend();
-                return ConstVertexIterator(vertexIndex, indexIterator);
+                return VertexIterator(vertexIndex, indexIterator);
             }
             
             
@@ -118,7 +118,7 @@ namespace GraphTool
             /// Compares this instance with another for equality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-            inline bool operator==(const ConstVertexIterator& other) const
+            inline bool operator==(const VertexIterator& other) const
             {
                 return (this->indexIterator == other.indexIterator);
             }
@@ -126,14 +126,14 @@ namespace GraphTool
             /// Compares this instance with another for inequality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is different from the other instance, `false` otherwise.
-            inline bool operator!=(const ConstVertexIterator& other) const
+            inline bool operator!=(const VertexIterator& other) const
             {
                 return (this->indexIterator != other.indexIterator);
             }
 
             /// Prefix-increments this instance by advancing it to the next position.
             /// @return This instance after it has been advanced.
-            ConstVertexIterator& operator++(void)
+            VertexIterator& operator++(void)
             {
                 ++(this->indexIterator);
                 return *this;
@@ -141,9 +141,9 @@ namespace GraphTool
 
             /// Postfix-increments this instance by advancing it to the next position.
             /// @return This instance before it has been advanced.
-            ConstVertexIterator operator++(int)
+            VertexIterator operator++(int)
             {
-                ConstVertexIterator beforeIncrement = *this;
+                VertexIterator beforeIncrement = *this;
                 ++(*this);
                 return beforeIncrement;
             }
@@ -151,9 +151,9 @@ namespace GraphTool
             /// Advances this iterator by the specified number of positions.
             /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
             /// @param [in] numPositions Number of positions by which to advance this iteartor.
-            ConstVertexIterator& operator+=(const TVertexCount numPositions)
+            VertexIterator& operator+=(const TVertexCount numPositions)
             {
-                ConstVertexIterator endIter = ConstVertexIteratorEnd(this->vertexIndex);
+                VertexIterator endIter = VertexIteratorEnd(this->vertexIndex);
 
                 for (TVertexCount i = 0; i < numPositions && *this != endIter; ++i)
                     ++(*this);
@@ -164,9 +164,9 @@ namespace GraphTool
             /// Advances a copy of this iterator by the specified number of positions.
             /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
             /// @param [in] numPositions Number of positions by which to advance this iterator.
-            ConstVertexIterator operator+(const TEdgeCount numPositions) const
+            VertexIterator operator+(const TEdgeCount numPositions) const
             {
-                ConstVertexIterator result = *this;
+                VertexIterator result = *this;
                 result += numPositions;
                 return result;
             }
@@ -200,7 +200,7 @@ namespace GraphTool
         
         /// Enables read-only access to all edges in this index, forward direction only.
         /// Accumulates and exposes data from multiple sources, so not a standard iterator type.
-        class ConstEdgeIterator
+        class EdgeIterator
         {
         private:
             // -------- INSTANCE VARIABLES --------------------------------- //
@@ -219,14 +219,14 @@ namespace GraphTool
             // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
             
             /// Default constructor.
-            ConstEdgeIterator() : vertexIndex(NULL), indexIterator(), vertexIterator()
+            EdgeIterator() : vertexIndex(NULL), indexIterator(), vertexIterator()
             {
                 // Nothing to do here.
             }
             
         private:
             /// Initialization constructor. Can only be invoked by a class-level factory method.
-            ConstEdgeIterator(const TVertexIndex* vertexIndex, typename TVertexIndex::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
+            EdgeIterator(const TVertexIndex* vertexIndex, typename TVertexIndex::const_iterator& indexIterator, typename TEdgeList::const_iterator& vertexIterator) : vertexIndex(vertexIndex), indexIterator(indexIterator), vertexIterator(vertexIterator)
             {
                 // Nothing to do here.
             }
@@ -238,39 +238,39 @@ namespace GraphTool
             /// Creates and returns an iterator to the position that corresponds to the beginning of the edges at the specified vertex.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @return Read-only iterator to the beginning of the edges for the corresponding vertex, or an invalid iterator if the vertex iterator supplied does not belong to the edge index.
-            static ConstEdgeIterator ConstEdgeIteratorAt(const EdgeIndex<TEdgeData>& edgeIndex, const ConstVertexIterator& vertexIterator)
+            static EdgeIterator EdgeIteratorAt(const EdgeIndex<TEdgeData>& edgeIndex, const VertexIterator& vertexIterator)
             {
                 if (vertexIterator.BelongsToEdgeIndex(edgeIndex))
                 {
                     auto indexIterator = vertexIterator.indexIterator;
                     auto vertexIterator = indexIterator->second.cbegin();
 
-                    return ConstEdgeIterator(&edgeIndex.vertexIndex, indexIterator, vertexIterator);
+                    return EdgeIterator(&edgeIndex.vertexIndex, indexIterator, vertexIterator);
                 }
                 else
-                    return ConstEdgeIterator();
+                    return EdgeIterator();
             }
             
             /// Creates and returns an iterator to the beginning of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @return Read-only iterator to the beginning of the index.
-            static ConstEdgeIterator ConstEdgeIteratorBegin(const TVertexIndex* vertexIndex)
+            static EdgeIterator EdgeIteratorBegin(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cbegin();
                 auto vertexIterator = indexIterator->second.cbegin();
 
-                return ConstEdgeIterator(vertexIndex, indexIterator, vertexIterator);
+                return EdgeIterator(vertexIndex, indexIterator, vertexIterator);
             }
             
             /// Creates and returns an iterator to the past-the-end element of the specified index.
             /// @param [in] vertexIndex Pointer to the vertex index of interest.
             /// @return Read-only iterator to the past-the-end element of the index.
-            static ConstEdgeIterator ConstEdgeIteratorEnd(const TVertexIndex* vertexIndex)
+            static EdgeIterator EdgeIteratorEnd(const TVertexIndex* vertexIndex)
             {
                 auto indexIterator = vertexIndex->cend();
                 auto vertexIterator = (--(vertexIndex->cend()))->second.cend();
 
-                return ConstEdgeIterator(vertexIndex, indexIterator, vertexIterator);
+                return EdgeIterator(vertexIndex, indexIterator, vertexIterator);
             }
             
             
@@ -279,7 +279,7 @@ namespace GraphTool
             /// Compares this instance with another for equality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is equal to the other instance, `false` otherwise.
-            inline bool operator==(const ConstEdgeIterator& other) const
+            inline bool operator==(const EdgeIterator& other) const
             {
                 return ((this->indexIterator == other.indexIterator) && (this->vertexIterator == other.vertexIterator));
             }
@@ -287,14 +287,14 @@ namespace GraphTool
             /// Compares this instance with another for inequality.
             /// @param [in] other Reference to the other instance.
             /// @return `true` if this instance is different from the other instance, `false` otherwise.
-            inline bool operator!=(const ConstEdgeIterator& other) const
+            inline bool operator!=(const EdgeIterator& other) const
             {
                 return ((this->indexIterator != other.indexIterator) || (this->vertexIterator != other.vertexIterator));
             }
             
             /// Prefix-increments this instance by advancing it to the next position.
             /// @return This instance after it has been advanced.
-            ConstEdgeIterator& operator++(void)
+            EdgeIterator& operator++(void)
             {
                 ++(this->vertexIterator);
 
@@ -311,9 +311,9 @@ namespace GraphTool
 
             /// Postfix-increments this instance by advancing it to the next position.
             /// @return This instance before it has been advanced.
-            ConstEdgeIterator operator++(int)
+            EdgeIterator operator++(int)
             {
-                ConstEdgeIterator beforeIncrement = *this;
+                EdgeIterator beforeIncrement = *this;
                 ++(*this);
                 return beforeIncrement;
             }
@@ -321,9 +321,9 @@ namespace GraphTool
             /// Advances this iterator by the specified number of positions.
             /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
             /// @param [in] numPositions Number of positions by which to advance this iteartor.
-            ConstEdgeIterator& operator+=(const TEdgeCount numPositions)
+            EdgeIterator& operator+=(const TEdgeCount numPositions)
             {
-                ConstEdgeIterator endIter = ConstEdgeIteratorEnd(this->vertexIndex);
+                EdgeIterator endIter = EdgeIteratorEnd(this->vertexIndex);
 
                 for (TEdgeCount i = 0; i < numPositions && *this != endIter; ++i)
                     ++(*this);
@@ -334,9 +334,9 @@ namespace GraphTool
             /// Advances a copy of this iterator by the specified number of positions.
             /// Saturates at the end of the associated edge index (i.e. will not advance past its past-the-end iterator).
             /// @param [in] numPositions Number of positions by which to advance this iterator.
-            ConstEdgeIterator operator+(const TEdgeCount numPositions) const
+            EdgeIterator operator+(const TEdgeCount numPositions) const
             {
-                ConstEdgeIterator result = *this;
+                EdgeIterator result = *this;
                 result += numPositions;
                 return result;
             }
@@ -405,44 +405,23 @@ namespace GraphTool
         
         /// Creates and returns an iterator to the beginning of the edges corresponding to the specified vertex iterator.
         /// @return Read-only iterator at the specified position, or an invalid iterator if the vertex iterator supplied does not belong to this edge index.
-        inline ConstEdgeIterator ConstEdgeIteratorAt(const ConstVertexIterator& vertexIterator) const
+        inline EdgeIterator EdgeIteratorAt(const VertexIterator& vertexIterator) const
         {
-            return ConstEdgeIterator::ConstEdgeIteratorAt(*this, vertexIterator);
+            return EdgeIterator::EdgeIteratorAt(*this, vertexIterator);
         }
         
         /// Creates and returns an iterator to the beginning of this edge index.
         /// @return Read-only iterator to the beginning of the index.
-        inline ConstEdgeIterator ConstEdgeIteratorBegin(void) const
+        inline EdgeIterator EdgeIteratorBegin(void) const
         {
-            return ConstEdgeIterator::ConstEdgeIteratorBegin(&(this->vertexIndex));
+            return EdgeIterator::EdgeIteratorBegin(&(this->vertexIndex));
         }
 
         /// Creates and returns an iterator to the past-the-end element of this edge index.
         /// @return Read-only iterator to the end of the index.
-        inline ConstEdgeIterator ConstEdgeIteratorEnd(void) const
+        inline EdgeIterator EdgeIteratorEnd(void) const
         {
-            return ConstEdgeIterator::ConstEdgeIteratorEnd(&(this->vertexIndex));
-        }
-
-        /// Creates and returns an iterator to the specified vertex in this edge index, if it exists.
-        /// @return Read-only iterator at the specified position, or an invalid iterator if the vertex is not present in this edge index.
-        inline ConstVertexIterator ConstVertexIteratorAt(const TVertexID vertexID) const
-        {
-            return ConstVertexIterator::ConstVertexIteratorAt(&(this->vertexIndex), vertexID);
-        }
-        
-        /// Creates and returns an iterator to the beginning vertex in this edge index.
-        /// @return Read-only iterator to the beginning of the index.
-        inline ConstVertexIterator ConstVertexIteratorBegin(void) const
-        {
-            return ConstVertexIterator::ConstVertexIteratorBegin(&(this->vertexIndex));
-        }
-
-        /// Creates and returns an iterator to the past-the-end vertex in this edge index.
-        /// @return Read-only iterator to the end of the index.
-        inline ConstVertexIterator ConstVertexIteratorEnd(void) const
-        {
-            return ConstVertexIterator::ConstVertexIteratorEnd(&(this->vertexIndex));
+            return EdgeIterator::EdgeIteratorEnd(&(this->vertexIndex));
         }
 
         /// Retrieves and returns information about the vertex of highest degree.
@@ -593,6 +572,27 @@ namespace GraphTool
                 vertexIndex[it->first].splice(vertexIndex[it->first].end(), it->second);
             
             other.vertexIndex.clear();
+        }
+
+        /// Creates and returns an iterator to the specified vertex in this edge index, if it exists.
+        /// @return Read-only iterator at the specified position, or an invalid iterator if the vertex is not present in this edge index.
+        inline VertexIterator VertexIteratorAt(const TVertexID vertexID) const
+        {
+            return VertexIterator::VertexIteratorAt(&(this->vertexIndex), vertexID);
+        }
+
+        /// Creates and returns an iterator to the beginning vertex in this edge index.
+        /// @return Read-only iterator to the beginning of the index.
+        inline VertexIterator VertexIteratorBegin(void) const
+        {
+            return VertexIterator::VertexIteratorBegin(&(this->vertexIndex));
+        }
+
+        /// Creates and returns an iterator to the past-the-end vertex in this edge index.
+        /// @return Read-only iterator to the end of the index.
+        inline VertexIterator VertexIteratorEnd(void) const
+        {
+            return VertexIterator::VertexIteratorEnd(&(this->vertexIndex));
         }
     };
 

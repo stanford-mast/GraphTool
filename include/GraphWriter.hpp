@@ -46,8 +46,8 @@ namespace GraphTool
         {
             FILE* file;                                                     ///< File handle.
             Graph<TEdgeData>* graph;                                        ///< Graph object being written.
-            typename Graph<TEdgeData>::ConstEdgeIterator edgesBegin;        ///< Iterator to the beginning of the graph's edges.
-            typename Graph<TEdgeData>::ConstEdgeIterator edgesEnd;          ///< Iterator to the end of the graph's edges.
+            typename Graph<TEdgeData>::EdgeIterator edgesBegin;        ///< Iterator to the beginning of the graph's edges.
+            typename Graph<TEdgeData>::EdgeIterator edgesEnd;          ///< Iterator to the end of the graph's edges.
             GraphWriter<TEdgeData>* writer;                                 ///< Graph write object.
             SEdgeBufferData<TEdgeData>* bufs[2];                            ///< Edge data buffers.
             TEdgeCount counts[2];                                           ///< Edge data buffer counts.
@@ -173,8 +173,8 @@ namespace GraphTool
             SGraphWriteSpec writeSpec;
 
             writeSpec.file = graphfile;
-            writeSpec.edgesBegin = (groupedByDestination ? graph.ConstEdgeIteratorDestinationBegin() : graph.ConstEdgeIteratorSourceBegin());
-            writeSpec.edgesEnd = (groupedByDestination ? graph.ConstEdgeIteratorDestinationEnd() : graph.ConstEdgeIteratorSourceEnd());
+            writeSpec.edgesBegin = (groupedByDestination ? graph.EdgeIteratorDestinationBegin() : graph.EdgeIteratorSourceBegin());
+            writeSpec.edgesEnd = (groupedByDestination ? graph.EdgeIteratorDestinationEnd() : graph.EdgeIteratorSourceEnd());
             writeSpec.writer = this;
             writeSpec.bufs[0] = bufs[0];
             writeSpec.bufs[1] = bufs[1];
