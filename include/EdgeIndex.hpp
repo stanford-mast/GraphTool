@@ -7,8 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file EdgeIndex.hpp
- *   Implementation of a templated data structure that holds edges in a form
- *   indexed by the vertex at one end.
+ *   Implementation of an index that holds edge grouped by common vertex.
  *****************************************************************************/
 
 #pragma once
@@ -33,7 +32,7 @@ namespace GraphTool
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
-        /// Alias for the templated type of edge data to store.
+        /// Alias for the type of edge data structure to use for each edge.
         typedef Edge<TEdgeData> TEdge;
         
         /// Alias for the container type to use to store edges within each index bucket.
@@ -382,8 +381,40 @@ namespace GraphTool
             }
         };
         
-        
     private:
+        /// Predicate object used to identify edges whose vertex ID matches a specified vertex ID.
+        class EdgeMatchesVertexPredicate
+        {
+        private:
+            // -------- INSTANCE VARIABLES --------------------------------- //
+
+            /// Vertex ID against which to compare.
+            const TVertexID vertexID;
+            
+            
+        public:
+            // -------- CONSTRUCTION AND DESTRUCTION ----------------------- //
+            
+            /// Initialization constructor.
+            /// Sets the vertex ID against which to compare.
+            EdgeMatchesVertexPredicate(TVertexID vertexID) : vertexID(vertexID)
+            {
+                // Nothing to do here.
+            }
+            
+            
+            // -------- OPERATORS ------------------------------------------ //
+
+            /// Checks if the specified edge has a vertex that matches the one previously set for comparison.
+            /// @param [in] edge Edge to check.
+            /// @return `true` if there is a match, `false` otherwise.
+            inline bool operator()(const Edge<TEdgeData>& edge)
+            {
+                return (edge.vertex == vertexID);
+            }
+        };
+        
+        
         // -------- INSTANCE VARIABLES ------------------------------------- //
         
         /// Main data structure, indexed by one end of each edge.
@@ -536,9 +567,9 @@ namespace GraphTool
         {
             if (0 != vertexIndex.count(indexedVertex))
             {
-                vertexIndex.at(indexedVertex).remove(otherVertex);
+                vertexIndex.at(indexedVertex).remove_if(EdgeMatchesVertexPredicate(otherVertex));
 
-                if (0 == vertexIndex[indexedVertex].size())
+                if (vertexIndex[indexedVertex].empty())
                     vertexIndex.erase(indexedVertex);
             }
         }
@@ -549,8 +580,16 @@ namespace GraphTool
         {
             vertexIndex.erase(vertex);
 
-            for (auto it = vertexIndex.begin(); it != vertexIndex.end(); ++it)
-                it->second.remove(vertex);
+            auto it = vertexIndex.begin();
+            while (it != vertexIndex.end())
+            {
+                it->second.remove_if(EdgeMatchesVertexPredicate(vertex));
+
+                if (it->second.empty())
+                    vertexIndex.erase(it++);
+                else
+                    ++it;
+            }
         }
 
         /// Replaces all edges contained in the current data structure with those contained in the supplied replacement.

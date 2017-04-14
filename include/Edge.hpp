@@ -7,8 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file Edge.hpp
- *   Implementation of a templated data structure that holds data for a single
- *   edge in a graph.
+ *   Implementation of a single edge data structure.
  *****************************************************************************/
 
 #pragma once
@@ -25,7 +24,7 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> struct Edge
     {
-        // -------- INSTANCE VARIABLES --------------------------------------------- //
+        // -------- INSTANCE VARIABLES ------------------------------------- //
 
         /// Identifies this edge based on its order of occurrence within the input file.
         TEdgeID seq;
@@ -37,7 +36,7 @@ namespace GraphTool
         TEdgeData edgeData;
 
 
-        // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
         Edge(void) : seq(), vertex(), edgeData()
@@ -101,12 +100,6 @@ namespace GraphTool
 
         /// Default constructor.
         Edge(void) : seq(), vertex()
-        {
-            // Nothing to do here.
-        }
-
-        /// Enables implicit conversion to this type from a vertex identifier.
-        Edge(TVertexID vertex) : seq(), vertex(vertex)
         {
             // Nothing to do here.
         }

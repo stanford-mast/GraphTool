@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file Graph.hpp
- *   Implementation of a templated data structure used to represent a graph.
+ *   Implementation of the data structure used to represent a graph.
  *****************************************************************************/
 
 #pragma once
@@ -111,7 +111,7 @@ namespace GraphTool
 
         /// Retrieves and returns the number of vertices in the graph.
         /// @return Number of vertices in the graph.
-        TVertexCount GetNumVertices(void) const
+        inline TVertexCount GetNumVertices(void) const
         {
             TVertexCount numDestinationVertices = 0;
             TVertexCount numSourceVertices = 0;
@@ -144,7 +144,7 @@ namespace GraphTool
         /// Removes an edge from the graph.
         /// @param [in] fromVertex Identifies the source vertex of the edge.
         /// @param [in] toVertex Identifies the destination vertex of the edge.
-        void RemoveEdge(TVertexID fromVertex, TVertexID toVertex)
+        inline void RemoveEdge(TVertexID fromVertex, TVertexID toVertex)
         {
             this->edgesByDestination.RemoveEdge(toVertex, fromVertex);
             this->edgesBySource.RemoveEdge(fromVertex, toVertex);
@@ -152,7 +152,7 @@ namespace GraphTool
         
         /// Removes a vertex from the graph, including all edges that include it.
         /// @param [in] vertex Identifier of the vertex to remove.
-        void RemoveVertex(TVertexID vertex)
+        inline void RemoveVertex(TVertexID vertex)
         {
             this->edgesByDestination.RemoveVertex(vertex);
             this->edgesBySource.RemoveVertex(vertex);
@@ -163,7 +163,7 @@ namespace GraphTool
         /// It is up to the caller to generate proper and consistent data structures, as this method does no checking.
         /// @param [in,out] replacementEdgesByDestination Edge data structure containing new edges to set, indexed by destination vertex.
         /// @param [in,out] replacementEdgesBySource Edge data structure containing new edges to set, indexed by source vertex.
-        void SetEdgeIndices(EdgeIndex<TEdgeData>& replacementEdgesByDestination, EdgeIndex<TEdgeData>& replacementEdgesBySource)
+        inline void SetEdgeIndices(EdgeIndex<TEdgeData>& replacementEdgesByDestination, EdgeIndex<TEdgeData>& replacementEdgesBySource)
         {
             edgesByDestination.SetEdges(replacementEdgesByDestination);
             edgesBySource.SetEdges(replacementEdgesBySource);

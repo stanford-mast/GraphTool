@@ -8,7 +8,7 @@
  *************************************************************************//**
  * @file GraphReader.hpp
  *   Declaration of the common interface to objects capable of interpreting
- *   graph files of various formats, templated by edge data type.
+ *   graph files of various formats.
  *****************************************************************************/
 
 #pragma once
