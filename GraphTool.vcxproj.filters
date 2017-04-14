@@ -57,9 +57,15 @@
     <ClInclude Include="include\VersionInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

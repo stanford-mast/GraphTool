@@ -18,6 +18,7 @@
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.hpp" />
     <ClInclude Include="include\GraphWriter.hpp" />
+    <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\SequenceComparator.hpp" />
     <ClInclude Include="include\TextEdgeListReader.hpp" />
     <ClInclude Include="include\TextEdgeListWriter.hpp" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Options.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>
@@ -80,7 +82,6 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AssemblerListingLocation>$(IntDir)%(Filename)%(Extension).asm</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)%(Filename)%(Extension).obj</ObjectFileName>
-      <ForcedIncludeFiles>VersionInfo.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Silo-Debug.lib;Spindle-Debug.lib;Topo-Debug.lib;libhwloc-5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -99,7 +100,6 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <AssemblerListingLocation>$(IntDir)%(Filename)%(Extension).asm</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)%(Filename)%(Extension).obj</ObjectFileName>
-      <ForcedIncludeFiles>VersionInfo.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
