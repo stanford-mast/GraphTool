@@ -11,25 +11,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\BinaryEdgeListReader.hpp" />
-    <ClInclude Include="include\BinaryEdgeListWriter.hpp" />
+    <ClInclude Include="include\BinaryEdgeListReader.h" />
+    <ClInclude Include="include\BinaryEdgeListWriter.h" />
     <ClInclude Include="include\Edge.hpp" />
     <ClInclude Include="include\Comparator.hpp" />
     <ClInclude Include="include\Graph.hpp" />
-    <ClInclude Include="include\GraphReader.hpp" />
-    <ClInclude Include="include\GraphWriter.hpp" />
+    <ClInclude Include="include\GraphReader.h" />
+    <ClInclude Include="include\GraphWriter.h" />
     <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\SequenceComparator.hpp" />
-    <ClInclude Include="include\TextEdgeListReader.hpp" />
-    <ClInclude Include="include\TextEdgeListWriter.hpp" />
+    <ClInclude Include="include\TextEdgeListReader.h" />
+    <ClInclude Include="include\TextEdgeListWriter.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\EdgeIndex.hpp" />
     <ClInclude Include="include\VersionInfo.h" />
     <ClInclude Include="include\VertexComparator.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\BinaryEdgeListReader.cpp" />
+    <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
+    <ClCompile Include="source\GraphReader.cpp" />
+    <ClCompile Include="source\GraphWriter.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\Options.cpp" />
+    <ClCompile Include="source\TextEdgeListReader.cpp" />
+    <ClCompile Include="source\TextEdgeListWriter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>

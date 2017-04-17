@@ -18,7 +18,6 @@
 #include <string>
 #include <utility>
 
-
 using namespace GraphTool;
 
 

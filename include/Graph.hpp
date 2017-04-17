@@ -29,10 +29,10 @@ namespace GraphTool
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
 
-        /// Convenience alias for read-only iterators over edges.
+        /// Alias for read-only iterators over edges.
         typedef typename EdgeIndex<TEdgeData>::EdgeIterator EdgeIterator;
 
-        /// Convenience alias for read-only iterators over indexed verties.
+        /// Alias for read-only iterators over indexed verties.
         typedef typename EdgeIndex<TEdgeData>::VertexIterator VertexIterator;
         
         
@@ -211,7 +211,4 @@ namespace GraphTool
             return edgesBySource.VertexIteratorEnd();
         }
     };
-
-    /// Convenience alias for graphs that do not use edge data or weights.
-    typedef Graph<void> UnweightedGraph;
 }
