@@ -53,12 +53,12 @@ namespace GraphTool
         
         /// Controls the consumption of edges from a buffer to a file, for use as a Spindle task function.
         /// Should be called by a single thread.
-        /// @param [in] arg Pointer to an instance of #SGraphWriteSpec that defines the graph write operation.
+        /// @param [in] arg Pointer to an instance of SGraphWriteSpec that defines the graph write operation.
         static void EdgeConsumer(void* arg);
 
         /// Controls the production of edges from a graph object to a buffer, for use as a Spindle task function.
         /// Should be called by a single thread.
-        /// @param [in] arg Pointer to an instance of #SGraphWriteSpec that defines the graph write operation.
+        /// @param [in] arg Pointer to an instance of SGraphWriteSpec that defines the graph write operation.
         static void EdgeProducer(void* arg);
 
         

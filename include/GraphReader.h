@@ -52,12 +52,12 @@ namespace GraphTool
         // -------- CLASS METHODS ------------------------------------------ //
 
         /// Controls the consumption of edges from a buffer to a graph object, for use as a Spindle task function.
-        /// @param [in] arg Pointer to an instance of #SGraphReadSpec that defines the graph read operation.
+        /// @param [in] arg Pointer to an instance of SGraphReadSpec that defines the graph read operation.
         static void EdgeConsumer(void* arg);
         
         /// Controls the production of edges from a graph file to a buffer, for use as a Spindle task function.
         /// Should be called by a single thread.
-        /// @param [in] arg Pointer to an instance of #SGraphReadSpec that defines the graph read operation.
+        /// @param [in] arg Pointer to an instance of SGraphReadSpec that defines the graph read operation.
         static void EdgeProducer(void* arg);
         
         

@@ -235,7 +235,8 @@ namespace GraphTool
             // -------- CLASS METHODS -------------------------------------- //
             
             /// Creates and returns an iterator to the position that corresponds to the beginning of the edges at the specified vertex.
-            /// @param [in] vertexIndex Pointer to the vertex index of interest.
+            /// @param [in] edgeIndex Edge index containing the supplied vertex iterator.
+            /// @param [in] vertexIterator Vertex iterator that points to the desired indexed vertex.
             /// @return Read-only iterator to the beginning of the edges for the corresponding vertex, or an invalid iterator if the vertex iterator supplied does not belong to the edge index.
             static EdgeIterator EdgeIteratorAt(const EdgeIndex<TEdgeData>& edgeIndex, const VertexIterator& vertexIterator)
             {
