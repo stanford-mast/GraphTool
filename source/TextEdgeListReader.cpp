@@ -26,9 +26,12 @@ using namespace GraphTool;
 // -------- CLASS METHODS -------------------------------------------------- //
 // See "TextEdgeListReader.h" for documentation.
 
-template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* edgeDataString, SEdgeBufferData<void>& edgeDataBuf)
+namespace GraphTool
 {
-    return true;
+    template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* edgeDataString, SEdgeBufferData<void>& edgeDataBuf)
+    {
+        return true;
+    }
 }
 
 

@@ -26,23 +26,26 @@ using namespace GraphTool;
 // -------- CLASS METHODS -------------------------------------------------- //
 // See "TextEdgeListWriter.h" for documentation.
 
-template <> int TextEdgeListWriter<void>::StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+namespace GraphTool
 {
-    return 0;
-}
+    template <> int TextEdgeListWriter<void>::StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    {
+        return 0;
+    }
 
-// --------
+    // --------
 
-template <> int TextEdgeListWriter<uint64_t>::StringFromEdgeData(const SEdgeBufferData<uint64_t>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
-{
-    return snprintf(edgeDataString, edgeDataStringCount, "%llu", (long long unsigned int)edgeBuf.edgeData);
-}
+    template <> int TextEdgeListWriter<uint64_t>::StringFromEdgeData(const SEdgeBufferData<uint64_t>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    {
+        return snprintf(edgeDataString, edgeDataStringCount, "%llu", (long long unsigned int)edgeBuf.edgeData);
+    }
 
-// --------
+    // --------
 
-template <> int TextEdgeListWriter<double>::StringFromEdgeData(const SEdgeBufferData<double>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
-{
-    return snprintf(edgeDataString, edgeDataStringCount, "%.10lf", edgeBuf.edgeData);
+    template <> int TextEdgeListWriter<double>::StringFromEdgeData(const SEdgeBufferData<double>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    {
+        return snprintf(edgeDataString, edgeDataStringCount, "%.10lf", edgeBuf.edgeData);
+    }
 }
 
 
