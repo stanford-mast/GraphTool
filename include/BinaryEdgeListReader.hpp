@@ -29,10 +29,10 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphReader.hpp" for documentation.
         
-        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename)
+        virtual FILE* OpenAndInitializeGraphFileForRead(const char* filename)
         {
             // This class reads files in binary mode.
-            FILE* graphfile = fopen(filename.c_str(), "rb");
+            FILE* graphfile = fopen(filename, "rb");
 
             if (NULL != graphfile)
             {

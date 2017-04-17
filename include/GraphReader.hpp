@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <silo.h>
 #include <spindle.h>
-#include <string>
 
 
 namespace GraphTool
@@ -213,7 +212,7 @@ namespace GraphTool
         /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] filename File name of the file to be opened for reading.
         /// @return File handle for the opened file.
-        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename) = 0;
+        virtual FILE* OpenAndInitializeGraphFileForRead(const char* filename) = 0;
         
         /// Reads the next set of edges from the specified graph file into the specified buffer.
         /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
@@ -231,10 +230,10 @@ namespace GraphTool
         /// @param [in] filename File name of the file to be read.
         /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
         /// @return Number of edges read, or kGraphReadError in the event of an error.
-        TEdgeCount ReadGraphFromFile(const std::string& filename, Graph<TEdgeData>& graph)
+        TEdgeCount ReadGraphFromFile(const char* filename, Graph<TEdgeData>& graph)
         {
             // First, open the file.
-            FILE* graphfile = this->OpenAndInitializeGraphFile(filename);
+            FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);
             if (NULL == graphfile)
                 return false;
 

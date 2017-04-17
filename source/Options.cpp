@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file Options.cpp
- *   Program entry point.
+ *   Implementation of command-line-option-handling functionality.
  *****************************************************************************/
 
 #include "Options.h"

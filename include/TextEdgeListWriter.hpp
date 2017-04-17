@@ -18,7 +18,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string>
 
 
 namespace GraphTool
@@ -32,16 +31,16 @@ namespace GraphTool
         /// Creates a string from the edge data in the specified edge.
         /// @param [in] edgeBuf Edge buffer of interest.
         /// @param [out] edgeDataString String representation of the edge data.
-        virtual void StringFromEdgeData(const SEdgeBufferData<TEdgeData>& edgeBuf, std::string& edgeDataString) = 0;
+        virtual void StringFromEdgeData(const SEdgeBufferData<TEdgeData>& edgeBuf, char* edgeDataString, size_t edgeDataStringCount) = 0;
 
 
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.hpp" for documentation.
 
-        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename, Graph<TEdgeData>& graph, bool groupedByDestination)
+        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* filename, Graph<TEdgeData>& graph, bool groupedByDestination)
         {
             // This class writes files in text mode.
-            FILE* graphfile = fopen(filename.c_str(), "w");
+            FILE* graphfile = fopen(filename, "w");
 
             if (NULL != graphfile)
             {
@@ -67,11 +66,11 @@ namespace GraphTool
                 fprintf(graphfile, "%llu %llu", (long long unsigned int)buf[i].sourceVertex, (long long unsigned int)buf[i].destinationVertex);
 
                 // Next, see if edge data are available for writing.
-                std::string edgeDataString;
-                StringFromEdgeData(buf[i], edgeDataString);
+                char edgeDataString[128];
+                StringFromEdgeData(buf[i], edgeDataString, sizeof(edgeDataString) / sizeof(edgeDataString[0]));
 
-                if (!edgeDataString.empty())
-                    fprintf(graphfile, " %s", edgeDataString.c_str());
+                if ('\0' != edgeDataString[0])
+                    fprintf(graphfile, " %s", edgeDataString);
 
                 // End the line.
                 fprintf(graphfile, "\n");
@@ -85,9 +84,10 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See above for documentation.
         
-        virtual void StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, std::string& edgeDataString)
+        virtual void StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, char* edgeDataString, size_t edgeDataStringCount)
         {
-            edgeDataString.clear();
+            if (0 < edgeDataStringCount)
+                edgeDataString[0] = '\0';
         }
     };
 }

@@ -19,7 +19,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string>
 
 
 namespace GraphTool
@@ -31,10 +30,10 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.hpp" for documentation.
 
-        virtual FILE* OpenAndInitializeGraphFile(const std::string& filename, Graph<TEdgeData>& graph, bool groupedByDestination)
+        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* filename, Graph<TEdgeData>& graph, bool groupedByDestination)
         {
             // This class writes files in binary mode.
-            FILE* graphfile = fopen(filename.c_str(), "wb");
+            FILE* graphfile = fopen(filename, "wb");
 
             if (NULL != graphfile)
             {
