@@ -85,6 +85,6 @@ namespace GraphTool
         /// @param [in] filename File name of the file to be read.
         /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
         /// @return Number of edges read, or kGraphReadError in the event of an error.
-        TEdgeCount ReadGraphFromFile(const char* filename, Graph<TEdgeData>& graph);
+        TEdgeCount ReadGraphFromFile(const char* const filename, Graph<TEdgeData>& graph);
     };
 }

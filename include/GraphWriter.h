@@ -91,6 +91,6 @@ namespace GraphTool
         /// @param [in] graph Graph object to be written to the file.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
         /// @return `true` if the graph was written successfully, `false` otherwise.
-        bool WriteGraphToFile(const char* filename, Graph<TEdgeData>& graph, const bool groupedByDestination = false);
+        bool WriteGraphToFile(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination = false);
     };
 }

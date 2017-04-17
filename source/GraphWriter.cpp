@@ -134,7 +134,7 @@ template <typename TEdgeData> void GraphWriter<TEdgeData>::EdgeProducer(void* ar
 // -------- INSTANCE METHODS ----------------------------------------------- //
 // See "GraphWriter.h" for documentation.
 
-template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* filename, Graph<TEdgeData>& graph, bool groupedByDestination = false)
+template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
 {
     // First, open the file.
     FILE* graphfile = this->OpenAndInitializeGraphFileForWrite(filename, graph, groupedByDestination);

@@ -34,7 +34,6 @@ CXX_SOURCE_SUFFIX           = .cpp
 
 CC                          = gcc
 CXX                         = g++
-AS                          = as
 LD                          = g++
 
 CCFLAGS                     = -g -O3 -Wall -std=c11 -march=core-avx2 -masm=intel -mno-vzeroupper -pthread -I$(INCLUDE_DIR) -D_GNU_SOURCE
