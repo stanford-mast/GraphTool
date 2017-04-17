@@ -28,9 +28,29 @@ using namespace GraphTool;
 
 namespace GraphTool
 {
-    template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* edgeDataString, SEdgeBufferData<void>& edgeDataBuf)
+    template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<void>& edgeDataBuf)
     {
         return true;
+    }
+
+    // --------
+    
+    template <> bool TextEdgeListReader<uint64_t>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<uint64_t>& edgeDataBuf)
+    {
+        char* endPos;
+        edgeDataBuf.edgeData = strtoull(edgeDataString, &endPos, 0);
+        
+        return (edgeDataString != endPos);
+    }
+
+    // --------
+    
+    template <> bool TextEdgeListReader<double>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<double>& edgeDataBuf)
+    {
+        char* endPos;
+        edgeDataBuf.edgeData = strtod(edgeDataString, &endPos);
+
+        return (edgeDataString != endPos);
     }
 }
 
@@ -110,3 +130,5 @@ template <typename TEdgeData> TEdgeCount TextEdgeListReader<TEdgeData>::ReadEdge
 // -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
 
 template class TextEdgeListReader<void>;
+template class TextEdgeListReader<uint64_t>;
+template class TextEdgeListReader<double>;
