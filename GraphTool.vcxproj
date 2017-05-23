@@ -18,6 +18,7 @@
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.h" />
     <ClInclude Include="include\GraphWriter.h" />
+    <ClInclude Include="include\OptionContainer.h" />
     <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\SequenceComparator.hpp" />
     <ClInclude Include="include\TextEdgeListReader.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="source\GraphReader.cpp" />
     <ClCompile Include="source\GraphWriter.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\OptionContainer.cpp" />
     <ClCompile Include="source\Options.cpp" />
     <ClCompile Include="source\TextEdgeListReader.cpp" />
     <ClCompile Include="source\TextEdgeListWriter.cpp" />
