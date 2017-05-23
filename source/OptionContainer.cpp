@@ -52,37 +52,44 @@ OptionContainer::UOptionValue::UOptionValue(std::string* value) : stringValue(va
 
 // --------
 
-OptionContainer::OptionContainer(EOptionValueType type) : type(type), defaultValue(), defaultValueSpecified(false), maxValueCount(1), values(1)
+OptionContainer::OptionContainer(EOptionValueType type) : type(type), defaultValue(), defaultValueSpecified(false), maxValueCount(1), values()
 {
-
+    values.reserve(1);
 }
 
 // --------
 
 OptionContainer::OptionContainer(const EOptionValueType type, const size_t maxValueCount) : type(type), defaultValue(), defaultValueSpecified(false), maxValueCount(maxValueCount), values()
 {
-
+    values.reserve(1);
 }
 
 // --------
 
-OptionContainer::OptionContainer(const bool defaultValue) : type(EOptionValueType::OptionValueTypeBoolean), defaultValue(defaultValue), defaultValueSpecified(true), maxValueCount(1), values(1)
+OptionContainer::OptionContainer(const bool defaultValue) : type(EOptionValueType::OptionValueTypeBoolean), defaultValue(defaultValue), defaultValueSpecified(true), maxValueCount(1), values()
+{
+    
+}
+
+// --------
+
+OptionContainer::OptionContainer(const int64_t defaultValue) : type(EOptionValueType::OptionValueTypeInteger), defaultValue(defaultValue), defaultValueSpecified(true), maxValueCount(1), values()
+{
+    
+}
+
+// --------
+
+OptionContainer::OptionContainer(const char* defaultValue) : type(EOptionValueType::OptionValueTypeString), defaultValue(new std::string(defaultValue)), defaultValueSpecified(true), maxValueCount(1), values()
 {
 
 }
 
 // --------
 
-OptionContainer::OptionContainer(const int64_t defaultValue) : type(EOptionValueType::OptionValueTypeInteger), defaultValue(defaultValue), defaultValueSpecified(true), maxValueCount(1), values(1)
+OptionContainer::OptionContainer(const std::string& defaultValue) : type(EOptionValueType::OptionValueTypeString), defaultValue(new std::string(defaultValue)), defaultValueSpecified(true), maxValueCount(1), values()
 {
-
-}
-
-// --------
-
-OptionContainer::OptionContainer(const std::string& defaultValue) : type(EOptionValueType::OptionValueTypeString), defaultValue(new std::string(defaultValue)), defaultValueSpecified(true), maxValueCount(1), values(1)
-{
-
+    
 }
 
 // --------
@@ -101,9 +108,35 @@ OptionContainer::OptionContainer(const int64_t defaultValue, const size_t maxVal
 
 // --------
 
+OptionContainer::OptionContainer(const char* defaultValue, const size_t maxValueCount) : type(EOptionValueType::OptionValueTypeString), defaultValue(new std::string(defaultValue)), defaultValueSpecified(true), maxValueCount(maxValueCount), values()
+{
+
+}
+
+// --------
+
 OptionContainer::OptionContainer(const std::string& defaultValue, const size_t maxValueCount) : type(EOptionValueType::OptionValueTypeString), defaultValue(new std::string(defaultValue)), defaultValueSpecified(true), maxValueCount(maxValueCount), values()
 {
 
+}
+
+// --------
+
+OptionContainer::OptionContainer(const OptionContainer& other) : type(other.type), defaultValueSpecified(other.defaultValueSpecified), maxValueCount(other.maxValueCount), values()
+{
+    if (EOptionValueType::OptionValueTypeString == other.type)
+    {
+        if (other.defaultValueSpecified)
+            defaultValue.stringValue = new std::string(*other.defaultValue.stringValue);
+
+        for (uint64_t i = 0; i < other.values.size(); ++i)
+            values[i].stringValue = new std::string(*other.values[i].stringValue);
+    }
+    else
+    {
+        defaultValue = other.defaultValue;
+        values = other.values;
+    }
 }
 
 // --------
@@ -115,7 +148,7 @@ OptionContainer::~OptionContainer()
     {
         if (defaultValueSpecified)
             delete defaultValue.stringValue;
-
+        
         if (values.size() > 0)
         {
             for (auto it = values.begin(); it != values.end(); ++it)
@@ -249,28 +282,28 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(std::stri
 
 // --------
 
-bool OptionContainer::QueryValue(bool& value)
+bool OptionContainer::QueryValue(bool& value) const
 {
     return QueryValueAt(0, value);
 }
 
 // --------
 
-bool OptionContainer::QueryValue(int64_t& value)
+bool OptionContainer::QueryValue(int64_t& value) const
 {
     return QueryValueAt(0, value);
 }
 
 // --------
 
-bool OptionContainer::QueryValue(std::string& value)
+bool OptionContainer::QueryValue(std::string& value) const
 {
     return QueryValueAt(0, value);
 }
 
 // --------
 
-bool OptionContainer::QueryValueAt(size_t index, bool& value)
+bool OptionContainer::QueryValueAt(size_t index, bool& value) const
 {
     if (EOptionValueType::OptionValueTypeBoolean != type)
         return false;
@@ -290,7 +323,7 @@ bool OptionContainer::QueryValueAt(size_t index, bool& value)
 
 // --------
 
-bool OptionContainer::QueryValueAt(size_t index, int64_t& value)
+bool OptionContainer::QueryValueAt(size_t index, int64_t& value) const
 {
     if (EOptionValueType::OptionValueTypeInteger != type)
         return false;
@@ -310,7 +343,7 @@ bool OptionContainer::QueryValueAt(size_t index, int64_t& value)
 
 // --------
 
-bool OptionContainer::QueryValueAt(size_t index, std::string& value)
+bool OptionContainer::QueryValueAt(size_t index, std::string& value) const
 {
     if (EOptionValueType::OptionValueTypeString != type)
         return false;

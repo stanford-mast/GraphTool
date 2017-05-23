@@ -75,7 +75,7 @@ namespace GraphTool
         const EOptionValueType type;
         
         /// Holds the default value for this command-line option.
-        const UOptionValue defaultValue;
+        UOptionValue defaultValue;
 
         /// Specifies whether or not this command-line option has a default.
         /// If so, it is used if no values are specified (and therefore this command-line option is optional).
@@ -91,7 +91,7 @@ namespace GraphTool
         
     public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
-
+        
         /// Constructs a command-line option value container.
         /// @param [in] type Value type to use.
         OptionContainer(const EOptionValueType type);
@@ -111,6 +111,10 @@ namespace GraphTool
 
         /// Constructs a command-line option value container.
         /// @param [in] defaultValue Default value for this option.
+        OptionContainer(const char* defaultValue);
+        
+        /// Constructs a command-line option value container.
+        /// @param [in] defaultValue Default value for this option.
         OptionContainer(const std::string& defaultValue);
 
         /// Constructs a command-line option value container.
@@ -126,8 +130,16 @@ namespace GraphTool
         /// Constructs a command-line option value container.
         /// @param [in] defaultValue Default value for this option.
         /// @param [in] maxValueCount Maximum number of values allowable.
-        OptionContainer(const std::string& defaultValue, const size_t maxValueCount);
+        OptionContainer(const char* defaultValue, const size_t maxValueCount);
 
+        /// Constructs a command-line option value container.
+        /// @param [in] defaultValue Default value for this option.
+        /// @param [in] maxValueCount Maximum number of values allowable.
+        OptionContainer(const std::string& defaultValue, const size_t maxValueCount);
+        
+        /// Copy constructor.
+        OptionContainer(const OptionContainer& other);
+        
         /// Default destructor.
         virtual ~OptionContainer(void);
         
@@ -194,34 +206,34 @@ namespace GraphTool
         /// Queries the first value for this object's command-line setting.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValue(bool& value);
+        bool QueryValue(bool& value) const;
 
         /// Queries the first value for this object's command-line setting.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValue(int64_t& value);
+        bool QueryValue(int64_t& value) const;
 
         /// Queries the first value for this object's command-line setting.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValue(std::string& value);
+        bool QueryValue(std::string& value) const;
 
         /// Queries the value for this object's command-line setting at the specified position.
         /// @param [in] index Position of interest.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValueAt(size_t index, bool& value);
+        bool QueryValueAt(size_t index, bool& value) const;
 
         /// Queries the value for this object's command-line setting at the specified position.
         /// @param [in] index Position of interest.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValueAt(size_t index, int64_t& value);
+        bool QueryValueAt(size_t index, int64_t& value) const;
 
         /// Queries the value for this object's command-line setting at the specified position.
         /// @param [in] index Position of interest.
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
-        bool QueryValueAt(size_t index, std::string& value);
+        bool QueryValueAt(size_t index, std::string& value) const;
     };
 }

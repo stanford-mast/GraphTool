@@ -10,6 +10,7 @@
  *   Implementation of command-line-option-handling functionality.
  *****************************************************************************/
 
+#include "OptionContainer.h"
 #include "Options.h"
 
 #include <cstddef>
@@ -24,19 +25,18 @@ using namespace GraphTool;
 // -------- CLASS VARIABLES ------------------------------------------------ //
 // See "Options.h" for documentation.
 
-std::map<std::string, std::pair<size_t, std::list<std::string>>> Options::specifiedCommandLineOptions = {
-    { "inputfile",                              { 1, std::list<std::string>() } },
-    { "outputfile",                             { 1, std::list<std::string>() } },
-    { "inputformat",                            { 1, std::list<std::string>() } },
-    { "outputformat",                           { 1, std::list<std::string>() } },
-    { "inputoptions",                           { 1, std::list<std::string>() } },
-    { "outputoptions",                          { 1, std::list<std::string>() } },
-    { "transform",                              { 0, std::list<std::string>() } },
-    { "edgedata",                               { 1, std::list<std::string>() } },
+std::unordered_map<std::string, OptionContainer*> Options::specifiedCommandLineOptions = {
+    { "inputfile",                              new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
+    { "outputfile",                             new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
+    { "inputformat",                            new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
+    { "outputformat",                           new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
+    { "inputoptions",                           new OptionContainer("") },
+    { "outputoptions",                          new OptionContainer("") },
+    { "edgedata",                               new OptionContainer("void") }
 };
 
-std::map<std::string, std::string> Options::supportedCommandLineAliases = {
-    { "noedgedata",                              "edgedata=void" },
+std::unordered_map<std::string, std::string> Options::supportedCommandLineAliases = {
+    { "noedgedata",                             "edgedata=void" },
 };
 
 
@@ -82,18 +82,7 @@ Options::EOptionSubmitResult Options::SubmitOption(const std::string& optionStri
         return EOptionSubmitResult::OptionSubmitResultErrorUnsupported;
 
     // Attempt to submit the option value.
-    std::pair<size_t, std::list<std::string>>& optionData = specifiedCommandLineOptions.at(optionName);
-    EOptionSubmitResult result = EOptionSubmitResult::OptionSubmitResultOk;
+    
 
-    if ((optionData.second.size() < optionData.first) || (0 == optionData.first))
-        optionData.second.push_back(optionValue);
-    else
-    {
-        if (usedAlias)
-            result = OptionSubmitResultErrorAliasTooMany;
-        else
-            result = OptionSubmitResultErrorTooMany;
-    }
-
-    return result;
+    return EOptionSubmitResult::OptionSubmitResultOk;
 }

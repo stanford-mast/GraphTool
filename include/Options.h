@@ -12,11 +12,11 @@
 
 #pragma once
 
+#include "OptionContainer.h"
+
 #include <cstddef>
-#include <list>
-#include <map>
 #include <string>
-#include <utility>
+#include <unordered_map>
 
 
 namespace GraphTool
@@ -43,14 +43,12 @@ namespace GraphTool
         // -------- CLASS VARIABLES ---------------------------------------- //
 
         /// Holds all supplied command-line option values, which the user would supply as --[option]=[value].
-        /// The map itself is statically initialized with mappings from supported command-line options to numbers and empty lists.
-        /// Each number specifies the maximum number of values allowed for each command-line option and is statically initialized, with 0 meaning unlimited.
-        /// The lists are filled at run-time with values supplied by the user.
-        static std::map<std::string, std::pair<size_t, std::list<std::string>>> specifiedCommandLineOptions;
+        /// The map itself is statically initialized with mappings from supported command-line options to containers for specified option values.
+        static std::unordered_map<std::string, OptionContainer*> specifiedCommandLineOptions;
 
         /// Holds all supported command-line aliases, which do not accept any argument values and would be specified as --[alias].
         /// Maps from possible command-line options to their expanded forms, which would then be parsed normally.
-        static std::map<std::string, std::string> supportedCommandLineAliases;
+        static std::unordered_map<std::string, std::string> supportedCommandLineAliases;
         
         
     public:
