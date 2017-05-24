@@ -43,10 +43,10 @@ std::vector<std::string> Options::prefixStrings = {
 };
 
 std::unordered_map<std::string, OptionContainer*> Options::specifiedCommandLineOptions = {
-    { "inputfile",                              new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
-    { "outputfile",                             new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
-    { "inputformat",                            new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
-    { "outputformat",                           new OptionContainer(OptionContainer::EOptionValueType::OptionValueTypeString) },
+    { "inputfile",                              new OptionContainer(EOptionValueType::OptionValueTypeString) },
+    { "outputfile",                             new OptionContainer(EOptionValueType::OptionValueTypeString) },
+    { "inputformat",                            new OptionContainer(EOptionValueType::OptionValueTypeString) },
+    { "outputformat",                           new OptionContainer(EOptionValueType::OptionValueTypeString) },
     { "inputoptions",                           new OptionContainer("") },
     { "outputoptions",                          new OptionContainer("") },
     { "edgedata",                               new OptionContainer("void") },
@@ -224,7 +224,7 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
     // Attempt to submit the option value.
     OptionContainer* optionContainer = specifiedCommandLineOptions.at(optionName.c_str());
     
-    if (OptionContainer::EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
+    if (EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
     {
         PrintErrorValueRejected(cmdline, optionName.c_str(), optionValue.c_str());
         return false;

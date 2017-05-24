@@ -15,60 +15,60 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
 namespace GraphTool
 {
+    /// Specifies the internal type of the option value.
+    /// All values held by each OptionContainer object have the same type.
+    enum EOptionValueType
+    {
+        OptionValueTypeBoolean,                                             ///< Boolean `true` or `false`.
+        OptionValueTypeInteger,                                             ///< Signed integer.
+        OptionValueTypeString,                                              ///< String.
+    };
+
+    /// Specifies the result of an attempt to submit a command-line option value.
+    enum EOptionValueSubmitResult
+    {
+        OptionValueSubmitResultOk,                                          ///< Success.
+        OptionValueSubmitResultWrongType,                                   ///< Incorrect type for submitted value.
+        OptionValueSubmitResultTooMany,                                     ///< Number of values for the command-line option is already at its maximum.
+        OptionValueSubmitResultOutOfRange,                                  ///< Submitted value is outside the range of acceptable values.
+        OptionValueSubmitResultInternalError,                               ///< Something unexpected happened, resulting in an error.
+    };
+
+    /// Holds an option value itself.
+    /// One field exists for each possible supported type of option value.
+    union UOptionValue
+    {
+        bool booleanValue;                                                  ///< Boolean value.
+        int64_t integerValue;                                               ///< Signed integer value.
+        std::string* stringValue;                                           ///< String value.
+
+        /// Default constructor.
+        UOptionValue(void);
+
+        /// Convenience constructor from a Boolean-typed value.
+        /// @param [in] value Value to initialize.
+        UOptionValue(bool value);
+
+        /// Convenience constructor from an integer-typed value.
+        /// @param [in] value Value to initialize.
+        UOptionValue(int64_t value);
+
+        /// Convenience constructor from a string-typed value.
+        /// @param [in] value Value to initialize.
+        UOptionValue(std::string* value);
+    };
+    
     /// Holds all values associated with a single command-line option.
     class OptionContainer
     {
-    public:
-        // -------- TYPE DEFINITIONS --------------------------------------- //
-        
-        /// Specifies the internal type of the option value.
-        /// All values held by each OptionContainer object have the same type.
-        enum EOptionValueType
-        {
-            OptionValueTypeBoolean,                                         ///< Boolean `true` or `false`.
-            OptionValueTypeInteger,                                         ///< Signed integer.
-            OptionValueTypeString,                                          ///< String.
-        };
-
-        /// Specifies the result of an attempt to submit a command-line option value.
-        enum EOptionValueSubmitResult
-        {
-            OptionValueSubmitResultOk,                                      ///< Success.
-            OptionValueSubmitResultWrongType,                               ///< Incorrect type for submitted value.
-            OptionValueSubmitResultTooMany,                                 ///< Number of values for the command-line option is already at its maximum.
-            OptionValueSubmitResultInternalError,                           ///< Something unexpected happened, resulting in an error.
-        };
-
-        /// Holds an option value itself.
-        /// One field exists for each possible supported type of option value.
-        union UOptionValue
-        {
-            bool booleanValue;                                              ///< Boolean value.
-            int64_t integerValue;                                           ///< Signed integer value.
-            std::string* stringValue;                                       ///< String value.
-
-            /// Default constructor.
-            UOptionValue(void);
-
-            /// Convenience constructor from a Boolean-typed value.
-            /// @param [in] value Value to initialize.
-            UOptionValue(bool value);
-
-            /// Convenience constructor from an integer-typed value.
-            /// @param [in] value Value to initialize.
-            UOptionValue(int64_t value);
-
-            /// Convenience constructor from a string-typed value.
-            /// @param [in] value Value to initialize.
-            UOptionValue(std::string* value);
-        };
-    
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
 
@@ -145,11 +145,17 @@ namespace GraphTool
         virtual ~OptionContainer(void);
         
         
-    private:
+    protected:
         // -------- HELPERS ------------------------------------------------ //
 
+        /// Provides read-only access to the default value.
+        const UOptionValue& GetDefaultValue(void) const;
+        
         /// Internal operation that specifies the number of submitted values.
         size_t GetSubmittedValueCount(void) const;
+        
+        /// Specifies if a default value has been supplied.
+        bool IsDefaultValuePresent(void) const;
         
         /// Attempts to parse a Boolean-typed value from a string.
         /// @param [in] stringToParse String to be parsed.
@@ -168,14 +174,46 @@ namespace GraphTool
 
 
     public:
-        // -------- INSTANCE METHODS --------------------------------------- //
+        // -------- VIRTUAL INSTANCE METHODS ------------------------------- //
 
         /// Indicates whether or not this object is in a valid state.
         /// A valid state indicates that the number of specified options is within the valid range.
         /// If a default is specified, this object is always in a valid state.
         /// If not, then it is only in a valid state if at least one value has been specified.
+        /// This is potentially subject to additional conditions imposed by subclasses.
         /// @return `true` if so, `false` if not.
-        bool AreValuesValid(void) const;
+        virtual bool AreValuesValid(void) const;
+
+        /// Attempts to parse and submit a value to this object.
+        /// Parsing behavior depends on this object's value type.
+        /// Subclasses can customize the behavior of parsing, for example, to support special values or other mappings.
+        /// @param [in] valueString String representation of the value to submit.
+        /// @return Enumerator indicating the result of the value parsing and submission attempt.
+        virtual EOptionValueSubmitResult ParseAndSubmitValue(std::string& valueString);
+
+        /// Attempts to submit a Boolean-typed value to this object.
+        /// If successful, the value is appended to those contained in this object.
+        /// Subclasses can perform further filtering or checks on submission attempts.
+        /// @param [in] value Value to submit.
+        /// @return Enumerator indicating the result of the value submission attempt.
+        virtual EOptionValueSubmitResult SubmitValue(bool value);
+
+        /// Attempts to submit an integer-typed value to this object.
+        /// If successful, the value is appended to those contained in this object.
+        /// Subclasses can perform further filtering or checks on submission attempts.
+        /// @param [in] value Value to submit.
+        /// @return Enumerator indicating the result of the value submission attempt.
+        virtual EOptionValueSubmitResult SubmitValue(int64_t value);
+
+        /// Attempts to submit a string-typed value to this object.
+        /// If successful, the value is appended to those contained in this object.
+        /// Subclasses can perform further filtering or checks on submission attempts.
+        /// @param [in] value Value to submit.
+        /// @return Enumerator indicating the result of the value submission attempt.
+        virtual EOptionValueSubmitResult SubmitValue(std::string& value);
+
+
+        // -------- INSTANCE METHODS --------------------------------------- //
         
         /// Specifies the maximum number of values acceptable for this object, configured at construction time.
         /// @return Maximum number of values this object will accept.
@@ -191,31 +229,6 @@ namespace GraphTool
         /// Specifies the value type for this object.
         /// @return Enumerator that corresponds to this object's value type.
         EOptionValueType GetValueType(void) const;
-
-        /// Attempts to parse and submit a value to this object.
-        /// Parsing behavior depends on this object's value type.
-        /// Subclasses can customize the behavior of parsing, for example, to support special values or other mappings.
-        /// @param [in] valueString String representation of the value to submit.
-        /// @return Enumerator indicating the result of the value parsing and submission attempt.
-        virtual EOptionValueSubmitResult ParseAndSubmitValue(std::string& valueString);
-        
-        /// Attempts to submit a Boolean-typed value to this object.
-        /// If successful, the value is appended to those contained in this object.
-        /// @param [in] value Value to submit.
-        /// @return Enumerator indicating the result of the value submission attempt.
-        EOptionValueSubmitResult SubmitValue(bool value);
-
-        /// Attempts to submit an integer-typed value to this object.
-        /// If successful, the value is appended to those contained in this object.
-        /// @param [in] value Value to submit.
-        /// @return Enumerator indicating the result of the value submission attempt.
-        EOptionValueSubmitResult SubmitValue(int64_t value);
-
-        /// Attempts to submit a string-typed value to this object.
-        /// If successful, the value is appended to those contained in this object.
-        /// @param [in] value Value to submit.
-        /// @return Enumerator indicating the result of the value submission attempt.
-        EOptionValueSubmitResult SubmitValue(std::string& value);
 
         /// Queries the first value for this object's command-line setting.
         /// @param [out] value Variable to be filled with the value, if it is available.
@@ -249,5 +262,55 @@ namespace GraphTool
         /// @param [out] value Variable to be filled with the value, if it is available.
         /// @return `true` if the correctly-typed value exists and was filled, `false` otherwise.
         bool QueryValueAt(size_t index, std::string& value) const;
+    };
+
+
+    /// Custom command-line option container for handling enumerations.
+    /// Internally uses integers to store information.
+    /// Maps from strings to integers and submits the resulting integers during parsing.
+    /// Intended to have values inserted by string parsing rather than by direct integer insertion.
+    class EnumOptionContainer : public OptionContainer
+    {
+    private:
+        // -------- INSTANCE VARIABLES ------------------------------------- //
+
+        /// Specifies the enumeration as a map from strings to integers.
+        /// The map itself would mostly likely be a statically-created data structure and so only a reference to it is required.
+        const std::unordered_map<std::string, int64_t>& enumMap;
+
+        /// Holds all the integers that are allowed to be set.
+        /// This is based on the contents of the enumeration.
+        std::set<int64_t> validIntegers;
+        
+        
+    public:
+        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
+
+        /// Constructs an instance of this object with the given enumeration map.
+        /// @param [in] enumMap Enumeration map to use.
+        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap);
+
+        /// Constructs an instance of this object with the given enumeration map.
+        /// @param [in] enumMap Enumeration map to use.
+        /// @param [in] maxValueCount Maximum number of values allowable.
+        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const size_t maxValueCount);
+
+        /// Constructs an instance of this object with the given enumeration map.
+        /// @param [in] enumMap Enumeration map to use.
+        /// @param [in] defaultValue Default value to use (not verified to be part of the enumeration).
+        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue);
+
+        /// Constructs an instance of this object with the given enumeration map.
+        /// @param [in] enumMap Enumeration map to use.
+        /// @param [in] defaultValue Default value to use (not verified to be part of the enumeration).
+        /// @param [in] maxValueCount Maximum number of values allowable.
+        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount);
+
+
+        // -------- VIRTUAL INSTANCE METHODS ------------------------------- //
+        // See above for documenatation.
+        
+        virtual EOptionValueSubmitResult ParseAndSubmitValue(std::string& valueString);
+        virtual EOptionValueSubmitResult SubmitValue(int64_t value);
     };
 }

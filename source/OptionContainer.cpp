@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -25,28 +26,28 @@ using namespace GraphTool;
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "OptionContainer.h" for documentation.
 
-OptionContainer::UOptionValue::UOptionValue(void)
+UOptionValue::UOptionValue(void)
 {
 
 }
 
 // --------
 
-OptionContainer::UOptionValue::UOptionValue(bool value) : booleanValue(value)
+UOptionValue::UOptionValue(bool value) : booleanValue(value)
 {
 
 }
 
 // --------
 
-OptionContainer::UOptionValue::UOptionValue(int64_t value) : integerValue(value)
+UOptionValue::UOptionValue(int64_t value) : integerValue(value)
 {
 
 }
 
 // --------
 
-OptionContainer::UOptionValue::UOptionValue(std::string* value) : stringValue(value)
+UOptionValue::UOptionValue(std::string* value) : stringValue(value)
 {
 
 }
@@ -158,13 +159,55 @@ OptionContainer::~OptionContainer()
     }
 }
 
+// --------
+
+EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap) : OptionContainer(EOptionValueType::OptionValueTypeInteger), enumMap(enumMap), validIntegers()
+{
+
+}
+
+// --------
+
+EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const size_t maxValueCount) : OptionContainer(EOptionValueType::OptionValueTypeInteger, maxValueCount), enumMap(enumMap), validIntegers()
+{
+
+}
+
+// --------
+
+EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue) : OptionContainer(defaultValue), enumMap(enumMap), validIntegers()
+{
+
+}
+
+// --------
+
+EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount) : OptionContainer(defaultValue, maxValueCount), enumMap(enumMap), validIntegers()
+{
+
+}
+
 
 // -------- HELPERS -------------------------------------------------------- //
 // See "OptionContainer.h" for documentation.
 
+const UOptionValue& OptionContainer::GetDefaultValue(void) const
+{
+    return defaultValue;
+}
+
+// --------
+
 size_t OptionContainer::GetSubmittedValueCount(void) const
 {
     return values.size();
+}
+
+// --------
+
+bool OptionContainer::IsDefaultValuePresent(void) const
+{
+    return defaultValueSpecified;
 }
 
 // --------
@@ -199,7 +242,7 @@ bool OptionContainer::ParseBoolean(std::string& stringToParse, bool& boolValue)
 
 // --------
 
-OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(UOptionValue& value)
+EOptionValueSubmitResult OptionContainer::SubmitValue(UOptionValue& value)
 {
     if (GetSubmittedValueCount() < GetMaxValueCount())
     {
@@ -219,7 +262,7 @@ bool OptionContainer::QueryValueAt(size_t index, UOptionValue& value) const
         value = values[index];
         return true;
     }
-    else if ((0 == index) && defaultValueSpecified)
+    else if ((0 == index) && IsDefaultValuePresent())
     {
         value = defaultValue;
         return true;
@@ -231,7 +274,7 @@ bool OptionContainer::QueryValueAt(size_t index, UOptionValue& value) const
 }
 
 
-// -------- INSTANCE METHODS ----------------------------------------------- //
+// -------- VIRTUAL INSTANCE METHODS --------------------------------------- //
 // See "OptionContainer.h" for documentation.
 
 bool OptionContainer::AreValuesValid(void) const
@@ -243,52 +286,26 @@ bool OptionContainer::AreValuesValid(void) const
 
 // --------
 
-size_t OptionContainer::GetMaxValueCount(void) const
-{
-    return maxValueCount;
-}
-
-// --------
-
-size_t OptionContainer::GetValueCount(void) const
-{
-    size_t valueCount = GetSubmittedValueCount();
-
-    if (0 == valueCount && defaultValueSpecified)
-        valueCount = 1;
-
-    return valueCount;
-}
-
-// --------
-
-OptionContainer::EOptionValueType OptionContainer::GetValueType(void) const
-{
-    return type;
-}
-
-// --------
-
-OptionContainer::EOptionValueSubmitResult OptionContainer::ParseAndSubmitValue(std::string& valueString)
+EOptionValueSubmitResult OptionContainer::ParseAndSubmitValue(std::string& valueString)
 {
     EOptionValueSubmitResult result = EOptionValueSubmitResult::OptionValueSubmitResultOk;
     char* parsedEndPos = NULL;
     UOptionValue parsedValue;
-    
+
     switch (type)
     {
     case EOptionValueType::OptionValueTypeBoolean:
-        
+
         // Attempt to parse the value as a Boolean value.
         if (false == ParseBoolean(valueString, parsedValue.booleanValue))
             result = EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
         else
             result = SubmitValue(parsedValue.booleanValue);
-        
+
         break;
 
     case EOptionValueType::OptionValueTypeInteger:
-        
+
         // Attempt to parse the value as an integer.
         parsedValue.integerValue = (int64_t)strtoll(valueString.c_str(), &parsedEndPos, 0);
 
@@ -300,13 +317,13 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::ParseAndSubmitValue(s
         break;
 
     case EOptionValueType::OptionValueTypeString:
-        
+
         // Attempt to submit the string value directly.
         result = SubmitValue(valueString);
         break;
 
     default:
-        
+
         // This should never happen.
         result = EOptionValueSubmitResult::OptionValueSubmitResultInternalError;
         break;
@@ -317,7 +334,22 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::ParseAndSubmitValue(s
 
 // --------
 
-OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(bool value)
+EOptionValueSubmitResult EnumOptionContainer::ParseAndSubmitValue(std::string& valueString)
+{
+    if (0 != enumMap.count(valueString))
+    {
+        int64_t valueToSubmit = enumMap.at(valueString);
+
+        validIntegers.insert(valueToSubmit);
+        return SubmitValue(valueToSubmit);
+    }
+    else
+        return EOptionValueSubmitResult::OptionValueSubmitResultOutOfRange;
+}
+
+// --------
+
+EOptionValueSubmitResult OptionContainer::SubmitValue(bool value)
 {
     if (type != EOptionValueType::OptionValueTypeBoolean)
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
@@ -330,7 +362,7 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(bool valu
 
 // --------
 
-OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(int64_t value)
+EOptionValueSubmitResult OptionContainer::SubmitValue(int64_t value)
 {
     if (type != EOptionValueType::OptionValueTypeInteger)
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
@@ -343,7 +375,17 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(int64_t v
 
 // --------
 
-OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(std::string& value)
+EOptionValueSubmitResult EnumOptionContainer::SubmitValue(int64_t value)
+{
+    if (0 == validIntegers.count(value))
+        return EOptionValueSubmitResult::OptionValueSubmitResultOutOfRange;
+    else
+        return OptionContainer::SubmitValue(value);
+}
+
+// --------
+
+EOptionValueSubmitResult OptionContainer::SubmitValue(std::string& value)
 {
     if (type != EOptionValueType::OptionValueTypeString)
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
@@ -357,6 +399,34 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(std::stri
 
         return result;
     }
+}
+
+
+// -------- INSTANCE METHODS ----------------------------------------------- //
+// See "OptionContainer.h" for documentation.
+
+size_t OptionContainer::GetMaxValueCount(void) const
+{
+    return maxValueCount;
+}
+
+// --------
+
+size_t OptionContainer::GetValueCount(void) const
+{
+    size_t valueCount = GetSubmittedValueCount();
+
+    if (0 == valueCount && IsDefaultValuePresent())
+        valueCount = 1;
+
+    return valueCount;
+}
+
+// --------
+
+EOptionValueType OptionContainer::GetValueType(void) const
+{
+    return type;
 }
 
 // --------
