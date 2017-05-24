@@ -70,7 +70,7 @@ namespace GraphTool
 
         /// Prints an error for a command-line option that is malformed.
         /// @param [in] cmdline Command-line with which this application was started, typically `argv[0]` in `main()`.
-        /// @param [in[ optionString Command-line option string that is the source of the error.
+        /// @param [in] optionString Command-line option string that is the source of the error.
         static void PrintErrorMalformed(const char* cmdline, const char* optionString);
 
         /// Prints an error for a command-line option that is missing but required.
@@ -104,6 +104,7 @@ namespace GraphTool
         /// Submits a command-line option string to the option system.
         /// Prints errors to standard error if there is an issue.
         /// @param [in] cmdline Command-line with which this application was started, typically `argv[0]` in `main()`.
+        /// @param [in] optionString String that holds the command-line option and value to be parsed and submitted.
         /// @return `true` if the option string was accepted, `false` otherwise.
         static bool SubmitOption(const char* cmdline, const char* optionString);
 

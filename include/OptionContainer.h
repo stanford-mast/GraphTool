@@ -275,7 +275,7 @@ namespace GraphTool
         // -------- INSTANCE VARIABLES ------------------------------------- //
 
         /// Specifies the enumeration as a map from strings to integers.
-        /// The map itself would mostly likely be a statically-created data structure and so only a reference to it is required.
+        /// The map itself would mostly likely be a statically-created data structure, so only a reference to it is required.
         const std::unordered_map<std::string, int64_t>& enumMap;
 
         /// Holds all the integers that are allowed to be set.
