@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -168,6 +169,36 @@ size_t OptionContainer::GetSubmittedValueCount(void) const
 
 // --------
 
+bool OptionContainer::ParseBoolean(std::string& stringToParse, bool& boolValue)
+{
+    static const std::string trueStrings[] = { "t", "true", "on", "y", "yes", "enabled", "1" };
+    static const std::string falseStrings[] = { "f", "false", "off", "n", "no", "disabled", "0" };
+
+    // Check if the string represents a value of 'true'.
+    for (size_t i = 0; i < sizeof(trueStrings) / sizeof(trueStrings[0]); ++i)
+    {
+        if (0 == _strnicmp(stringToParse.c_str(), trueStrings[i].c_str(), stringToParse.size()))
+        {
+            boolValue = true;
+            return true;
+        }
+    }
+
+    // Check if the string represents a value of 'false'.
+    for (size_t i = 0; i < sizeof(falseStrings) / sizeof(falseStrings[0]); ++i)
+    {
+        if (0 == _strnicmp(stringToParse.c_str(), falseStrings[i].c_str(), stringToParse.size()))
+        {
+            boolValue = false;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// --------
+
 OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(UOptionValue& value)
 {
     if (GetSubmittedValueCount() < GetMaxValueCount())
@@ -207,7 +238,7 @@ bool OptionContainer::AreValuesValid(void) const
 {
     const size_t valueCount = GetValueCount();
 
-    return ((valueCount > 0) && (valueCount < GetMaxValueCount()));
+    return ((valueCount > 0) && (valueCount <= GetMaxValueCount()));
 }
 
 // --------
@@ -238,13 +269,61 @@ OptionContainer::EOptionValueType OptionContainer::GetValueType(void) const
 
 // --------
 
+OptionContainer::EOptionValueSubmitResult OptionContainer::ParseAndSubmitValue(std::string& valueString)
+{
+    EOptionValueSubmitResult result = EOptionValueSubmitResult::OptionValueSubmitResultOk;
+    char* parsedEndPos = NULL;
+    UOptionValue parsedValue;
+    
+    switch (type)
+    {
+    case EOptionValueType::OptionValueTypeBoolean:
+        
+        // Attempt to parse the value as a Boolean value.
+        if (false == ParseBoolean(valueString, parsedValue.booleanValue))
+            result = EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
+        else
+            result = SubmitValue(parsedValue.booleanValue);
+        
+        break;
+
+    case EOptionValueType::OptionValueTypeInteger:
+        
+        // Attempt to parse the value as an integer.
+        parsedValue.integerValue = (int64_t)strtoll(valueString.c_str(), &parsedEndPos, 0);
+
+        if ('\0' != *parsedEndPos)
+            result = EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
+        else
+            result = SubmitValue(parsedValue.integerValue);
+
+        break;
+
+    case EOptionValueType::OptionValueTypeString:
+        
+        // Attempt to submit the string value directly.
+        result = SubmitValue(valueString);
+        break;
+
+    default:
+        
+        // This should never happen.
+        result = EOptionValueSubmitResult::OptionValueSubmitResultInternalError;
+        break;
+    }
+
+    return result;
+}
+
+// --------
+
 OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(bool value)
 {
     if (type != EOptionValueType::OptionValueTypeBoolean)
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
     else
     {
-        UOptionValue uValue = {value};
+        UOptionValue uValue(value);
         return SubmitValue(uValue);
     }
 }
@@ -257,7 +336,7 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(int64_t v
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
     else
     {
-        UOptionValue uValue = {value};
+        UOptionValue uValue(value);
         return SubmitValue(uValue);
     }
 }
@@ -270,7 +349,7 @@ OptionContainer::EOptionValueSubmitResult OptionContainer::SubmitValue(std::stri
         return EOptionValueSubmitResult::OptionValueSubmitResultWrongType;
     else
     {
-        UOptionValue uValue = {new std::string(value)};
+        UOptionValue uValue(new std::string(value));
         EOptionValueSubmitResult result = SubmitValue(uValue);
 
         if (EOptionValueSubmitResult::OptionValueSubmitResultOk != result)

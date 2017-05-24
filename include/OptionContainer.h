@@ -42,6 +42,7 @@ namespace GraphTool
             OptionValueSubmitResultOk,                                      ///< Success.
             OptionValueSubmitResultWrongType,                               ///< Incorrect type for submitted value.
             OptionValueSubmitResultTooMany,                                 ///< Number of values for the command-line option is already at its maximum.
+            OptionValueSubmitResultInternalError,                           ///< Something unexpected happened, resulting in an error.
         };
 
         /// Holds an option value itself.
@@ -150,6 +151,12 @@ namespace GraphTool
         /// Internal operation that specifies the number of submitted values.
         size_t GetSubmittedValueCount(void) const;
         
+        /// Attempts to parse a Boolean-typed value from a string.
+        /// @param [in] stringToParse String to be parsed.
+        /// @param [out] boolValue Boolean variable to be updated with the result of the parse.
+        /// @return `true` if parsing was successful, `false` otherwise (in which case no update takes place).
+        static bool ParseBoolean(std::string& stringToParse, bool& boolValue);
+        
         /// Internal operation that submits a type-validated value to this object.
         EOptionValueSubmitResult SubmitValue(UOptionValue& value);
 
@@ -185,6 +192,13 @@ namespace GraphTool
         /// @return Enumerator that corresponds to this object's value type.
         EOptionValueType GetValueType(void) const;
 
+        /// Attempts to parse and submit a value to this object.
+        /// Parsing behavior depends on this object's value type.
+        /// Subclasses can customize the behavior of parsing, for example, to support special values or other mappings.
+        /// @param [in] valueString String representation of the value to submit.
+        /// @return Enumerator indicating the result of the value parsing and submission attempt.
+        virtual EOptionValueSubmitResult ParseAndSubmitValue(std::string& valueString);
+        
         /// Attempts to submit a Boolean-typed value to this object.
         /// If successful, the value is appended to those contained in this object.
         /// @param [in] value Value to submit.
