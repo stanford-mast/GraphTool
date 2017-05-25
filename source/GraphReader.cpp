@@ -27,7 +27,7 @@
 using namespace GraphTool;
 
 
-// -------- LOCAL TYPE DEFINITIONS --------------------------------- //
+// -------- LOCAL TYPE DEFINITIONS ----------------------------------------- //
 
 namespace GraphTool
 {

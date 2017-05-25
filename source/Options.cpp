@@ -25,60 +25,24 @@
 using namespace GraphTool;
 
 
-// -------- CONSTANTS ------------------------------------------------------ //
+// -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "Options.h" for documentation.
 
-const std::string Options::kOptionEdgeData      = "edgedata";
-const std::string Options::kOptionInputFile     = "inputfile";
-const std::string Options::kOptionInputFormat   = "inputformat";
-const std::string Options::kOptionInputOptions  = "inputoptions";
-const std::string Options::kOptionOutputFile    = "outputfile";
-const std::string Options::kOptionOutputFormat  = "outputformat";
-const std::string Options::kOptionOutputOptions = "outputoptions";
+Options::Options(const std::string& commandLine, const std::vector<std::string>& prefixStrings, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
+{
 
-
-// -------- CLASS VARIABLES ------------------------------------------------ //
-// See "Options.h" for documentation.
-
-std::vector<std::string> Options::helpStrings = {
-#ifdef __PLATFORM_WINDOWS
-    "?",
-#endif
-    "help",
-};
-
-std::vector<std::string> Options::prefixStrings = {
-#ifdef __PLATFORM_WINDOWS
-    "/",
-#endif
-    "--",
-};
-
-std::unordered_map<std::string, OptionContainer*> Options::specifiedCommandLineOptions = {
-    { kOptionEdgeData,                          new OptionContainer("void") },
-    { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { kOptionInputFormat,                       new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { kOptionInputOptions,                      new OptionContainer("") },
-    { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-    { kOptionOutputFormat,                      new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-    { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
-};
-
-std::unordered_map<std::string, std::string> Options::supportedCommandLineAliases = {
-    { "noedgedata",                             "edgedata=void" },
-};
-
+}
 
 // -------- HELPERS -------------------------------------------------------- //
 // See "Options.h" for documentation.
 
-bool Options::IsHelpString(const char* optionString)
+bool Options::IsHelpString(const char* optionString) const
 {
-    if (NULL != optionString)
+    if ((NULL != helpStrings) && (NULL != optionString))
     {
         std::string testString(optionString);
 
-        for (auto it = helpStrings.cbegin(); it != helpStrings.cend(); ++it)
+        for (auto it = helpStrings->cbegin(); it != helpStrings->cend(); ++it)
         {
             if (*it == testString)
                 return true;
@@ -90,7 +54,7 @@ bool Options::IsHelpString(const char* optionString)
 
 // --------
 
-size_t Options::PrefixLength(const char* optionString)
+size_t Options::PrefixLength(const char* optionString) const
 {
     if (NULL != optionString)
     {
@@ -106,96 +70,97 @@ size_t Options::PrefixLength(const char* optionString)
 
 // --------
 
-void Options::PrintErrorAliasConflict(const char* cmdline, const char* optionAlias, const char* optionName)
+void Options::PrintErrorAliasConflict(const char* optionAlias, const char* optionName) const
 {
-    fprintf(stderr, "%s: '%s' conflicts with '%s'.\n", cmdline, optionAlias, optionName);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: '%s' conflicts with '%s'.\n", commandLine.c_str(), optionAlias, optionName);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorCommon(const char* cmdline)
+void Options::PrintErrorCommon(void) const
 {
-    fprintf(stderr, "Try '%s %s%s' for more information.\n", cmdline, prefixStrings[0].c_str(), helpStrings[0].c_str());
+    if (NULL != helpStrings)
+        fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), prefixStrings[0].c_str(), (*helpStrings)[0].c_str());
 }
 
 // --------
 
-void Options::PrintErrorInternal(const char* cmdline)
+void Options::PrintErrorInternal(void) const
 {
-    fprintf(stderr, "%s: Internal error while processing command-line options.\n", cmdline);
+    fprintf(stderr, "%s: Internal error while processing options.\n", commandLine.c_str());
 }
 
 // --------
 
-void Options::PrintErrorMalformed(const char* cmdline, const char* optionString)
+void Options::PrintErrorMalformed(const char* optionString) const
 {
-    fprintf(stderr, "%s: Invalid option '%s'.\n", cmdline, optionString);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionString);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorMissing(const char* cmdline, const char* optionName)
+void Options::PrintErrorMissing(const char* optionName) const
 {
-    fprintf(stderr, "%s: Missing required option '%s'.\n", cmdline, optionName);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Missing required option '%s'.\n", commandLine.c_str(), optionName);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorQuantityMismatch(const char* cmdline, const char* optionName1, const char* optionName2)
+void Options::PrintErrorQuantityMismatch(const char* optionName1, const char* optionName2) const
 {
-    fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", cmdline, optionName1, optionName2);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", commandLine.c_str(), optionName1, optionName2);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorTooMany(const char* cmdline, const char* optionName)
+void Options::PrintErrorTooMany(const char* optionName) const
 {
-    fprintf(stderr, "%s: Option '%s' specified too many times.\n", cmdline, optionName);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Option '%s' specified too many times.\n", commandLine.c_str(), optionName);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorUnsupported(const char* cmdline, const char* optionName)
+void Options::PrintErrorUnsupported(const char* optionName) const
 {
-    fprintf(stderr, "%s: Invalid option '%s'.\n", cmdline, optionName);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionName);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintErrorValueRejected(const char* cmdline, const char* optionName, const char* optionValue)
+void Options::PrintErrorValueRejected(const char* optionName, const char* optionValue) const
 {
-    fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", cmdline, optionValue, optionName);
-    PrintErrorCommon(cmdline);
+    fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", commandLine.c_str(), optionValue, optionName);
+    PrintErrorCommon();
 }
 
 // --------
 
-void Options::PrintHelp(const char* cmdline)
+void Options::PrintHelp(void) const
 {
     fprintf(stderr, "TODO: Help message goes here.\n");
 }
 
 
-// -------- CLASS METHODS -------------------------------------------------- //
+// -------- INSTANCE METHODS ----------------------------------------------- //
 // See "Options.h" for documentation.
 
-const OptionContainer* Options::GetOptionValues(const std::string& optionName)
+const OptionContainer* Options::GetOptionValues(const std::string& optionName) const
 {
-    if (0 != specifiedCommandLineOptions.count(optionName))
-        return specifiedCommandLineOptions.at(optionName);
+    if (0 != specifiedOptions.count(optionName))
+        return specifiedOptions.at(optionName);
     else
         return NULL;
 }
 
 // --------
 
-bool Options::SubmitOption(const char* cmdline, const char* optionString)
+bool Options::SubmitOption(const char* optionString)
 {
     const char* aliasString = NULL;
     const char* stringToParse = optionString;
@@ -205,22 +170,22 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
     stringToParse += optionPrefixLength;
     if (0 == optionPrefixLength)
     {
-        PrintErrorMalformed(cmdline, optionString);
+        PrintErrorMalformed(optionString);
         return false;
     }
 
     // Check if the option is a help string.
     if (IsHelpString(stringToParse))
     {
-        PrintHelp(cmdline);
+        PrintHelp();
         return false;
     }
     
     // Check if an alias is being used and, if so, get the actual command-line value string for it.
-    if (0 != supportedCommandLineAliases.count(stringToParse))
+    if ((NULL != supportedAliases) && (0 != supportedAliases->count(stringToParse)))
     {
         aliasString = stringToParse;
-        stringToParse = supportedCommandLineAliases.at(stringToParse).c_str();
+        stringToParse = supportedAliases->at(stringToParse).c_str();
     }
     
     // Parse the string into a name and a value.
@@ -229,7 +194,7 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
     // No equals sign means the input string is malformed.
     if (NULL == posEqualsSign)
     {
-        PrintErrorMalformed(cmdline, optionString);
+        PrintErrorMalformed(optionString);
         return false;
     }
 
@@ -240,7 +205,7 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
     // Reject empty option values.
     if (optionValue.empty())
     {
-        PrintErrorMalformed(cmdline, optionString);
+        PrintErrorMalformed(optionString);
         return false;
     }
     
@@ -252,18 +217,18 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
     }
     
     // Check if the option name is supported.
-    if (0 == specifiedCommandLineOptions.count(optionName))
+    if (0 == specifiedOptions.count(optionName))
     {
-        PrintErrorUnsupported(cmdline, optionName.c_str());
+        PrintErrorUnsupported(optionName.c_str());
         return false;
     }
 
     // Attempt to submit the option value.
-    OptionContainer* optionContainer = specifiedCommandLineOptions.at(optionName.c_str());
+    OptionContainer* optionContainer = specifiedOptions.at(optionName.c_str());
     
     if (EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
     {
-        PrintErrorValueRejected(cmdline, optionName.c_str(), optionValue.c_str());
+        PrintErrorValueRejected(optionName.c_str(), optionValue.c_str());
         return false;
     }
 
@@ -272,35 +237,40 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
 
 // --------
 
-bool Options::ValidateOptions(const char* cmdline)
+bool Options::ValidateOptions(void) const
 {
     // Verify that required options are all supplied.
-    for (auto it = specifiedCommandLineOptions.cbegin(); it != specifiedCommandLineOptions.cend(); ++it)
+    for (auto it = specifiedOptions.cbegin(); it != specifiedOptions.cend(); ++it)
     {
         if (!(it->second->AreValuesValid()))
         {
-            PrintErrorMissing(cmdline, it->first.c_str());
+            PrintErrorMissing(it->first.c_str());
             return false;
         }
     }
-    
-    // Verify specific conditions and relationships between options.
-    // Specifically, output file and format options must have the same number of values.
-    const OptionContainer* outputFileValues = GetOptionValues(kOptionOutputFile);
-    const OptionContainer* outputFormatValues = GetOptionValues(kOptionOutputFormat);
 
-    if (NULL == outputFileValues || NULL == outputFormatValues)
+    return true;
+}
+
+// --------
+
+bool Options::VerifyEqualValueCount(const char* optionName1, const char* optionName2) const
+{
+    // Get the option containers for the two option names.
+    const OptionContainer* options1 = GetOptionValues(optionName1);
+    const OptionContainer* options2 = GetOptionValues(optionName2);
+
+    if (NULL == options1 || NULL == options2)
     {
-        PrintErrorInternal(cmdline);
+        PrintErrorInternal();
         return false;
     }
 
-    if (outputFileValues->GetValueCount() != outputFormatValues->GetValueCount())
+    if (options1->GetValueCount() != options2->GetValueCount())
     {
-        PrintErrorQuantityMismatch(cmdline, kOptionOutputFile.c_str(), kOptionOutputFormat.c_str());
+        PrintErrorQuantityMismatch(optionName1, optionName2);
         return false;
     }
-
 
     return true;
 }
