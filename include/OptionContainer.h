@@ -69,6 +69,13 @@ namespace GraphTool
     /// Holds all values associated with a single command-line option.
     class OptionContainer
     {
+    public:
+        // -------- CONSTANTS ---------------------------------------------- //
+
+        /// Specifies that there is no limit to the number of values accepted for a particular command-line option.
+        static const size_t kUnlimitedValueCount = SIZE_MAX;
+
+
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
 
@@ -167,7 +174,7 @@ namespace GraphTool
         EOptionValueSubmitResult SubmitValue(UOptionValue& value);
 
         /// Internal operation that obtains the value at a specific index.
-        /// If the specified index is zero and a default value exists, uses that.
+        /// Uses the default value if it exists and the index is out of range.
         /// @param [in] index Position of interest.
         /// @param [out] value Variable to be filled with the value, if available.
         bool QueryValueAt(size_t index, UOptionValue& value) const;

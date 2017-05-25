@@ -262,7 +262,7 @@ bool OptionContainer::QueryValueAt(size_t index, UOptionValue& value) const
         value = values[index];
         return true;
     }
-    else if ((0 == index) && IsDefaultValuePresent())
+    else if (IsDefaultValuePresent())
     {
         value = defaultValue;
         return true;

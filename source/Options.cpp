@@ -25,6 +25,18 @@
 using namespace GraphTool;
 
 
+// -------- CONSTANTS ------------------------------------------------------ //
+// See "Options.h" for documentation.
+
+const std::string Options::kOptionEdgeData      = "edgedata";
+const std::string Options::kOptionInputFile     = "inputfile";
+const std::string Options::kOptionInputFormat   = "inputformat";
+const std::string Options::kOptionInputOptions  = "inputoptions";
+const std::string Options::kOptionOutputFile    = "outputfile";
+const std::string Options::kOptionOutputFormat  = "outputformat";
+const std::string Options::kOptionOutputOptions = "outputoptions";
+
+
 // -------- CLASS VARIABLES ------------------------------------------------ //
 // See "Options.h" for documentation.
 
@@ -43,13 +55,13 @@ std::vector<std::string> Options::prefixStrings = {
 };
 
 std::unordered_map<std::string, OptionContainer*> Options::specifiedCommandLineOptions = {
-    { "inputfile",                              new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { "outputfile",                             new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { "inputformat",                            new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { "outputformat",                           new OptionContainer(EOptionValueType::OptionValueTypeString) },
-    { "inputoptions",                           new OptionContainer("") },
-    { "outputoptions",                          new OptionContainer("") },
-    { "edgedata",                               new OptionContainer("void") },
+    { kOptionEdgeData,                          new OptionContainer("void") },
+    { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
+    { kOptionInputFormat,                       new OptionContainer(EOptionValueType::OptionValueTypeString) },
+    { kOptionInputOptions,                      new OptionContainer("") },
+    { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
+    { kOptionOutputFormat,                      new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
+    { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
 };
 
 std::unordered_map<std::string, std::string> Options::supportedCommandLineAliases = {
@@ -109,6 +121,13 @@ void Options::PrintErrorCommon(const char* cmdline)
 
 // --------
 
+void Options::PrintErrorInternal(const char* cmdline)
+{
+    fprintf(stderr, "%s: Internal error while processing command-line options.\n", cmdline);
+}
+
+// --------
+
 void Options::PrintErrorMalformed(const char* cmdline, const char* optionString)
 {
     fprintf(stderr, "%s: Invalid option '%s'.\n", cmdline, optionString);
@@ -120,6 +139,14 @@ void Options::PrintErrorMalformed(const char* cmdline, const char* optionString)
 void Options::PrintErrorMissing(const char* cmdline, const char* optionName)
 {
     fprintf(stderr, "%s: Missing required option '%s'.\n", cmdline, optionName);
+    PrintErrorCommon(cmdline);
+}
+
+// --------
+
+void Options::PrintErrorQuantityMismatch(const char* cmdline, const char* optionName1, const char* optionName2)
+{
+    fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", cmdline, optionName1, optionName2);
     PrintErrorCommon(cmdline);
 }
 
@@ -157,6 +184,16 @@ void Options::PrintHelp(const char* cmdline)
 
 // -------- CLASS METHODS -------------------------------------------------- //
 // See "Options.h" for documentation.
+
+const OptionContainer* Options::GetOptionValues(const std::string& optionName)
+{
+    if (0 != specifiedCommandLineOptions.count(optionName))
+        return specifiedCommandLineOptions.at(optionName);
+    else
+        return NULL;
+}
+
+// --------
 
 bool Options::SubmitOption(const char* cmdline, const char* optionString)
 {
@@ -237,6 +274,7 @@ bool Options::SubmitOption(const char* cmdline, const char* optionString)
 
 bool Options::ValidateOptions(const char* cmdline)
 {
+    // Verify that required options are all supplied.
     for (auto it = specifiedCommandLineOptions.cbegin(); it != specifiedCommandLineOptions.cend(); ++it)
     {
         if (!(it->second->AreValuesValid()))
@@ -245,6 +283,24 @@ bool Options::ValidateOptions(const char* cmdline)
             return false;
         }
     }
+    
+    // Verify specific conditions and relationships between options.
+    // Specifically, output file and format options must have the same number of values.
+    const OptionContainer* outputFileValues = GetOptionValues(kOptionOutputFile);
+    const OptionContainer* outputFormatValues = GetOptionValues(kOptionOutputFormat);
+
+    if (NULL == outputFileValues || NULL == outputFormatValues)
+    {
+        PrintErrorInternal(cmdline);
+        return false;
+    }
+
+    if (outputFileValues->GetValueCount() != outputFormatValues->GetValueCount())
+    {
+        PrintErrorQuantityMismatch(cmdline, kOptionOutputFile.c_str(), kOptionOutputFormat.c_str());
+        return false;
+    }
+
 
     return true;
 }
