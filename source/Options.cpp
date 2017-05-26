@@ -201,7 +201,6 @@ const OptionContainer* Options::GetOptionValues(const std::string& optionName) c
 
 bool Options::SubmitOption(const char* optionString)
 {
-    const char* aliasString = NULL;
     const char* stringToParse = optionString;
     
     // Handle the command-line option prefix. It is an error for it to be missing if prefixes are enabled.
@@ -226,10 +225,7 @@ bool Options::SubmitOption(const char* optionString)
     
     // Check if an alias is being used and, if so, get the actual command-line value string for it.
     if (UsingOptionAliases() && (0 != supportedAliases->count(stringToParse)))
-    {
-        aliasString = stringToParse;
         stringToParse = supportedAliases->at(stringToParse).c_str();
-    }
     
     // Parse the string into a name and a value.
     const char* posEqualsSign = strchr(stringToParse, '=');

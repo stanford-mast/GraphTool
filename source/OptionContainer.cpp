@@ -12,6 +12,7 @@
  *****************************************************************************/
 
 #include "OptionContainer.h"
+#include "PlatformFunctions.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -213,7 +214,7 @@ bool OptionContainer::ParseBoolean(std::string& stringToParse, bool& boolValue)
     // Check if the string represents a value of 'true'.
     for (size_t i = 0; i < sizeof(trueStrings) / sizeof(trueStrings[0]); ++i)
     {
-        if (0 == _strnicmp(stringToParse.c_str(), trueStrings[i].c_str(), stringToParse.size()))
+        if (0 == strnicmp(stringToParse.c_str(), trueStrings[i].c_str(), stringToParse.size()))
         {
             boolValue = true;
             return true;
@@ -223,7 +224,7 @@ bool OptionContainer::ParseBoolean(std::string& stringToParse, bool& boolValue)
     // Check if the string represents a value of 'false'.
     for (size_t i = 0; i < sizeof(falseStrings) / sizeof(falseStrings[0]); ++i)
     {
-        if (0 == _strnicmp(stringToParse.c_str(), falseStrings[i].c_str(), stringToParse.size()))
+        if (0 == strnicmp(stringToParse.c_str(), falseStrings[i].c_str(), stringToParse.size()))
         {
             boolValue = false;
             return true;
