@@ -59,6 +59,7 @@ namespace GraphTool
 
 namespace GraphTool
 {
+    /// Enumerates all supported data types for edge data (i.e. edge weights).
     enum EEdgeDataType : int64_t
     {
         EdgeDataTypeVoid,                                                   ///< No edge data (i.e. an unweighted graph).
@@ -123,6 +124,8 @@ namespace GraphTool
 
 /// Runs the main graph manipulation operations.
 /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+/// @param [in] commandLineOptions Top-level command-line options that have already been parsed.
+/// @return Program exit code. 0 means successful termination, anything else indicates an error.
 template <typename TEdgeData> int run(const Options& commandLineOptions)
 {
     // Get the input file name.
