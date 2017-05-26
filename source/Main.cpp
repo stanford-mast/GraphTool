@@ -105,10 +105,10 @@ namespace GraphTool
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
         { kOptionEdgeData,                          new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, 1) },
         { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
-        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory<void>::GetGraphReaderStrings())) },
+        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory<void>::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
         { kOptionInputOptions,                      new OptionContainer("") },
         { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory<void>::GetGraphWriterStrings())) },
+        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory<void>::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
 
