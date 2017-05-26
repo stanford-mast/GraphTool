@@ -37,7 +37,7 @@ namespace GraphTool
         const std::vector<std::string>* helpStrings;
 
         /// Holds all supported command-line option prefix strings.
-        const std::vector<std::string>& prefixStrings;
+        const std::vector<std::string>* prefixStrings;
         
         /// Holds all supplied command-line option values, which the user would supply as --[option]=[value].
         std::map<std::string, OptionContainer*>& specifiedOptions;
@@ -52,7 +52,7 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Constructs an instance of this object, given all required strings and maps.
-        Options(const std::string& commandLine, const std::vector<std::string>& prefixStrings, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases = NULL, const std::vector<std::string>* helpStrings = NULL);
+        Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases = NULL, const std::vector<std::string>* prefixStrings = NULL, const std::vector<std::string>* helpStrings = NULL);
 
 
     private:
@@ -109,6 +109,19 @@ namespace GraphTool
 
         /// Prints the help message for this application.
         void PrintHelp(void) const;
+
+        /// Checks if help strings are in use.
+        /// @return `true` if so, `false` otherwise.
+        bool UsingHelpStrings(void) const;
+
+        /// Checks if option aliases are in use.
+        /// @return `true` if so, `false` otherwise.
+        bool UsingOptionAliases(void) const;
+        
+        /// Checks if prefix strings are in use.
+        /// @return `true` if so, `false` otherwise.
+        bool UsingPrefixStrings(void) const;
+
         
     public:
         // -------- INSTANCE METHODS --------------------------------------- //

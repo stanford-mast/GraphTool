@@ -93,7 +93,7 @@ namespace GraphTool
 int main(int argc, char* argv[])
 {
     const std::string cmdline = argv[0];
-    Options commandLineOptions(cmdline, cmdlinePrefixStrings, cmdlineSpecifiedOptions, &cmdlineSupportedAliases, &cmdlineHelpStrings);
+    Options commandLineOptions(cmdline, cmdlineSpecifiedOptions, &cmdlineSupportedAliases, &cmdlinePrefixStrings, &cmdlineHelpStrings);
 
     // Submit all command-line options for parsing.
     bool commandLineOptionsSuccess = true;
@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
     if (!commandLineOptionsSuccess)
         return 1;
     
-    // Validate that all required values are present.
-    commandLineOptionsSuccess = commandLineOptions.ValidateOptions();
+    // Validate that all required values are present and required relationships hold.
+    commandLineOptionsSuccess = (commandLineOptions.ValidateOptions() && commandLineOptions.VerifyEqualValueCount(kOptionOutputFile.c_str(), kOptionOutputFormat.c_str()));
 
     if (!commandLineOptionsSuccess)
         return 2;

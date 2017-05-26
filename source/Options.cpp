@@ -28,7 +28,7 @@ using namespace GraphTool;
 // -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
 // See "Options.h" for documentation.
 
-Options::Options(const std::string& commandLine, const std::vector<std::string>& prefixStrings, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
+Options::Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* prefixStrings, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
 {
 
 }
@@ -38,7 +38,7 @@ Options::Options(const std::string& commandLine, const std::vector<std::string>&
 
 bool Options::IsHelpString(const char* optionString) const
 {
-    if ((NULL != helpStrings) && (NULL != optionString))
+    if (UsingHelpStrings() && (NULL != optionString))
     {
         std::string testString(optionString);
 
@@ -56,9 +56,9 @@ bool Options::IsHelpString(const char* optionString) const
 
 size_t Options::PrefixLength(const char* optionString) const
 {
-    if (NULL != optionString)
+    if (UsingPrefixStrings() && (NULL != optionString))
     {
-        for (auto it = prefixStrings.cbegin(); it != prefixStrings.cend(); ++it)
+        for (auto it = prefixStrings->cbegin(); it != prefixStrings->cend(); ++it)
         {
             if (0 == strncmp(optionString, it->c_str(), it->size()))
                 return it->size();
@@ -80,8 +80,8 @@ void Options::PrintErrorAliasConflict(const char* optionAlias, const char* optio
 
 void Options::PrintErrorCommon(void) const
 {
-    if (NULL != helpStrings)
-        fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), prefixStrings[0].c_str(), (*helpStrings)[0].c_str());
+    if (UsingHelpStrings())
+        fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), (UsingPrefixStrings() ? (*prefixStrings)[0].c_str() : ""), (*helpStrings)[0].c_str());
 }
 
 // --------
@@ -146,6 +146,27 @@ void Options::PrintHelp(void) const
     fprintf(stderr, "TODO: Help message goes here.\n");
 }
 
+// --------
+
+bool Options::UsingHelpStrings(void) const
+{
+    return (NULL != helpStrings);
+}
+
+// --------
+
+bool Options::UsingOptionAliases(void) const
+{
+    return (NULL != supportedAliases);
+}
+
+// --------
+
+bool Options::UsingPrefixStrings(void) const
+{
+    return (NULL != prefixStrings);
+}
+
 
 // -------- INSTANCE METHODS ----------------------------------------------- //
 // See "Options.h" for documentation.
@@ -164,25 +185,29 @@ bool Options::SubmitOption(const char* optionString)
 {
     const char* aliasString = NULL;
     const char* stringToParse = optionString;
-    const size_t optionPrefixLength = PrefixLength(optionString);
     
-    // Handle the command-line option prefix. It is an error for it to be missing.
-    stringToParse += optionPrefixLength;
-    if (0 == optionPrefixLength)
+    // Handle the command-line option prefix. It is an error for it to be missing if prefixes are enabled.
+    if (UsingPrefixStrings())
     {
-        PrintErrorMalformed(optionString);
-        return false;
+        const size_t optionPrefixLength = PrefixLength(optionString);
+        stringToParse += optionPrefixLength;
+
+        if (0 == optionPrefixLength)
+        {
+            PrintErrorMalformed(optionString);
+            return false;
+        }
     }
 
     // Check if the option is a help string.
-    if (IsHelpString(stringToParse))
+    if (UsingHelpStrings() && IsHelpString(stringToParse))
     {
         PrintHelp();
         return false;
     }
     
     // Check if an alias is being used and, if so, get the actual command-line value string for it.
-    if ((NULL != supportedAliases) && (0 != supportedAliases->count(stringToParse)))
+    if (UsingOptionAliases() && (0 != supportedAliases->count(stringToParse)))
     {
         aliasString = stringToParse;
         stringToParse = supportedAliases->at(stringToParse).c_str();
