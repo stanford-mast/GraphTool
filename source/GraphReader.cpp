@@ -201,7 +201,7 @@ template <typename TEdgeData> void GraphReader<TEdgeData>::EdgeProducer(void* ar
 // -------- INSTANCE METHODS ----------------------------------------------- //
 // See "GraphReader.h" for documentation.
 
-template <typename TEdgeData> TEdgeCount GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph<TEdgeData>& graph)
+template <typename TEdgeData> bool GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph<TEdgeData>& graph)
 {
     // First, open the file.
     FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);

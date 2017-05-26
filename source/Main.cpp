@@ -10,6 +10,11 @@
 *   Program entry point and main control flow.
 *****************************************************************************/
 
+#include "Graph.hpp"
+#include "GraphReader.h"
+#include "GraphReaderFactory.h"
+#include "GraphWriter.h"
+#include "GraphWriterFactory.h"
 #include "OptionContainer.h"
 #include "Options.h"
 #include "VersionInfo.h"
@@ -87,9 +92,11 @@ namespace GraphTool
     static const std::map<std::string, int64_t> cmdlineEdgeDataTypeStrings = {
         { "void",                                   EEdgeDataType::EdgeDataTypeVoid },
         { "none",                                   EEdgeDataType::EdgeDataTypeVoid },
+
         { "int",                                    EEdgeDataType::EdgeDataTypeInteger },
         { "integer",                                EEdgeDataType::EdgeDataTypeInteger },
         { "uint",                                   EEdgeDataType::EdgeDataTypeInteger },
+
         { "float",                                  EEdgeDataType::EdgeDataTypeFloatingPoint },
         { "double",                                 EEdgeDataType::EdgeDataTypeFloatingPoint },
     };
@@ -98,10 +105,10 @@ namespace GraphTool
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
         { kOptionEdgeData,                          new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, 1) },
         { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
-        { kOptionInputFormat,                       new OptionContainer(EOptionValueType::OptionValueTypeString) },
+        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory<void>::GetGraphReaderStrings())) },
         { kOptionInputOptions,                      new OptionContainer("") },
         { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-        { kOptionOutputFormat,                      new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory<void>::GetGraphWriterStrings())) },
         { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
 
@@ -116,8 +123,84 @@ namespace GraphTool
 
 /// Runs the main graph manipulation operations.
 /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-template <typename TEdgeData> int run(void)
+template <typename TEdgeData> int run(const Options& commandLineOptions)
 {
+    // Get the input file name.
+    const OptionContainer* optionValues = commandLineOptions.GetOptionValues(kOptionInputFile);
+    if (NULL == optionValues)
+        return __LINE__;
+
+    std::string inputGraphFile;
+    if (!(optionValues->QueryValue(inputGraphFile)))
+        return __LINE__;
+
+    // Get the output file names.
+    optionValues = commandLineOptions.GetOptionValues(kOptionOutputFile);
+    if (NULL == optionValues)
+        return __LINE__;
+
+    std::vector<std::string> outputGraphFiles(optionValues->GetValueCount());
+
+    for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+    {
+        if (!(optionValues->QueryValueAt(i, outputGraphFiles[i])))
+            return __LINE__;
+    }
+    
+    // Create the graph reader object.
+    optionValues = commandLineOptions.GetOptionValues(kOptionInputFormat);
+    if (NULL == optionValues)
+        return __LINE__;
+
+    int64_t optionGraphFormatEnum;
+    if (!(optionValues->QueryValue(optionGraphFormatEnum)))
+        return __LINE__;
+    
+    GraphReader<TEdgeData>* reader = GraphReaderFactory<TEdgeData>::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum);
+    if (NULL == reader)
+        return __LINE__;
+    
+    // Create the graph writer objects.
+    optionValues = commandLineOptions.GetOptionValues(kOptionOutputFormat);
+    if (NULL == optionValues)
+        return __LINE__;
+
+    std::vector<GraphWriter<TEdgeData>*> writers(optionValues->GetValueCount());
+
+    for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+    {
+        if (!(optionValues->QueryValueAt(i, optionGraphFormatEnum)))
+            return __LINE__;
+
+        GraphWriter<TEdgeData>* writer = GraphWriterFactory<TEdgeData>::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum);
+        if (NULL == writer)
+            return __LINE__;
+
+        writers[i] = writer;
+    }
+
+    // Consistency check.
+    if (!(writers.size() == outputGraphFiles.size()))
+        return __LINE__;
+
+    // Submit input and output options to all of the readers and writers, respectively.
+    // TODO
+
+    // Read the input graph.
+    Graph<TEdgeData> graph;
+    if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
+        return __LINE__;
+
+    // Perform transformations.
+    // TODO
+
+    // Write the output graphs.
+    for (size_t i = 0; i < writers.size(); ++i)
+    {
+        if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
+            return __LINE__;
+    }
+    
     return 0;
 }
 
@@ -132,34 +215,34 @@ int main(int argc, const char* argv[])
 
     // Submit all command-line options for parsing.
     if (!(commandLineOptions.FillFromStringArray(argc - 1, &argv[1])))
-        return 1;
+        return __LINE__;
     
     // Validate that all required values are present and required relationships hold.
     if (!(commandLineOptions.ValidateOptions() && commandLineOptions.VerifyEqualValueCount(kOptionOutputFile.c_str(), kOptionOutputFormat.c_str())))
-        return 2;
+        return __LINE__;
     
     // Branch based on the edge data type specified.
     const OptionContainer* edgeDataOptionValue = commandLineOptions.GetOptionValues(kOptionEdgeData);
     int64_t edgeDataValue = 0ll;
 
     if (NULL == edgeDataOptionValue)
-        return 3;
+        return __LINE__;
 
     if (!(edgeDataOptionValue->QueryValue(edgeDataValue)))
-        return 4;
+        return __LINE__;
     
     switch ((EEdgeDataType)edgeDataValue)
     {
     case EEdgeDataType::EdgeDataTypeVoid:
-        return run<void>();
+        return run<void>(commandLineOptions);
 
     case EEdgeDataType::EdgeDataTypeInteger:
-        return run<uint64_t>();
+        return run<uint64_t>(commandLineOptions);
 
     case EEdgeDataType::EdgeDataTypeFloatingPoint:
-        return run<double>();
+        return run<double>(commandLineOptions);
 
     default:
-        return 5;
+        return __LINE__;
     }
 }

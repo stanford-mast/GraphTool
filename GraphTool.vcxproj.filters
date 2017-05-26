@@ -63,6 +63,12 @@
     <ClInclude Include="include\OptionContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphReaderFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphWriterFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp">
@@ -90,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\OptionContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GraphReaderFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GraphWriterFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
