@@ -171,6 +171,24 @@ bool Options::UsingPrefixStrings(void) const
 // -------- INSTANCE METHODS ----------------------------------------------- //
 // See "Options.h" for documentation.
 
+bool Options::FillFromStringArray(const size_t count, const char* strings[])
+{
+    if (NULL == strings)
+        return false;
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        const bool submitResult = SubmitOption(strings[i]);
+
+        if (true != submitResult)
+            return false;
+    }
+
+    return true;
+}
+
+// --------
+
 const OptionContainer* Options::GetOptionValues(const std::string& optionName) const
 {
     if (0 != specifiedOptions.count(optionName))

@@ -161,28 +161,21 @@ OptionContainer::~OptionContainer()
 
 // --------
 
-EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap) : OptionContainer(EOptionValueType::OptionValueTypeInteger), enumMap(enumMap), validIntegers()
+EnumOptionContainer::EnumOptionContainer(const std::map<std::string, int64_t>& enumMap) : OptionContainer(EOptionValueType::OptionValueTypeInteger), enumMap(enumMap)
 {
 
 }
 
 // --------
 
-EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const size_t maxValueCount) : OptionContainer(EOptionValueType::OptionValueTypeInteger, maxValueCount), enumMap(enumMap), validIntegers()
+EnumOptionContainer::EnumOptionContainer(const std::map<std::string, int64_t>& enumMap, const size_t maxValueCount) : OptionContainer(EOptionValueType::OptionValueTypeInteger, maxValueCount), enumMap(enumMap)
 {
 
 }
 
 // --------
 
-EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue) : OptionContainer(defaultValue), enumMap(enumMap), validIntegers()
-{
-
-}
-
-// --------
-
-EnumOptionContainer::EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount) : OptionContainer(defaultValue, maxValueCount), enumMap(enumMap), validIntegers()
+EnumOptionContainer::EnumOptionContainer(const std::map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount) : OptionContainer(defaultValue, maxValueCount), enumMap(enumMap)
 {
 
 }
@@ -338,10 +331,10 @@ EOptionValueSubmitResult EnumOptionContainer::ParseAndSubmitValue(std::string& v
 {
     if (0 != enumMap.count(valueString))
     {
-        int64_t valueToSubmit = enumMap.at(valueString);
-
-        validIntegers.insert(valueToSubmit);
-        return SubmitValue(valueToSubmit);
+        UOptionValue valueToSubmit;
+        valueToSubmit.integerValue = enumMap.at(valueString);
+        
+        return OptionContainer::SubmitValue(valueToSubmit);
     }
     else
         return EOptionValueSubmitResult::OptionValueSubmitResultOutOfRange;
@@ -377,10 +370,8 @@ EOptionValueSubmitResult OptionContainer::SubmitValue(int64_t value)
 
 EOptionValueSubmitResult EnumOptionContainer::SubmitValue(int64_t value)
 {
-    if (0 == validIntegers.count(value))
-        return EOptionValueSubmitResult::OptionValueSubmitResultOutOfRange;
-    else
-        return OptionContainer::SubmitValue(value);
+    // Values should not be submitted this way.
+    return EOptionValueSubmitResult::OptionValueSubmitResultOutOfRange;
 }
 
 // --------

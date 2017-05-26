@@ -15,9 +15,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 
@@ -283,11 +283,7 @@ namespace GraphTool
 
         /// Specifies the enumeration as a map from strings to integers.
         /// The map itself would mostly likely be a statically-created data structure, so only a reference to it is required.
-        const std::unordered_map<std::string, int64_t>& enumMap;
-
-        /// Holds all the integers that are allowed to be set.
-        /// This is based on the contents of the enumeration.
-        std::set<int64_t> validIntegers;
+        const std::map<std::string, int64_t>& enumMap;
         
         
     public:
@@ -295,23 +291,18 @@ namespace GraphTool
 
         /// Constructs an instance of this object with the given enumeration map.
         /// @param [in] enumMap Enumeration map to use.
-        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap);
+        EnumOptionContainer(const std::map<std::string, int64_t>& enumMap);
 
         /// Constructs an instance of this object with the given enumeration map.
         /// @param [in] enumMap Enumeration map to use.
         /// @param [in] maxValueCount Maximum number of values allowable.
-        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const size_t maxValueCount);
-
-        /// Constructs an instance of this object with the given enumeration map.
-        /// @param [in] enumMap Enumeration map to use.
-        /// @param [in] defaultValue Default value to use (not verified to be part of the enumeration).
-        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue);
+        EnumOptionContainer(const std::map<std::string, int64_t>& enumMap, const size_t maxValueCount);
 
         /// Constructs an instance of this object with the given enumeration map.
         /// @param [in] enumMap Enumeration map to use.
         /// @param [in] defaultValue Default value to use (not verified to be part of the enumeration).
         /// @param [in] maxValueCount Maximum number of values allowable.
-        EnumOptionContainer(const std::unordered_map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount);
+        EnumOptionContainer(const std::map<std::string, int64_t>& enumMap, const int64_t defaultValue, const size_t maxValueCount);
 
 
         // -------- VIRTUAL INSTANCE METHODS ------------------------------- //

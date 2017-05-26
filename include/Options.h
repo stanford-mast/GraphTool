@@ -126,6 +126,13 @@ namespace GraphTool
     public:
         // -------- INSTANCE METHODS --------------------------------------- //
 
+        /// Iterates through the supplied array of strings (for example, argv) and submits each in turn.
+        /// Prints errors to standard error if there is an issue.
+        /// @param [in] count Number of strings in the array.
+        /// @param [in] strings Array of strings to submit.
+        /// @return `true` if all option strings were accepted, `false` in the event of an error.
+        bool FillFromStringArray(const size_t count, const char* strings[]);
+        
         /// Retrieves the container that holds values for the specified option.
         /// @param [in] optionName Name of the option. Should be one of the constants defined in this class.
         /// @return Pointer to a read-only container holding option values (ownership does not transfer to the caller) or `NULL` in the event of an error.
