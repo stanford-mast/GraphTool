@@ -22,6 +22,7 @@
     <ClInclude Include="include\GraphWriterFactory.h" />
     <ClInclude Include="include\OptionContainer.h" />
     <ClInclude Include="include\Options.h" />
+    <ClInclude Include="include\PlatformFunctions.h" />
     <ClInclude Include="include\SequenceComparator.hpp" />
     <ClInclude Include="include\TextEdgeListReader.h" />
     <ClInclude Include="include\TextEdgeListWriter.h" />
