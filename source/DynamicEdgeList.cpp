@@ -15,122 +15,123 @@
 #include "Edge.hpp"
 #include "Types.h"
 
-using namespace GraphTool;
 
-
-// -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
-// See "DynamicEdgeList.h" for documentation.
-
-template <typename TEdgeData> DynamicEdgeList<TEdgeData>::DynamicEdgeList(void) : edgeList(), degree(0)
+namespace GraphTool
 {
-    // Nothing to do here.
-}
-
-
-// -------- INSTANCE METHODS ----------------------------------------------- //
-// See "DynamicEdgeList.h" for documentation.
-
-template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdge(const Edge<TEdgeData>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.vertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
+    // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
+    // See "DynamicEdgeList.h" for documentation.
     
-    // TODO: insert the edge data properly
-}
-
-// --------
-
-void DynamicEdgeList<void>::InsertEdge(const Edge<void>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.vertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
-}
-
-// --------
-
-template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdgeBufferData<TEdgeData>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.destinationVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
-
-    // TODO: insert the edge data properly
-}
-
-// --------
-
-void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdgeBufferData<void>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.destinationVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
-}
-
-// --------
-
-template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.sourceVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
-
-    // TODO: insert the edge data properly
-}
-
-// --------
-
-void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdgeBufferData<void>& edge)
-{
-    const uint64_t block = ((uint64_t)edge.sourceVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 63ull);
-
-    edgeList[block].edges |= (1ull << bit);
-}
-
-// --------
-
-template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
-{
-    const uint64_t block = ((uint64_t)otherVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 63ull);
-
-    if (0 != edgeList.count(block))
+    template <typename TEdgeData> DynamicEdgeList<TEdgeData>::DynamicEdgeList(void) : edgeList(), degree(0)
     {
-        edgeList[block].edges &= ~(1ull << bit);
-
-        if (0ull == edgeList[block].edges)
-            edgeList.erase(block);
+        // Nothing to do here.
     }
-
-    // TODO: remove the edge data properly
-}
-
-// --------
-
-void DynamicEdgeList<void>::RemoveEdge(const TVertexID otherVertex)
-{
-    const uint64_t block = ((uint64_t)otherVertex) >> 6ull;
-    const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 63ull);
-
-    if (0 != edgeList.count(block))
+    
+    
+    // -------- INSTANCE METHODS ------------------------------------------- //
+    // See "DynamicEdgeList.h" for documentation.
+    
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdge(const Edge<TEdgeData>& edge)
     {
-        edgeList[block].edges &= ~(1ull << bit);
-
-        if (0ull == edgeList[block].edges)
-            edgeList.erase(block);
+        const uint64_t block = ((uint64_t)edge.vertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+        
+        // TODO: insert the edge data properly
     }
+    
+    // --------
+    
+    template <> void DynamicEdgeList<void>::InsertEdge(const Edge<void>& edge)
+    {
+        const uint64_t block = ((uint64_t)edge.vertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+    }
+    
+    // --------
+    
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdgeBufferData<TEdgeData>& edge)
+    {
+        const uint64_t block = ((uint64_t)edge.destinationVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+    
+        // TODO: insert the edge data properly
+    }
+    
+    // --------
+    
+    template <> void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdgeBufferData<void>& edge)
+    {
+        const uint64_t block = ((uint64_t)edge.destinationVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+    }
+    
+    // --------
+    
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge)
+    {
+        const uint64_t block = ((uint64_t)edge.sourceVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+    
+        // TODO: insert the edge data properly
+    }
+    
+    // --------
+    
+    template <> void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdgeBufferData<void>& edge)
+    {
+        const uint64_t block = ((uint64_t)edge.sourceVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 63ull);
+    
+        edgeList[block].edges |= (1ull << bit);
+    }
+    
+    // --------
+    
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
+    {
+        const uint64_t block = ((uint64_t)otherVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 63ull);
+    
+        if (0 != edgeList.count(block))
+        {
+            edgeList[block].edges &= ~(1ull << bit);
+    
+            if (0ull == edgeList[block].edges)
+                edgeList.erase(block);
+        }
+    
+        // TODO: remove the edge data properly
+    }
+    
+    // --------
+    
+    template <> void DynamicEdgeList<void>::RemoveEdge(const TVertexID otherVertex)
+    {
+        const uint64_t block = ((uint64_t)otherVertex) >> 6ull;
+        const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 63ull);
+    
+        if (0 != edgeList.count(block))
+        {
+            edgeList[block].edges &= ~(1ull << bit);
+    
+            if (0ull == edgeList[block].edges)
+                edgeList.erase(block);
+        }
+    }
+    
+    
+    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
+    
+    template class DynamicEdgeList<void>;
+    //template class DynamicEdgeList<uint64_t>;
+    //template class DynamicEdgeList<double>;
 }
-
-
-// -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
-
-template class DynamicEdgeList<void>;
-//template class DynamicEdgeList<uint64_t>;
-//template class DynamicEdgeList<double>;
