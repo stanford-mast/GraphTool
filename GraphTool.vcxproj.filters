@@ -78,6 +78,9 @@
     <ClInclude Include="include\MemoryPool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DynamicVertexIndex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp">
@@ -114,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\DynamicEdgeList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DynamicVertexIndex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
