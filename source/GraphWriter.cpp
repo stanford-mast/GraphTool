@@ -31,8 +31,8 @@ namespace GraphTool
     {
         FILE* file;                                                         ///< File handle.
         Graph<TEdgeData>* graph;                                            ///< Graph object being written.
-        typename Graph<TEdgeData>::EdgeIterator edgesBegin;                 ///< Iterator to the beginning of the graph's edges.
-        typename Graph<TEdgeData>::EdgeIterator edgesEnd;                   ///< Iterator to the end of the graph's edges.
+        typename Graph<TEdgeData>::VertexIterator iterBegin;                ///< Iterator to the beginning of the graph's top-level vertices.
+        typename Graph<TEdgeData>::VertexIterator iterEnd;                  ///< Iterator to the end of the graph's top-level vertices.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
         SEdgeBufferData<TEdgeData>* bufs[2];                                ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
@@ -93,35 +93,34 @@ namespace GraphTool
     {
         SGraphWriteSpec<TEdgeData>* writeSpec = (SGraphWriteSpec<TEdgeData>*)arg;
         uint32_t currentBufferIndex = 0;
-
+        
         const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdgeBufferData<void>));
-        auto edgeIter = writeSpec->edgesBegin;
-
+        auto vertexIter = writeSpec->iterBegin;
+        
         while (true)
         {
             // Fill the buffer with edges.
             TEdgeCount edgeIdx = 0;
-
-            while ((edgeIdx < writeBufferCount) && !(edgeIter == writeSpec->edgesEnd))
+        
+            for (; (edgeIdx < writeBufferCount) && !(vertexIter == writeSpec->iterEnd); ++vertexIter)
             {
-                if (writeSpec->groupedByDestination)
-                    edgeIter.GetOtherEdgeInfo().ExportToSourceEdgeBuffer(edgeIter.GetIndexedVertexID(), writeSpec->bufs[currentBufferIndex][edgeIdx]);
-                else
-                    edgeIter.GetOtherEdgeInfo().ExportToDestinationEdgeBuffer(edgeIter.GetIndexedVertexID(), writeSpec->bufs[currentBufferIndex][edgeIdx]);
+                for (auto edgeIter = vertexIter->second.BeginIterator(); (edgeIdx < writeBufferCount) && !(edgeIter == vertexIter->second.EndIterator()); ++edgeIter)
+                {
+                    // TODO: write out edges properly by looking into the blocks and extracting bits.
 
-                edgeIdx += 1;
-                ++edgeIter;
+                    edgeIdx += 1;
+                }
             }
-
+        
             writeSpec->counts[currentBufferIndex] = edgeIdx;
-
+        
             // Synchronize with the consumer.
             spindleBarrierGlobal();
-
+        
             // Check for termination or I/O errors.
             if (0 == writeSpec->counts[currentBufferIndex] || false == writeSpec->writeSuccessfulSoFar)
                 break;
-
+        
             // Switch to the other buffer to read from file during a consumption operation.
             currentBufferIndex = (~currentBufferIndex) & 1;
         }
@@ -145,8 +144,8 @@ namespace GraphTool
         SGraphWriteSpec<TEdgeData> writeSpec;
 
         writeSpec.file = graphfile;
-        writeSpec.edgesBegin = (groupedByDestination ? graph.EdgeIteratorDestinationBegin() : graph.EdgeIteratorSourceBegin());
-        writeSpec.edgesEnd = (groupedByDestination ? graph.EdgeIteratorDestinationEnd() : graph.EdgeIteratorSourceEnd());
+        writeSpec.iterBegin = (groupedByDestination ? graph.VertexIteratorDestinationBegin() : graph.VertexIteratorSourceBegin());
+        writeSpec.iterEnd = (groupedByDestination ? graph.VertexIteratorDestinationEnd() : graph.VertexIteratorSourceEnd());
         writeSpec.writer = this;
         writeSpec.bufs[0] = bufs[0];
         writeSpec.bufs[1] = bufs[1];

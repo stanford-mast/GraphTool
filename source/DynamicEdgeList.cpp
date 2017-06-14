@@ -36,7 +36,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 31ull);
         const uint32_t mask = (1u << bit);
     
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
         
         edgeList[block].edges |= mask;
@@ -52,7 +52,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 31ull);
         const uint32_t mask = (1u << bit);
     
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
         
         edgeList[block].edges |= mask;
@@ -66,7 +66,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
         const uint32_t mask = (1u << bit);
     
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
         
         edgeList[block].edges |= mask;
@@ -82,7 +82,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
         const uint32_t mask = (1u << bit);
         
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
 
         edgeList[block].edges |= mask;
@@ -96,7 +96,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);
         const uint32_t mask = (1u << bit);
 
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
     
         edgeList[block].edges |= mask;
@@ -112,7 +112,7 @@ namespace GraphTool
         const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);
         const uint32_t mask = (1u << bit);
 
-        if (edgeList[block].edges & mask)
+        if (!(edgeList[block].edges & mask))
             degree += 1;
     
         edgeList[block].edges |= mask;

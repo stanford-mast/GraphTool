@@ -12,7 +12,8 @@
 
 #pragma once
 
-#include "EdgeIndex.hpp"
+#include "DynamicEdgeList.h"
+#include "DynamicVertexIndex.h"
 #include "Types.h"
 
 #include <cstddef>
@@ -28,12 +29,9 @@ namespace GraphTool
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
-
-        /// Alias for read-only iterators over edges.
-        typedef typename EdgeIndex<TEdgeData>::EdgeIterator EdgeIterator;
-
-        /// Alias for read-only iterators over indexed verties.
-        typedef typename EdgeIndex<TEdgeData>::VertexIterator VertexIterator;
+        
+        /// Alias for read-only iterators over indexed vertices.
+        typedef typename DynamicVertexIndex<TEdgeData>::VertexIterator VertexIterator;
         
         
     private:
@@ -41,11 +39,11 @@ namespace GraphTool
         
         /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
-        EdgeIndex<TEdgeData> edgesByDestination;
+        DynamicVertexIndex<TEdgeData> edgesByDestination;
         
         /// Source-grouped vertex data structure.
         /// Maps from a source vertex ID to a set of vertices to which out-edges exist.
-        EdgeIndex<TEdgeData> edgesBySource;
+        DynamicVertexIndex<TEdgeData> edgesBySource;
         
         
     public:
@@ -60,67 +58,22 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
-        /// Obtains a read-only iterator to the beginning of the in-edges edges that correspond to the supplied destination vertex iterator.
-        /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
-        inline EdgeIterator EdgeIteratorDestinationAt(const VertexIterator& vertexIterator) const
-        {
-            return edgesByDestination.EdgeIteratorAt(vertexIterator);
-        }
-        
-        /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by destination vertex.
-        /// @return Iterator, as described.
-        inline EdgeIterator EdgeIteratorDestinationBegin(void) const
-        {
-            return edgesByDestination.EdgeIteratorBegin();
-        }
-
-        /// Obtains a read-only iterator to the end of this graph's edges, grouped by destination vertex.
-        /// @return Iterator, as described.
-        inline EdgeIterator EdgeIteratorDestinationEnd(void) const
-        {
-            return edgesByDestination.EdgeIteratorEnd();
-        }
-
-        /// Obtains a read-only iterator to the beginning of the out-edges edges that correspond to the supplied source vertex iterator.
-        /// @return Iterator, as described, or an invalid iterator if the supplied vertex iterator does not belong to the destination edge index.
-        inline EdgeIterator EdgeIteratorSourceAt(const VertexIterator& vertexIterator) const
-        {
-            return edgesBySource.EdgeIteratorAt(vertexIterator);
-        }
-        
-        /// Obtains a read-only iterator to the beginning of this graph's edges, grouped by source vertex.
-        /// @return Iterator, as described.
-        inline EdgeIterator EdgeIteratorSourceBegin(void) const
-        {
-            return edgesBySource.EdgeIteratorBegin();
-        }
-        
-        /// Obtains a read-only iterator to the end of this graph's edges, grouped by source vertex.
-        /// @return Iterator, as described.
-        inline EdgeIterator EdgeIteratorSourceEnd(void) const
-        {
-            return edgesBySource.EdgeIteratorEnd();
-        }
-        
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
         inline TEdgeCount GetNumEdges(void) const
         {
-            return this->edgesBySource.GetNumEdges();
+            return edgesBySource.GetNumEdges();
         }
 
         /// Retrieves and returns the number of vertices in the graph.
         /// @return Number of vertices in the graph.
         inline TVertexCount GetNumVertices(void) const
         {
-            TVertexCount numDestinationVertices = 0;
-            TVertexCount numSourceVertices = 0;
+            const bool hasDestinationVertices = (0 != edgesByDestination.GetNumVertices());
+            const bool hasSourceVertices = (0 != edgesBySource.GetNumVertices());
 
-            bool destinationHasVertices = this->edgesByDestination.GetIndexUpperBound(numDestinationVertices);
-            bool sourceHasVertices = this->edgesBySource.GetIndexUpperBound(numSourceVertices);
-
-            numDestinationVertices = (destinationHasVertices ? numDestinationVertices + 1 : 0);
-            numSourceVertices = (sourceHasVertices ? numSourceVertices + 1 : 0);
+            const TVertexCount numDestinationVertices = (hasDestinationVertices ? 1 + edgesByDestination.GetMaximumVertexID() : 0);
+            const TVertexCount numSourceVertices = (hasSourceVertices? 1 + edgesBySource.GetMaximumVertexID() : 0);
             
             return (numDestinationVertices > numSourceVertices ? numDestinationVertices : numSourceVertices);
         }
@@ -130,7 +83,7 @@ namespace GraphTool
         /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.
         inline TEdgeCount GetVertexIndegree(TVertexID vertex) const
         {
-            return this->edgesByDestination.GetVertexDegree(vertex);
+            return edgesByDestination.GetDegree(vertex);
         }
         
         /// Retrieves and returns the out-degree of the specified vertex.
@@ -138,7 +91,21 @@ namespace GraphTool
         /// @return Out-degree of the specified vertex. 0 is returned if the vertex has no out-edges or does not exist.
         inline TEdgeCount GetVertexOutdegree(TVertexID vertex) const
         {
-            return this->edgesBySource.GetVertexDegree(vertex);
+            return edgesBySource.GetDegree(vertex);
+        }
+        
+        /// Inserts an edge into the destination-grouped representation using the specified edge buffer.
+        /// @param [in] edge Edge to insert.
+        inline void InsertEdgeByDestination(const SEdgeBufferData<TEdgeData>& edge)
+        {
+            edgesByDestination.InsertEdgeBufferIndexedByDestination(edge);
+        }
+        
+        /// Inserts an edge into the source-grouped representation using the specified edge buffer.
+        /// @param [in] edge Edge to insert.
+        inline void InsertEdgeBySource(const SEdgeBufferData<TEdgeData>& edge)
+        {
+            edgesBySource.InsertEdgeBufferIndexedBySource(edge);
         }
         
         /// Removes an edge from the graph.
@@ -146,69 +113,36 @@ namespace GraphTool
         /// @param [in] toVertex Identifies the destination vertex of the edge.
         inline void RemoveEdge(TVertexID fromVertex, TVertexID toVertex)
         {
-            this->edgesByDestination.RemoveEdge(toVertex, fromVertex);
-            this->edgesBySource.RemoveEdge(fromVertex, toVertex);
+            edgesByDestination.RemoveEdge(toVertex, fromVertex);
+            edgesBySource.RemoveEdge(fromVertex, toVertex);
         }
         
         /// Removes a vertex from the graph, including all edges that include it.
         /// @param [in] vertex Identifier of the vertex to remove.
         inline void RemoveVertex(TVertexID vertex)
         {
-            this->edgesByDestination.RemoveVertex(vertex);
-            this->edgesBySource.RemoveVertex(vertex);
+            edgesByDestination.RemoveVertex(vertex);
+            edgesBySource.RemoveVertex(vertex);
         }
 
-        /// Replaces the existing graph edge indices with those provided.
-        /// Implemented internally as a swap, so the provided edge indices will be empty when done.
-        /// It is up to the caller to generate proper and consistent data structures, as this method does no checking.
-        /// @param [in,out] replacementEdgesByDestination Edge data structure containing new edges to set, indexed by destination vertex.
-        /// @param [in,out] replacementEdgesBySource Edge data structure containing new edges to set, indexed by source vertex.
-        inline void SetEdgeIndices(EdgeIndex<TEdgeData>& replacementEdgesByDestination, EdgeIndex<TEdgeData>& replacementEdgesBySource)
-        {
-            edgesByDestination.SetEdges(replacementEdgesByDestination);
-            edgesBySource.SetEdges(replacementEdgesBySource);
-        }
-
-        /// Obtains a read-only iterator to this graph's destination vertices starting with the specified vertex.
-        /// @return Iterator, as described, or an invalid iterator if the supplied vertex is not present in the graph.
-        inline VertexIterator VertexIteratorDestinationAt(const TVertexID vertexID) const
-        {
-            return edgesByDestination.VertexIteratorAt(vertexID);
-        }
-
-        /// Obtains a read-only iterator to the beginning of this graph's destination vertices.
-        /// @return Iterator, as described.
         inline VertexIterator VertexIteratorDestinationBegin(void) const
         {
-            return edgesByDestination.VertexIteratorBegin();
+            return edgesByDestination.BeginIterator();
         }
-
-        /// Obtains a read-only iterator to the end of this graph's destination vertices.
-        /// @return Iterator, as described.
+        
         inline VertexIterator VertexIteratorDestinationEnd(void) const
         {
-            return edgesByDestination.VertexIteratorEnd();
+            return edgesByDestination.EndIterator();
         }
-
-        /// Obtains a read-only iterator to this graph's source vertices starting with the specified vertex.
-        /// @return Iterator, as described, or an invalid iterator if the supplied vertex is not present in the graph.
-        inline VertexIterator VertexIteratorSourceAt(const TVertexID vertexID) const
-        {
-            return edgesBySource.VertexIteratorAt(vertexID);
-        }
-
-        /// Obtains a read-only iterator to the beginning of this graph's source vertices.
-        /// @return Iterator, as described.
+        
         inline VertexIterator VertexIteratorSourceBegin(void) const
         {
-            return edgesBySource.VertexIteratorBegin();
+            return edgesBySource.BeginIterator();
         }
 
-        /// Obtains a read-only iterator to the end of this graph's source vertices.
-        /// @return Iterator, as described.
         inline VertexIterator VertexIteratorSourceEnd(void) const
         {
-            return edgesBySource.VertexIteratorEnd();
+            return edgesBySource.EndIterator();
         }
     };
 }

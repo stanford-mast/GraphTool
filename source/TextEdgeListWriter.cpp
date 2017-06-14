@@ -67,23 +67,19 @@ namespace GraphTool
 
     template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
-        // Select an edge grouping based on the passed parameter.
-        typename Graph<TEdgeData>::EdgeIterator iter;
-        typename Graph<TEdgeData>::EdgeIterator end;
-
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)
         {
             // First, write the source and destination vertices.
             fprintf(graphfile, "%llu %llu", (long long unsigned int)buf[i].sourceVertex, (long long unsigned int)buf[i].destinationVertex);
-
+        
             // Next, see if edge data are available for writing.
             char edgeDataString[128];
             const size_t edgeDataStringLength = StringFromEdgeData(buf[i], edgeDataString, sizeof(edgeDataString) / sizeof(edgeDataString[0]));
-
+        
             if (0 < edgeDataStringLength)
                 fprintf(graphfile, " %s", edgeDataString);
-
+        
             // End the line.
             fprintf(graphfile, "\n");
         }
