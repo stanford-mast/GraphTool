@@ -13,8 +13,10 @@
   <ItemGroup>
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
+    <ClInclude Include="include\DynamicEdgeList.h" />
     <ClInclude Include="include\Edge.hpp" />
     <ClInclude Include="include\Comparator.hpp" />
+    <ClInclude Include="include\EdgeList.h" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.h" />
     <ClInclude Include="include\GraphReaderFactory.h" />
@@ -34,6 +36,7 @@
   <ItemGroup>
     <ClCompile Include="source\BinaryEdgeListReader.cpp" />
     <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
+    <ClCompile Include="source\DynamicEdgeList.cpp" />
     <ClCompile Include="source\GraphReader.cpp" />
     <ClCompile Include="source\GraphReaderFactory.cpp" />
     <ClCompile Include="source\GraphWriter.cpp" />
