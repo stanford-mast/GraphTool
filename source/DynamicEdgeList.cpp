@@ -32,7 +32,12 @@ template <typename TEdgeData> DynamicEdgeList<TEdgeData>::DynamicEdgeList(void) 
 
 template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdge(const Edge<TEdgeData>& edge)
 {
+    const uint64_t block = ((uint64_t)edge.vertex) >> 6ull;
+    const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 63ull);
+
+    edgeList[block].edges |= (1ull << bit);
     
+    // TODO: insert the edge data properly
 }
 
 // --------
@@ -49,7 +54,12 @@ void DynamicEdgeList<void>::InsertEdge(const Edge<void>& edge)
 
 template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdgeBufferData<TEdgeData>& edge)
 {
+    const uint64_t block = ((uint64_t)edge.destinationVertex) >> 6ull;
+    const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 63ull);
 
+    edgeList[block].edges |= (1ull << bit);
+
+    // TODO: insert the edge data properly
 }
 
 // --------
@@ -66,7 +76,12 @@ void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdgeBufferData<vo
 
 template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge)
 {
-    
+    const uint64_t block = ((uint64_t)edge.sourceVertex) >> 6ull;
+    const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 63ull);
+
+    edgeList[block].edges |= (1ull << bit);
+
+    // TODO: insert the edge data properly
 }
 
 // --------
@@ -83,7 +98,18 @@ void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdgeBufferData<void>& 
 
 template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
 {
+    const uint64_t block = ((uint64_t)otherVertex) >> 6ull;
+    const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 63ull);
 
+    if (0 != edgeList.count(block))
+    {
+        edgeList[block].edges &= ~(1ull << bit);
+
+        if (0ull == edgeList[block].edges)
+            edgeList.erase(block);
+    }
+
+    // TODO: remove the edge data properly
 }
 
 // --------
@@ -106,3 +132,5 @@ void DynamicEdgeList<void>::RemoveEdge(const TVertexID otherVertex)
 // -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
 
 template class DynamicEdgeList<void>;
+//template class DynamicEdgeList<uint64_t>;
+//template class DynamicEdgeList<double>;

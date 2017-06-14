@@ -21,6 +21,24 @@
 
 namespace GraphTool
 {
+    /// Specifies the information to be held for each edge.
+    /// Contains both the edge bit-mask and a pointer to edge data.
+    /// The bit-mask contains bit set to '1' if the corresponding edge is present and '0' otherwise.
+    /// The data points to an array of edge data for each '1' bit.
+    /// Which vertices are represented per instance is determined by the data structure that uses it, such as by position.
+    template <typename TEdgeData> struct SDynamicEdgeInfo
+    {
+        uint64_t edges;                                                 ///< Edge presence bit-mask.
+        TEdgeData* data;                                                ///< Pointer to array of edge data.
+    };
+
+    /// Specifies the information to be held for each edge.
+    /// This version is specialized for unweighted graphs and only contains the edge bit-mask.
+    template <> struct SDynamicEdgeInfo<void>
+    {
+        uint64_t edges;                                                 ///< Edge presence bit-mask.
+    };
+    
     /// Holds edges in a way optimized for fast insertion; useful for ingress.
     /// Represents graph topology data and can hold edge data, such as weights, as well.
     /// This indexed data structure represents unidirectional edges but does not specify the direction.
@@ -28,21 +46,11 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class DynamicEdgeList
     {
-    private:
-        // -------- TYPE DEFINITIONS --------------------------------------- //
-
-        /// Specifies the information to be held with each edge.
-        /// Contains both the edge bit-mask and a pointer to edge data.
-        /// See EdgeList documentation for more information.
-        struct SDynamicEdgeInfo
-        {
-            uint64_t edges;                                                 ///< Edge presence bit-mask.
-            TEdgeData* data;                                                ///< Pointer to array of edge data.
-        };
-
     public:
+        // -------- TYPE DEFINITIONS --------------------------------------- //
+        
         /// Alias for the iterator type used by this class.
-        typedef typename std::map<uint64_t, SDynamicEdgeInfo>::const_iterator EdgeIterator;
+        typedef typename std::map<uint64_t, SDynamicEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
         
         
     private:
@@ -50,7 +58,7 @@ namespace GraphTool
 
         /// Holds all edge information.
         /// Key is the edge block identifier, value is the edge information structure.
-        std::map<uint64_t, SDynamicEdgeInfo> edgeList;
+        std::map<uint64_t, SDynamicEdgeInfo<TEdgeData>> edgeList;
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
@@ -97,83 +105,6 @@ namespace GraphTool
         /// Inserts the specified edge into this data structure, using the source as its data source.
         /// @param [in] edge Edge to insert.
         void InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge);
-
-        /// Removes the specified edge from this data structure.
-        /// @param [in] otherVertex Vertex at the other end of the edge to remove.
-        void RemoveEdge(const TVertexID otherVertex);
-    };
-
-    /// Holds edges in a way optimized for fast insertion, specialized for unweighted graphs.
-    template <> class DynamicEdgeList<void>
-    {
-    private:
-        // -------- TYPE DEFINITIONS --------------------------------------- //
-
-        /// Specifies the information to be held within each edge block.
-        /// Contains the edge bit-mask.
-        /// See EdgeList documentation for more information.
-        struct SDynamicEdgeInfo
-        {
-            uint64_t edges;                                                 ///< Edge presence bit-mask.
-        };
-        
-    public:
-        /// Alias for the iterator type used by this class.
-        typedef typename std::map<uint64_t, SDynamicEdgeInfo>::const_iterator EdgeIterator;
-        
-        
-    private:
-        // -------- INSTANCE VARIABLES ------------------------------------- //
-
-        /// Holds all edge information.
-        /// Key is the edge block identifier, value is the edge information structure.
-        std::map<uint64_t, SDynamicEdgeInfo> edgeList;
-
-        /// Holds the total number of edges present in this data structure.
-        TEdgeCount degree;
-
-
-    public:
-        // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
-
-        /// Default constructor.
-        DynamicEdgeList(void);
-
-
-        // -------- INSTANCE METHODS --------------------------------------- //
-
-        /// Returns a read-only iterator for the beginning of the edge list.
-        /// @return Read-only iterator to the beginning of the edge list.
-        inline EdgeIterator BeginIterator(void) const
-        {
-            return edgeList.cbegin();
-        }
-
-        /// Returns a read-only iterator for the end of the edge list.
-        /// @return Read-only iterator for the end of the edge list.
-        inline EdgeIterator EndIterator(void) const
-        {
-            return edgeList.cend();
-        }
-        
-        /// Returns the total number of edges in this data structure (i.e. the degree of the top-level vertex it represents).
-        /// @return Total number of edges, which could be 0.
-        inline TEdgeCount GetDegree(void) const
-        {
-            return degree;
-        }
-
-        /// Inserts the specified edge into this data structure.
-        /// @param [in] edge Edge to insert.
-        void InsertEdge(const Edge<void>& edge);
-
-        /// Inserts the specified edge into this data structure, using the destination as its data source.
-        /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferDestination(const SEdgeBufferData<void>& edge);
-
-        /// Inserts the specified edge into this data structure, using the source as its data source.
-        /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferSource(const SEdgeBufferData<void>& edge);
 
         /// Removes the specified edge from this data structure.
         /// @param [in] otherVertex Vertex at the other end of the edge to remove.
