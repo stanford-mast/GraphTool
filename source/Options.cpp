@@ -22,294 +22,295 @@
 #include <string>
 #include <utility>
 
-using namespace GraphTool;
 
-
-// -------- CONSTRUCTION AND DESTRUCTION ----------------------------------- //
-// See "Options.h" for documentation.
-
-Options::Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* prefixStrings, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
+namespace GraphTool
 {
+    // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
+    // See "Options.h" for documentation.
 
-}
-
-// -------- HELPERS -------------------------------------------------------- //
-// See "Options.h" for documentation.
-
-bool Options::IsHelpString(const char* optionString) const
-{
-    if (UsingHelpStrings() && (NULL != optionString))
+    Options::Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* prefixStrings, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
     {
-        std::string testString(optionString);
 
-        for (auto it = helpStrings->cbegin(); it != helpStrings->cend(); ++it)
-        {
-            if (*it == testString)
-                return true;
-        }
     }
 
-    return false;
-}
+    // -------- HELPERS ---------------------------------------------------- //
+    // See "Options.h" for documentation.
 
-// --------
-
-size_t Options::PrefixLength(const char* optionString) const
-{
-    if (UsingPrefixStrings() && (NULL != optionString))
+    bool Options::IsHelpString(const char* optionString) const
     {
-        for (auto it = prefixStrings->cbegin(); it != prefixStrings->cend(); ++it)
+        if (UsingHelpStrings() && (NULL != optionString))
         {
-            if (0 == strncmp(optionString, it->c_str(), it->size()))
-                return it->size();
+            std::string testString(optionString);
+
+            for (auto it = helpStrings->cbegin(); it != helpStrings->cend(); ++it)
+            {
+                if (*it == testString)
+                    return true;
+            }
         }
-    }
-    
-    return 0;
-}
 
-// --------
-
-void Options::PrintErrorAliasConflict(const char* optionAlias, const char* optionName) const
-{
-    fprintf(stderr, "%s: '%s' conflicts with '%s'.\n", commandLine.c_str(), optionAlias, optionName);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorCommon(void) const
-{
-    if (UsingHelpStrings())
-        fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), (UsingPrefixStrings() ? (*prefixStrings)[0].c_str() : ""), (*helpStrings)[0].c_str());
-}
-
-// --------
-
-void Options::PrintErrorInternal(void) const
-{
-    fprintf(stderr, "%s: Internal error while processing options.\n", commandLine.c_str());
-}
-
-// --------
-
-void Options::PrintErrorMalformed(const char* optionString) const
-{
-    fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionString);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorMissing(const char* optionName) const
-{
-    fprintf(stderr, "%s: Missing required option '%s'.\n", commandLine.c_str(), optionName);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorQuantityMismatch(const char* optionName1, const char* optionName2) const
-{
-    fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", commandLine.c_str(), optionName1, optionName2);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorTooMany(const char* optionName) const
-{
-    fprintf(stderr, "%s: Option '%s' specified too many times.\n", commandLine.c_str(), optionName);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorUnsupported(const char* optionName) const
-{
-    fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionName);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintErrorValueRejected(const char* optionName, const char* optionValue) const
-{
-    fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", commandLine.c_str(), optionValue, optionName);
-    PrintErrorCommon();
-}
-
-// --------
-
-void Options::PrintHelp(void) const
-{
-    fprintf(stderr, "TODO: Help message goes here.\n");
-}
-
-// --------
-
-bool Options::UsingHelpStrings(void) const
-{
-    return (NULL != helpStrings);
-}
-
-// --------
-
-bool Options::UsingOptionAliases(void) const
-{
-    return (NULL != supportedAliases);
-}
-
-// --------
-
-bool Options::UsingPrefixStrings(void) const
-{
-    return (NULL != prefixStrings);
-}
-
-
-// -------- INSTANCE METHODS ----------------------------------------------- //
-// See "Options.h" for documentation.
-
-bool Options::FillFromStringArray(const size_t count, const char* strings[])
-{
-    if (NULL == strings)
         return false;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        const bool submitResult = SubmitOption(strings[i]);
-
-        if (true != submitResult)
-            return false;
     }
 
-    return true;
-}
+    // --------
 
-// --------
-
-const OptionContainer* Options::GetOptionValues(const std::string& optionName) const
-{
-    if (0 != specifiedOptions.count(optionName))
-        return specifiedOptions.at(optionName);
-    else
-        return NULL;
-}
-
-// --------
-
-bool Options::SubmitOption(const char* optionString)
-{
-    const char* stringToParse = optionString;
-    
-    // Handle the command-line option prefix. It is an error for it to be missing if prefixes are enabled.
-    if (UsingPrefixStrings())
+    size_t Options::PrefixLength(const char* optionString) const
     {
-        const size_t optionPrefixLength = PrefixLength(optionString);
-        stringToParse += optionPrefixLength;
+        if (UsingPrefixStrings() && (NULL != optionString))
+        {
+            for (auto it = prefixStrings->cbegin(); it != prefixStrings->cend(); ++it)
+            {
+                if (0 == strncmp(optionString, it->c_str(), it->size()))
+                    return it->size();
+            }
+        }
 
-        if (0 == optionPrefixLength)
+        return 0;
+    }
+
+    // --------
+
+    void Options::PrintErrorAliasConflict(const char* optionAlias, const char* optionName) const
+    {
+        fprintf(stderr, "%s: '%s' conflicts with '%s'.\n", commandLine.c_str(), optionAlias, optionName);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorCommon(void) const
+    {
+        if (UsingHelpStrings())
+            fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), (UsingPrefixStrings() ? (*prefixStrings)[0].c_str() : ""), (*helpStrings)[0].c_str());
+    }
+
+    // --------
+
+    void Options::PrintErrorInternal(void) const
+    {
+        fprintf(stderr, "%s: Internal error while processing options.\n", commandLine.c_str());
+    }
+
+    // --------
+
+    void Options::PrintErrorMalformed(const char* optionString) const
+    {
+        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionString);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorMissing(const char* optionName) const
+    {
+        fprintf(stderr, "%s: Missing required option '%s'.\n", commandLine.c_str(), optionName);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorQuantityMismatch(const char* optionName1, const char* optionName2) const
+    {
+        fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", commandLine.c_str(), optionName1, optionName2);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorTooMany(const char* optionName) const
+    {
+        fprintf(stderr, "%s: Option '%s' specified too many times.\n", commandLine.c_str(), optionName);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorUnsupported(const char* optionName) const
+    {
+        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionName);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintErrorValueRejected(const char* optionName, const char* optionValue) const
+    {
+        fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", commandLine.c_str(), optionValue, optionName);
+        PrintErrorCommon();
+    }
+
+    // --------
+
+    void Options::PrintHelp(void) const
+    {
+        fprintf(stderr, "TODO: Help message goes here.\n");
+    }
+
+    // --------
+
+    bool Options::UsingHelpStrings(void) const
+    {
+        return (NULL != helpStrings);
+    }
+
+    // --------
+
+    bool Options::UsingOptionAliases(void) const
+    {
+        return (NULL != supportedAliases);
+    }
+
+    // --------
+
+    bool Options::UsingPrefixStrings(void) const
+    {
+        return (NULL != prefixStrings);
+    }
+
+
+    // -------- INSTANCE METHODS ------------------------------------------- //
+    // See "Options.h" for documentation.
+
+    bool Options::FillFromStringArray(const size_t count, const char* strings[])
+    {
+        if (NULL == strings)
+            return false;
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            const bool submitResult = SubmitOption(strings[i]);
+
+            if (true != submitResult)
+                return false;
+        }
+
+        return true;
+    }
+
+    // --------
+
+    const OptionContainer* Options::GetOptionValues(const std::string& optionName) const
+    {
+        if (0 != specifiedOptions.count(optionName))
+            return specifiedOptions.at(optionName);
+        else
+            return NULL;
+    }
+
+    // --------
+
+    bool Options::SubmitOption(const char* optionString)
+    {
+        const char* stringToParse = optionString;
+
+        // Handle the command-line option prefix. It is an error for it to be missing if prefixes are enabled.
+        if (UsingPrefixStrings())
+        {
+            const size_t optionPrefixLength = PrefixLength(optionString);
+            stringToParse += optionPrefixLength;
+
+            if (0 == optionPrefixLength)
+            {
+                PrintErrorMalformed(optionString);
+                return false;
+            }
+        }
+
+        // Check if the option is a help string.
+        if (UsingHelpStrings() && IsHelpString(stringToParse))
+        {
+            PrintHelp();
+            return false;
+        }
+
+        // Check if an alias is being used and, if so, get the actual command-line value string for it.
+        if (UsingOptionAliases() && (0 != supportedAliases->count(stringToParse)))
+            stringToParse = supportedAliases->at(stringToParse).c_str();
+
+        // Parse the string into a name and a value.
+        const char* posEqualsSign = strchr(stringToParse, '=');
+
+        // No equals sign means the input string is malformed.
+        if (NULL == posEqualsSign)
         {
             PrintErrorMalformed(optionString);
             return false;
         }
-    }
 
-    // Check if the option is a help string.
-    if (UsingHelpStrings() && IsHelpString(stringToParse))
-    {
-        PrintHelp();
-        return false;
-    }
-    
-    // Check if an alias is being used and, if so, get the actual command-line value string for it.
-    if (UsingOptionAliases() && (0 != supportedAliases->count(stringToParse)))
-        stringToParse = supportedAliases->at(stringToParse).c_str();
-    
-    // Parse the string into a name and a value.
-    const char* posEqualsSign = strchr(stringToParse, '=');
-    
-    // No equals sign means the input string is malformed.
-    if (NULL == posEqualsSign)
-    {
-        PrintErrorMalformed(optionString);
-        return false;
-    }
+        // Separate the name and value portions.
+        std::string optionName(stringToParse, posEqualsSign - stringToParse);
+        std::string optionValue(posEqualsSign + 1);
 
-    // Separate the name and value portions.
-    std::string optionName(stringToParse, posEqualsSign - stringToParse);
-    std::string optionValue(posEqualsSign + 1);
-
-    // Reject empty option values.
-    if (optionValue.empty())
-    {
-        PrintErrorMalformed(optionString);
-        return false;
-    }
-    
-    // Check for single-quotes or double-quotes surrounding the option value and remove them if present.
-    if ((optionValue.front() == optionValue.back()) && ((optionValue.front() == '\"') || (optionValue.front() == '\'')) && (optionValue.size() >= 2))
-    {
-        optionValue.erase(0, 1);
-        optionValue.pop_back();
-    }
-    
-    // Check if the option name is supported.
-    if (0 == specifiedOptions.count(optionName))
-    {
-        PrintErrorUnsupported(optionName.c_str());
-        return false;
-    }
-
-    // Attempt to submit the option value.
-    OptionContainer* optionContainer = specifiedOptions.at(optionName.c_str());
-    
-    if (EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
-    {
-        PrintErrorValueRejected(optionName.c_str(), optionValue.c_str());
-        return false;
-    }
-
-    return true;
-}
-
-// --------
-
-bool Options::ValidateOptions(void) const
-{
-    // Verify that required options are all supplied.
-    for (auto it = specifiedOptions.cbegin(); it != specifiedOptions.cend(); ++it)
-    {
-        if (!(it->second->AreValuesValid()))
+        // Reject empty option values.
+        if (optionValue.empty())
         {
-            PrintErrorMissing(it->first.c_str());
+            PrintErrorMalformed(optionString);
             return false;
         }
+
+        // Check for single-quotes or double-quotes surrounding the option value and remove them if present.
+        if ((optionValue.front() == optionValue.back()) && ((optionValue.front() == '\"') || (optionValue.front() == '\'')) && (optionValue.size() >= 2))
+        {
+            optionValue.erase(0, 1);
+            optionValue.pop_back();
+        }
+
+        // Check if the option name is supported.
+        if (0 == specifiedOptions.count(optionName))
+        {
+            PrintErrorUnsupported(optionName.c_str());
+            return false;
+        }
+
+        // Attempt to submit the option value.
+        OptionContainer* optionContainer = specifiedOptions.at(optionName.c_str());
+
+        if (EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
+        {
+            PrintErrorValueRejected(optionName.c_str(), optionValue.c_str());
+            return false;
+        }
+
+        return true;
     }
 
-    return true;
-}
+    // --------
 
-// --------
-
-bool Options::VerifyEqualValueCount(const char* optionName1, const char* optionName2) const
-{
-    // Get the option containers for the two option names.
-    const OptionContainer* options1 = GetOptionValues(optionName1);
-    const OptionContainer* options2 = GetOptionValues(optionName2);
-
-    if (NULL == options1 || NULL == options2)
+    bool Options::ValidateOptions(void) const
     {
-        PrintErrorInternal();
-        return false;
+        // Verify that required options are all supplied.
+        for (auto it = specifiedOptions.cbegin(); it != specifiedOptions.cend(); ++it)
+        {
+            if (!(it->second->AreValuesValid()))
+            {
+                PrintErrorMissing(it->first.c_str());
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    if (options1->GetValueCount() != options2->GetValueCount())
+    // --------
+
+    bool Options::VerifyEqualValueCount(const char* optionName1, const char* optionName2) const
     {
-        PrintErrorQuantityMismatch(optionName1, optionName2);
-        return false;
-    }
+        // Get the option containers for the two option names.
+        const OptionContainer* options1 = GetOptionValues(optionName1);
+        const OptionContainer* options2 = GetOptionValues(optionName2);
 
-    return true;
+        if (NULL == options1 || NULL == options2)
+        {
+            PrintErrorInternal();
+            return false;
+        }
+
+        if (options1->GetValueCount() != options2->GetValueCount())
+        {
+            PrintErrorQuantityMismatch(optionName1, optionName2);
+            return false;
+        }
+
+        return true;
+    }
 }

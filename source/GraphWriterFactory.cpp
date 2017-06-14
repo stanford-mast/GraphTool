@@ -20,13 +20,12 @@
 #include <map>
 #include <string>
 
-using namespace GraphTool;
-
-
-// -------- LOCALS --------------------------------------------------------- //
 
 namespace GraphTool
 {
+    // -------- LOCALS ----------------------------------------------------- //
+
+    /// Maps strings to the internal edge list type.
     static const std::map<std::string, int64_t> graphWriterStrings = {
         { "binaryedgelist",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
         { "binaryEdgeList",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
@@ -36,43 +35,43 @@ namespace GraphTool
         { "textEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "TextEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
     };
-}
 
 
-// -------- CLASS METHODS -------------------------------------------------- //
-// See "GraphWriterFactory.h" for documentation.
+    // -------- CLASS METHODS ---------------------------------------------- //
+    // See "GraphWriterFactory.h" for documentation.
 
-template <typename TEdgeData> GraphWriter<TEdgeData>* GraphWriterFactory<TEdgeData>::CreateGraphWriter(EGraphWriterType type)
-{
-    GraphWriter<TEdgeData>* result = NULL;
-
-    switch (type)
+    template <typename TEdgeData> GraphWriter<TEdgeData>* GraphWriterFactory<TEdgeData>::CreateGraphWriter(EGraphWriterType type)
     {
-    case EGraphWriterType::GraphWriterTypeBinaryEdgeList:
-        result = new BinaryEdgeListWriter<TEdgeData>();
-        break;
+        GraphWriter<TEdgeData>* result = NULL;
 
-    case EGraphWriterType::GraphWriterTypeTextEdgeList:
-        result = new TextEdgeListWriter<TEdgeData>();
-        break;
+        switch (type)
+        {
+        case EGraphWriterType::GraphWriterTypeBinaryEdgeList:
+            result = new BinaryEdgeListWriter<TEdgeData>();
+            break;
 
-    default:
-        break;
+        case EGraphWriterType::GraphWriterTypeTextEdgeList:
+            result = new TextEdgeListWriter<TEdgeData>();
+            break;
+
+        default:
+            break;
+        }
+
+        return result;
     }
 
-    return result;
+    // --------
+
+    template <typename TEdgeData> const std::map<std::string, int64_t>* GraphWriterFactory<TEdgeData>::GetGraphWriterStrings(void)
+    {
+        return &graphWriterStrings;
+    }
+
+
+    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
+
+    template class GraphWriterFactory<void>;
+    template class GraphWriterFactory<uint64_t>;
+    template class GraphWriterFactory<double>;
 }
-
-// --------
-
-template <typename TEdgeData> const std::map<std::string, int64_t>* GraphWriterFactory<TEdgeData>::GetGraphWriterStrings(void)
-{
-    return &graphWriterStrings;
-}
-
-
-// -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
-
-template class GraphWriterFactory<void>;
-template class GraphWriterFactory<uint64_t>;
-template class GraphWriterFactory<double>;

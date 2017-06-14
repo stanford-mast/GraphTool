@@ -20,37 +20,38 @@
 #include <cstdint>
 #include <cstdio>
 
-using namespace GraphTool;
 
-
-// -------- CONCRETE INSTANCE METHODS -------------------------------------- //
-// See "GraphWriter.h" for documentation.
-
-template <typename TEdgeData> FILE* BinaryEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
+namespace GraphTool
 {
-    // This class writes files in binary mode.
-    FILE* graphfile = fopen(filename, "wb");
+    // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
+    // See "GraphWriter.h" for documentation.
 
-    if (NULL != graphfile)
+    template <typename TEdgeData> FILE* BinaryEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
     {
-        // Write out the number of vertices and edges in the graph.
-        TVertexCount metadata[2] = { graph.GetNumVertices(), graph.GetNumEdges() };
-        fwrite((void*)metadata, sizeof(metadata[0]), sizeof(metadata) / sizeof(metadata[0]), graphfile);
+        // This class writes files in binary mode.
+        FILE* graphfile = fopen(filename, "wb");
+
+        if (NULL != graphfile)
+        {
+            // Write out the number of vertices and edges in the graph.
+            TVertexCount metadata[2] = { graph.GetNumVertices(), graph.GetNumEdges() };
+            fwrite((void*)metadata, sizeof(metadata[0]), sizeof(metadata) / sizeof(metadata[0]), graphfile);
+        }
+
+        return graphfile;
     }
 
-    return graphfile;
+    // --------
+
+    template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    {
+        fwrite((void*)buf, sizeof(const SEdgeBufferData<TEdgeData>), count, graphfile);
+    }
+
+
+    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
+
+    template class BinaryEdgeListWriter<void>;
+    template class BinaryEdgeListWriter<uint64_t>;
+    template class BinaryEdgeListWriter<double>;
 }
-
-// --------
-
-template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
-{
-    fwrite((void*)buf, sizeof(const SEdgeBufferData<TEdgeData>), count, graphfile);
-}
-
-
-// -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
-
-template class BinaryEdgeListWriter<void>;
-template class BinaryEdgeListWriter<uint64_t>;
-template class BinaryEdgeListWriter<double>;

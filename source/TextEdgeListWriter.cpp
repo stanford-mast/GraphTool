@@ -20,14 +20,12 @@
 #include <cstdint>
 #include <cstdio>
 
-using namespace GraphTool;
-
-
-// -------- CLASS METHODS -------------------------------------------------- //
-// See "TextEdgeListWriter.h" for documentation.
 
 namespace GraphTool
 {
+    // -------- CLASS METHODS ---------------------------------------------- //
+    // See "TextEdgeListWriter.h" for documentation.
+
     template <> int TextEdgeListWriter<void>::StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
     {
         return 0;
@@ -46,55 +44,55 @@ namespace GraphTool
     {
         return snprintf(edgeDataString, edgeDataStringCount, "%.10lf", edgeBuf.edgeData);
     }
-}
 
 
-// -------- CONCRETE INSTANCE METHODS -------------------------------------- //
-// See "GraphWriter.h" for documentation.
+    // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
+    // See "GraphWriter.h" for documentation.
 
-template <typename TEdgeData> FILE* TextEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
-{
-    // This class writes files in text mode.
-    FILE* graphfile = fopen(filename, "w");
-
-    if (NULL != graphfile)
+    template <typename TEdgeData> FILE* TextEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
     {
-        // Write out the number of vertices and edges in the graph.
-        fprintf(graphfile, "%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
+        // This class writes files in text mode.
+        FILE* graphfile = fopen(filename, "w");
+
+        if (NULL != graphfile)
+        {
+            // Write out the number of vertices and edges in the graph.
+            fprintf(graphfile, "%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
+        }
+
+        return graphfile;
     }
 
-    return graphfile;
-}
+    // --------
 
-// --------
-
-template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
-{
-    // Select an edge grouping based on the passed parameter.
-    typename Graph<TEdgeData>::EdgeIterator iter;
-    typename Graph<TEdgeData>::EdgeIterator end;
-
-    // Write out each edge.
-    for (size_t i = 0; i < count; ++i)
+    template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
-        // First, write the source and destination vertices.
-        fprintf(graphfile, "%llu %llu", (long long unsigned int)buf[i].sourceVertex, (long long unsigned int)buf[i].destinationVertex);
+        // Select an edge grouping based on the passed parameter.
+        typename Graph<TEdgeData>::EdgeIterator iter;
+        typename Graph<TEdgeData>::EdgeIterator end;
 
-        // Next, see if edge data are available for writing.
-        char edgeDataString[128];
-        const size_t edgeDataStringLength = StringFromEdgeData(buf[i], edgeDataString, sizeof(edgeDataString) / sizeof(edgeDataString[0]));
+        // Write out each edge.
+        for (size_t i = 0; i < count; ++i)
+        {
+            // First, write the source and destination vertices.
+            fprintf(graphfile, "%llu %llu", (long long unsigned int)buf[i].sourceVertex, (long long unsigned int)buf[i].destinationVertex);
 
-        if (0 < edgeDataStringLength)
-            fprintf(graphfile, " %s", edgeDataString);
+            // Next, see if edge data are available for writing.
+            char edgeDataString[128];
+            const size_t edgeDataStringLength = StringFromEdgeData(buf[i], edgeDataString, sizeof(edgeDataString) / sizeof(edgeDataString[0]));
 
-        // End the line.
-        fprintf(graphfile, "\n");
+            if (0 < edgeDataStringLength)
+                fprintf(graphfile, " %s", edgeDataString);
+
+            // End the line.
+            fprintf(graphfile, "\n");
+        }
     }
+
+
+    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
+
+    template class TextEdgeListWriter<void>;
+    template class TextEdgeListWriter<uint64_t>;
+    template class TextEdgeListWriter<double>;
 }
-
-
-// -------- EXPLICIT TEMPLATE INSTANTIATIONS ------------------------------- //
-
-template class TextEdgeListWriter<void>;
-template class TextEdgeListWriter<uint64_t>;
-template class TextEdgeListWriter<double>;
