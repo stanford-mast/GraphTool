@@ -72,10 +72,10 @@
     <ClInclude Include="include\PlatformFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EdgeList.h">
+    <ClInclude Include="include\DynamicEdgeList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DynamicEdgeList.h">
+    <ClInclude Include="include\MemoryPool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

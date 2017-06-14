@@ -26,9 +26,10 @@ namespace GraphTool
     /// The bit-mask contains bit set to '1' if the corresponding edge is present and '0' otherwise.
     /// The data points to an array of edge data for each '1' bit.
     /// Which vertices are represented per instance is determined by the data structure that uses it, such as by position.
+    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> struct SDynamicEdgeInfo
     {
-        uint64_t edges;                                                 ///< Edge presence bit-mask.
+        uint32_t edges;                                                 ///< Edge presence bit-mask.
         TEdgeData* data;                                                ///< Pointer to array of edge data.
     };
 
@@ -36,7 +37,7 @@ namespace GraphTool
     /// This version is specialized for unweighted graphs and only contains the edge bit-mask.
     template <> struct SDynamicEdgeInfo<void>
     {
-        uint64_t edges;                                                 ///< Edge presence bit-mask.
+        uint32_t edges;                                                 ///< Edge presence bit-mask.
     };
     
     /// Holds edges in a way optimized for fast insertion; useful for ingress.
@@ -92,6 +93,13 @@ namespace GraphTool
         inline TEdgeCount GetDegree(void) const
         {
             return degree;
+        }
+
+        /// Returns the number of blocks in this data structure.
+        /// This is a lower-level measurement related to the underlying data structure implementation.
+        inline size_t GetNumBlocks(void) const
+        {
+            return edgeList.size();
         }
 
         /// Inserts the specified edge into this data structure.
