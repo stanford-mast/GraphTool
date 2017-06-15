@@ -78,6 +78,20 @@ namespace GraphTool
             return (numDestinationVertices > numSourceVertices ? numDestinationVertices : numSourceVertices);
         }
         
+        /// Retrieves and returns the number of Vector-Sparse vectors required to represent the destination-grouped edges.
+        /// @return Number of vectors required.
+        inline size_t GetNumVectorsDestination(void) const
+        {
+            return edgesByDestination.GetNumVectors();
+        }
+        
+        /// Retrieves and returns the number of Vector-Sparse vectors required to represent the source-grouped edges.
+        /// @return Number of vectors required.
+        inline size_t GetNumVectorsSource(void) const
+        {
+            return edgesBySource.GetNumVectors();
+        }
+        
         /// Retrieves and returns the in-degree of the specified vertex.
         /// @param [in] vertex Identifier of the vertex of interest.
         /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.

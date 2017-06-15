@@ -20,7 +20,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "DynamicEdgeList.h" for documentation.
     
-    template <typename TEdgeData> DynamicEdgeList<TEdgeData>::DynamicEdgeList(void) : edgeList(), degree(0)
+    template <typename TEdgeData> DynamicEdgeList<TEdgeData>::DynamicEdgeList(void) : edgeList(), degree(0), numVectors(0)
     {
         // Nothing to do here.
     }
@@ -36,7 +36,12 @@ namespace GraphTool
         const uint32_t mask = (1u << bit);
     
         if (!(edgeList[block].edges & mask))
+        {
             degree += 1;
+            
+            if (1 == (degree & 3))
+                numVectors += 1;
+        }
         
         edgeList[block].edges |= mask;
     
@@ -52,7 +57,12 @@ namespace GraphTool
         const uint32_t mask = (1u << bit);
         
         if (!(edgeList[block].edges & mask))
+        {
             degree += 1;
+            
+            if (1 == (degree & 3))
+                numVectors += 1;
+        }
 
         edgeList[block].edges |= mask;
     }
@@ -66,7 +76,12 @@ namespace GraphTool
         const uint32_t mask = (1u << bit);
 
         if (!(edgeList[block].edges & mask))
+        {
             degree += 1;
+            
+            if (1 == (degree & 3))
+                numVectors += 1;
+        }
     
         edgeList[block].edges |= mask;
     
@@ -82,7 +97,12 @@ namespace GraphTool
         const uint32_t mask = (1u << bit);
 
         if (!(edgeList[block].edges & mask))
+        {
             degree += 1;
+            
+            if (1 == (degree & 3))
+                numVectors += 1;
+        }
     
         edgeList[block].edges |= mask;
     }
@@ -98,7 +118,12 @@ namespace GraphTool
         if (0 != edgeList.count(block))
         {
             if (edgeList[block].edges & mask)
+            {
                 degree -= 1;
+                
+                if (0 == (degree & 3))
+                    numVectors -= 1;
+            }
 
             edgeList[block].edges &= ~mask;
     
@@ -120,7 +145,12 @@ namespace GraphTool
         if (0 != edgeList.count(block))
         {
             if (edgeList[block].edges & mask)
+            {
                 degree -= 1;
+                
+                if (0 == (degree & 3))
+                    numVectors -= 1;
+            }
             
             edgeList[block].edges &= ~mask;
     

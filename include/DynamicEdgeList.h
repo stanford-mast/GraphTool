@@ -62,6 +62,9 @@ namespace GraphTool
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
+        
+        /// Holds the total number of Vector-Sparse vectors needed to represent the edges in this data structure.
+        size_t numVectors;
 
 
     public:
@@ -96,9 +99,17 @@ namespace GraphTool
 
         /// Returns the number of blocks in this data structure.
         /// This is a lower-level measurement related to the underlying data structure implementation.
+        /// @return Total number of blocks, which could be 0.
         inline size_t GetNumBlocks(void) const
         {
             return edgeList.size();
+        }
+        
+        /// Returns the number of Vector-Sparse vectors needed to represent the edges in this data structure.
+        /// @return Total number of vectors, which could be 0.
+        inline size_t GetNumVectors(void) const
+        {
+            return numVectors;
         }
 
         /// Inserts the specified edge into this data structure, using the destination as its data source.

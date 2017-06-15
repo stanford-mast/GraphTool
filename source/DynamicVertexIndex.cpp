@@ -20,7 +20,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "DynamicVertexIndex.h" for documentation.
 
-    template <typename TEdgeData> DynamicVertexIndex<TEdgeData>::DynamicVertexIndex(void) : vertexIndex(), numEdges(0)
+    template <typename TEdgeData> DynamicVertexIndex<TEdgeData>::DynamicVertexIndex(void) : vertexIndex(), numEdges(0), numVectors(0)
     {
         // Nothing to do here.
     }
@@ -32,11 +32,15 @@ namespace GraphTool
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex].GetDegree();
+        const size_t oldVectors = vertexIndex[edge.destinationVertex].GetNumVectors();
 
         vertexIndex[edge.destinationVertex].InsertEdgeBufferSource(edge);
 
         if (oldDegree < vertexIndex[edge.destinationVertex].GetDegree())
             numEdges += 1;
+        
+        if (oldVectors < vertexIndex[edge.destinationVertex].GetNumVectors())
+            numVectors += 1;
     }
 
     // --------
@@ -44,11 +48,15 @@ namespace GraphTool
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge)
     {
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex].GetDegree();
+        const size_t oldVectors = vertexIndex[edge.sourceVertex].GetNumVectors();
 
         vertexIndex[edge.sourceVertex].InsertEdgeBufferDestination(edge);
 
         if (oldDegree < vertexIndex[edge.sourceVertex].GetDegree())
             numEdges += 1;
+        
+        if (oldVectors < vertexIndex[edge.sourceVertex].GetNumVectors())
+            numVectors += 1;
     }
 
     // --------
@@ -58,11 +66,15 @@ namespace GraphTool
         if (0 != vertexIndex.count(indexedVertex))
         {
             const TEdgeCount oldDegree = vertexIndex[indexedVertex].GetDegree();
+            const size_t oldVectors = vertexIndex[indexedVertex].GetNumVectors();
 
             vertexIndex[indexedVertex].RemoveEdge(otherVertex);
 
             if (oldDegree > vertexIndex[indexedVertex].GetDegree())
                 numEdges -= 1;
+            
+            if (oldVectors > vertexIndex[indexedVertex].GetNumVectors())
+                numVectors -= 1;
 
             if (0 == vertexIndex[indexedVertex].GetDegree())
                 vertexIndex.erase(indexedVertex);
@@ -78,8 +90,6 @@ namespace GraphTool
             numEdges -= vertexIndex[indexedVertex].GetDegree();
             vertexIndex.erase(indexedVertex);
         }
-
-        // TODO: Remove all references to the vertex in other indexed vertices.
     }
     
     

@@ -39,11 +39,14 @@ namespace GraphTool
         /// Holds all vertex and edge information.
         /// Key is the vertex identifier, value is the corresponding edge list for the vertex.
         std::map<TVertexID, DynamicEdgeList<TEdgeData>> vertexIndex;
-
+        
         /// Holds the total number of edges present in this data structure.
         TEdgeCount numEdges;
-
-
+        
+        /// Holds the total number of Vector-Sparse vectors required to represent the edges in this data structure.
+        size_t numVectors;
+        
+        
     public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
@@ -99,6 +102,13 @@ namespace GraphTool
             return numEdges;
         }
         
+        /// Returns the number of Vector-Sparse vectors required to represent the edges in this data structure.
+        /// @return Number of vectors.
+        inline size_t GetNumVectors(void) const
+        {
+            return numVectors;
+        }
+        
         /// Returns the number of top-level vertices in the index.
         /// @return Number of indexed vertices.
         inline TVertexCount GetNumVertices(void) const
@@ -120,6 +130,7 @@ namespace GraphTool
         void RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex);
 
         /// Removes the specified top-level vertex from this data structure.
+        /// Does not remove any other references to the vertex within individual edge lists, just removes it from the index.
         /// @param [in] indexedVertex Top-level vertex to remove.
         void RemoveVertex(const TVertexID indexedVertex);
     };

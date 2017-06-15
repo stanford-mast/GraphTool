@@ -10,6 +10,7 @@
 *   Program entry point and primary control flow.
 *****************************************************************************/
 
+#include "Benchmark.h"
 #include "Graph.hpp"
 #include "GraphReader.h"
 #include "GraphReaderFactory.h"
@@ -21,6 +22,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <immintrin.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -182,18 +185,58 @@ namespace GraphTool
 
         // Read the input graph.
         Graph<TEdgeData> graph;
+        double timeElapsed = 0.0;
+        
+        BenchmarkStart();
+        
         if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
             return __LINE__;
+        
+        timeElapsed = BenchmarkStop();
+        printf("Reading graph took %.2lf msec.\n", timeElapsed);
 
         // Perform transformations.
         // TODO
 
         // Write the output graphs.
-        for (size_t i = 0; i < writers.size(); ++i)
+        //for (size_t i = 0; i < writers.size(); ++i)
+        //{
+        //    if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
+        //        return __LINE__;
+        //}
+        
+        
+        BenchmarkStart();
+        
+        uint64_t numDestinationEdges = 0ull;
+        for (auto vit = graph.VertexIteratorDestinationBegin(); vit != graph.VertexIteratorDestinationEnd(); ++vit)
         {
-            if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
-                return __LINE__;
+            for (auto eit = vit->second.BeginIterator(); eit != vit->second.EndIterator(); ++eit)
+            {
+                numDestinationEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
+            }
         }
+        
+        uint64_t numSourceEdges = 0ull;
+        for (auto vit = graph.VertexIteratorSourceBegin(); vit != graph.VertexIteratorSourceEnd(); ++vit)
+        {
+            for (auto eit = vit->second.BeginIterator(); eit != vit->second.EndIterator(); ++eit)
+            {
+                numSourceEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
+            }
+        }
+        
+        timeElapsed = BenchmarkStop();
+        
+        printf("Traversal took %.2lf msec (%.0lf Medges/sec)\n", timeElapsed, (double)graph.GetNumEdges() / timeElapsed / 500.0);
+        
+        if (graph.GetNumEdges() == numDestinationEdges && graph.GetNumEdges() == numSourceEdges)
+            printf("Edge consistency check: PASS.\n");
+        else
+            printf("Edge consistency check: FAIL.\n");
+        
+        printf("Number of destination vectors = %llu\n", (unsigned long long)graph.GetNumVectorsDestination());
+        printf("Number of source vectors      = %llu\n", (unsigned long long)graph.GetNumVectorsSource());
 
         return 0;
     }
