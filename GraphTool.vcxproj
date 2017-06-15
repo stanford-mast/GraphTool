@@ -15,8 +15,6 @@
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
     <ClInclude Include="include\DynamicEdgeList.h" />
     <ClInclude Include="include\DynamicVertexIndex.h" />
-    <ClInclude Include="include\Edge.hpp" />
-    <ClInclude Include="include\Comparator.hpp" />
     <ClInclude Include="include\Graph.hpp" />
     <ClInclude Include="include\GraphReader.h" />
     <ClInclude Include="include\GraphReaderFactory.h" />
@@ -26,13 +24,10 @@
     <ClInclude Include="include\OptionContainer.h" />
     <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\PlatformFunctions.h" />
-    <ClInclude Include="include\SequenceComparator.hpp" />
     <ClInclude Include="include\TextEdgeListReader.h" />
     <ClInclude Include="include\TextEdgeListWriter.h" />
     <ClInclude Include="include\Types.h" />
-    <ClInclude Include="include\EdgeIndex.hpp" />
     <ClInclude Include="include\VersionInfo.h" />
-    <ClInclude Include="include\VertexComparator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\BinaryEdgeListReader.cpp" />

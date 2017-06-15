@@ -31,7 +31,7 @@ namespace GraphTool
 
     /// Represents an individual edge within a buffer.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct SEdgeBufferData
+    template <typename TEdgeData> struct SEdge
     {
         TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
         TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.
@@ -39,7 +39,7 @@ namespace GraphTool
     };
 
     /// Represents an individual edge within a buffer, specialized for unweighted graphs.
-    template <> struct SEdgeBufferData<void>
+    template <> struct SEdge<void>
     {
         TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
         TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.

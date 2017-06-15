@@ -12,7 +12,6 @@
  *****************************************************************************/
 
 #include "DynamicVertexIndex.h"
-#include "Edge.hpp"
 #include "Types.h"
 
 
@@ -30,19 +29,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "DynamicVertexIndex.h" for documentation.
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdge(const TVertexID indexedVertex, const Edge<TEdgeData>& edge)
-    {
-        const TEdgeCount oldDegree = vertexIndex[indexedVertex].GetDegree();
-
-        vertexIndex[indexedVertex].InsertEdge(edge);
-
-        if (oldDegree < vertexIndex[indexedVertex].GetDegree())
-            numEdges += 1;
-    }
-
-    // --------
-
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedByDestination(const SEdgeBufferData<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex].GetDegree();
 
@@ -54,7 +41,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedBySource(const SEdgeBufferData<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge)
     {
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex].GetDegree();
 

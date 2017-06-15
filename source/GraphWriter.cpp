@@ -34,7 +34,7 @@ namespace GraphTool
         typename Graph<TEdgeData>::VertexIterator iterBegin;                ///< Iterator to the beginning of the graph's top-level vertices.
         typename Graph<TEdgeData>::VertexIterator iterEnd;                  ///< Iterator to the end of the graph's top-level vertices.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
-        SEdgeBufferData<TEdgeData>* bufs[2];                                ///< Edge data buffers.
+        SEdge<TEdgeData>* bufs[2];                                ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         bool groupedByDestination;                                          ///< Indicates that graph edges should be grouped by destination instead of by source.
         bool writeSuccessfulSoFar;                                          ///< Indicates the continued success of the write operation.
@@ -94,7 +94,7 @@ namespace GraphTool
         SGraphWriteSpec<TEdgeData>* writeSpec = (SGraphWriteSpec<TEdgeData>*)arg;
         uint32_t currentBufferIndex = 0;
         
-        const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdgeBufferData<void>));
+        const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<void>));
         auto vertexIter = writeSpec->iterBegin;
         
         while (true)
@@ -138,7 +138,7 @@ namespace GraphTool
             return false;
 
         // Allocate some buffers for read data.
-        SEdgeBufferData<TEdgeData>* bufs[] = { (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]), (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]) };
+        SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]) };
 
         // Define the graph write task.
         SGraphWriteSpec<TEdgeData> writeSpec;

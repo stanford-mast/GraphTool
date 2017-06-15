@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "Edge.hpp"
 #include "Types.h"
 
 #include <map>
@@ -102,17 +101,13 @@ namespace GraphTool
             return edgeList.size();
         }
 
-        /// Inserts the specified edge into this data structure.
-        /// @param [in] edge Edge to insert.
-        void InsertEdge(const Edge<TEdgeData>& edge);
-
         /// Inserts the specified edge into this data structure, using the destination as its data source.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferDestination(const SEdgeBufferData<TEdgeData>& edge);
+        void InsertEdgeBufferDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as its data source.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge);
+        void InsertEdgeBufferSource(const SEdge<TEdgeData>& edge);
 
         /// Removes the specified edge from this data structure.
         /// @param [in] otherVertex Vertex at the other end of the edge to remove.

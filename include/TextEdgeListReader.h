@@ -33,7 +33,7 @@ namespace GraphTool
         /// @param [in] edgeDataString String from which to parse edge data.
         /// @param [out] edgeDataBuf Edge data buffer into which to place parsed edge data, if parsing succeeds.
         /// @return `true` if parsing was successful, `false` otherwise.
-        static bool ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<TEdgeData>& edgeDataBuf);
+        static bool ParseEdgeData(const char* const edgeDataString, SEdge<TEdgeData>& edgeDataBuf);
         
         
     public:
@@ -41,6 +41,6 @@ namespace GraphTool
         // See "GraphReader.h" for documentation.
 
         virtual FILE* OpenAndInitializeGraphFileForRead(const char* const filename);
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdgeBufferData<TEdgeData>* buf, const size_t size);
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdge<TEdgeData>* buf, const size_t size);
     };
 }

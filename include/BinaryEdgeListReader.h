@@ -29,6 +29,6 @@ namespace GraphTool
         // See "GraphReader.h" for documentation.
         
         virtual FILE* OpenAndInitializeGraphFileForRead(const char* const filename);
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdgeBufferData<TEdgeData>* buf, const size_t count);
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdge<TEdgeData>* buf, const size_t count);
     };
 }

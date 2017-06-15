@@ -12,7 +12,6 @@
  *****************************************************************************/
 
 #include "DynamicEdgeList.h"
-#include "Edge.hpp"
 #include "Types.h"
 
 
@@ -30,37 +29,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "DynamicEdgeList.h" for documentation.
     
-    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdge(const Edge<TEdgeData>& edge)
-    {
-        const uint64_t block = ((uint64_t)edge.vertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-    
-        if (!(edgeList[block].edges & mask))
-            degree += 1;
-        
-        edgeList[block].edges |= mask;
-        
-        // TODO: insert the edge data properly
-    }
-    
-    // --------
-    
-    template <> void DynamicEdgeList<void>::InsertEdge(const Edge<void>& edge)
-    {
-        const uint64_t block = ((uint64_t)edge.vertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.vertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-    
-        if (!(edgeList[block].edges & mask))
-            degree += 1;
-        
-        edgeList[block].edges |= mask;
-    }
-    
-    // --------
-    
-    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdgeBufferData<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdge<TEdgeData>& edge)
     {
         const uint64_t block = ((uint64_t)edge.destinationVertex) >> 5ull;
         const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
@@ -76,7 +45,7 @@ namespace GraphTool
     
     // --------
     
-    template <> void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdgeBufferData<void>& edge)
+    template <> void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdge<void>& edge)
     {
         const uint64_t block = ((uint64_t)edge.destinationVertex) >> 5ull;
         const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
@@ -90,7 +59,7 @@ namespace GraphTool
     
     // --------
     
-    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdgeBufferData<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdge<TEdgeData>& edge)
     {
         const uint64_t block = ((uint64_t)edge.sourceVertex) >> 5ull;
         const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);
@@ -106,7 +75,7 @@ namespace GraphTool
     
     // --------
     
-    template <> void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdgeBufferData<void>& edge)
+    template <> void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdge<void>& edge)
     {
         const uint64_t block = ((uint64_t)edge.sourceVertex) >> 5ull;
         const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);

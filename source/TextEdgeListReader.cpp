@@ -26,14 +26,14 @@ namespace GraphTool
     // -------- CLASS METHODS ---------------------------------------------- //
     // See "TextEdgeListReader.h" for documentation.
 
-    template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<void>& edgeDataBuf)
+    template <> bool TextEdgeListReader<void>::ParseEdgeData(const char* const edgeDataString, SEdge<void>& edgeDataBuf)
     {
         return true;
     }
 
     // --------
 
-    template <> bool TextEdgeListReader<uint64_t>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<uint64_t>& edgeDataBuf)
+    template <> bool TextEdgeListReader<uint64_t>::ParseEdgeData(const char* const edgeDataString, SEdge<uint64_t>& edgeDataBuf)
     {
         char* endPos;
         edgeDataBuf.edgeData = strtoull(edgeDataString, &endPos, 0);
@@ -43,7 +43,7 @@ namespace GraphTool
 
     // --------
 
-    template <> bool TextEdgeListReader<double>::ParseEdgeData(const char* const edgeDataString, SEdgeBufferData<double>& edgeDataBuf)
+    template <> bool TextEdgeListReader<double>::ParseEdgeData(const char* const edgeDataString, SEdge<double>& edgeDataBuf)
     {
         char* endPos;
         edgeDataBuf.edgeData = strtod(edgeDataString, &endPos);
@@ -83,9 +83,9 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> TEdgeCount TextEdgeListReader<TEdgeData>::ReadEdgesToBuffer(FILE* const graphfile, SEdgeBufferData<TEdgeData>* buf, const size_t size)
+    template <typename TEdgeData> TEdgeCount TextEdgeListReader<TEdgeData>::ReadEdgesToBuffer(FILE* const graphfile, SEdge<TEdgeData>* buf, const size_t size)
     {
-        const size_t edgeSize = sizeof(SEdgeBufferData<TEdgeData>);
+        const size_t edgeSize = sizeof(SEdge<TEdgeData>);
         const size_t edgeCount = (size / edgeSize);
         TEdgeCount numEdgesRead = 0;
 

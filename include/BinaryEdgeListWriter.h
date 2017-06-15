@@ -29,6 +29,6 @@ namespace GraphTool
         // See "GraphWriter.h" for documentation.
 
         virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination);
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
     };
 }

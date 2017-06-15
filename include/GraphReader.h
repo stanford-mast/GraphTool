@@ -75,7 +75,7 @@ namespace GraphTool
         /// @param [in] buf Buffer to which to read edge data.
         /// @param [in] count Number of edges that the buffer can hold.
         /// @return Number of edges read to the buffer.
-        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdgeBufferData<TEdgeData>* buf, const size_t count) = 0;
+        virtual TEdgeCount ReadEdgesToBuffer(FILE* const graphfile, SEdge<TEdgeData>* buf, const size_t count) = 0;
         
 
     public:

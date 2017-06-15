@@ -96,14 +96,14 @@ namespace GraphTool
         
         /// Inserts an edge into the destination-grouped representation using the specified edge buffer.
         /// @param [in] edge Edge to insert.
-        inline void InsertEdgeByDestination(const SEdgeBufferData<TEdgeData>& edge)
+        inline void InsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
             edgesByDestination.InsertEdgeBufferIndexedByDestination(edge);
         }
         
         /// Inserts an edge into the source-grouped representation using the specified edge buffer.
         /// @param [in] edge Edge to insert.
-        inline void InsertEdgeBySource(const SEdgeBufferData<TEdgeData>& edge)
+        inline void InsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
             edgesBySource.InsertEdgeBufferIndexedBySource(edge);
         }

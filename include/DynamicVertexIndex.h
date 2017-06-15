@@ -106,18 +106,13 @@ namespace GraphTool
             return vertexIndex.size();
         }
 
-        /// Inserts the specified edge into this data structure.
-        /// @param [in] indexedVertex Top-level vertex to which the edge corresponds.
-        /// @param [in] edge Edge to insert.
-        void InsertEdge(const TVertexID indexedVertex, const Edge<TEdgeData>& edge);
-
         /// Inserts the specified edge into this data structure, using the destination as the top-level vertex.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferIndexedByDestination(const SEdgeBufferData<TEdgeData>& edge);
+        void InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as the top-level vertex.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferIndexedBySource(const SEdgeBufferData<TEdgeData>& edge);
+        void InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge);
 
         /// Removes the specified edge from this data structure.
         /// @param [in] indexedVertex Top-level vertex to which the edge corresponds.

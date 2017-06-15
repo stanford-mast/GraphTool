@@ -26,21 +26,21 @@ namespace GraphTool
     // -------- CLASS METHODS ---------------------------------------------- //
     // See "TextEdgeListWriter.h" for documentation.
 
-    template <> int TextEdgeListWriter<void>::StringFromEdgeData(const SEdgeBufferData<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    template <> int TextEdgeListWriter<void>::StringFromEdgeData(const SEdge<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
     {
         return 0;
     }
 
     // --------
 
-    template <> int TextEdgeListWriter<uint64_t>::StringFromEdgeData(const SEdgeBufferData<uint64_t>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    template <> int TextEdgeListWriter<uint64_t>::StringFromEdgeData(const SEdge<uint64_t>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
     {
         return snprintf(edgeDataString, edgeDataStringCount, "%llu", (long long unsigned int)edgeBuf.edgeData);
     }
 
     // --------
 
-    template <> int TextEdgeListWriter<double>::StringFromEdgeData(const SEdgeBufferData<double>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
+    template <> int TextEdgeListWriter<double>::StringFromEdgeData(const SEdge<double>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
     {
         return snprintf(edgeDataString, edgeDataStringCount, "%.10lf", edgeBuf.edgeData);
     }
@@ -65,7 +65,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)

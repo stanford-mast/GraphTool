@@ -80,7 +80,7 @@ namespace GraphTool
         /// @param [in] count Number of edges in the buffer.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
         /// @return `true` if all edges were successfully written, `false` otherwise.
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination) = 0;
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination) = 0;
         
         
     public:

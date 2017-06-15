@@ -11,10 +11,8 @@
  *   files of various formats.
  *****************************************************************************/
 
-#include "Edge.hpp"
 #include "Graph.hpp"
 #include "GraphReader.h"
-#include "SequenceComparator.hpp"
 #include "Types.h"
 
 #include <cstddef>
@@ -34,7 +32,7 @@ namespace GraphTool
         FILE* file;                                                         ///< File handle.
         Graph<TEdgeData>* graph;                                            ///< Graph object to be filled.
         GraphReader<TEdgeData>* reader;                                     ///< Graph reader object.
-        SEdgeBufferData<TEdgeData>* bufs[2];                                ///< Edge data buffers.
+        SEdge<TEdgeData>* bufs[2];                                ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         bool readSuccessfulSoFar;                                           ///< Indicates the continued success of the read operation.
     };
@@ -111,7 +109,7 @@ namespace GraphTool
         while (true)
         {
             // Fill the buffer with edges.
-            readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdgeBufferData<void>)));
+            readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdge<void>)));
 
             // Check for any I/O errors.
             if (ferror(readSpec->file))
@@ -141,7 +139,7 @@ namespace GraphTool
             return false;
 
         // Allocate some buffers for read data.
-        SEdgeBufferData<TEdgeData>* bufs[] = { (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdgeBufferData<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
+        SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
 
         // Define the graph read task.
         SGraphReadSpec<TEdgeData> readSpec;

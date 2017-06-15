@@ -41,9 +41,9 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> TEdgeCount BinaryEdgeListReader<TEdgeData>::ReadEdgesToBuffer(FILE* const graphfile, SEdgeBufferData<TEdgeData>* buf, const size_t count)
+    template <typename TEdgeData> TEdgeCount BinaryEdgeListReader<TEdgeData>::ReadEdgesToBuffer(FILE* const graphfile, SEdge<TEdgeData>* buf, const size_t count)
     {
-        return (TEdgeCount)fread(buf, sizeof(SEdgeBufferData<TEdgeData>), count, graphfile);
+        return (TEdgeCount)fread(buf, sizeof(SEdge<TEdgeData>), count, graphfile);
     }
 
 

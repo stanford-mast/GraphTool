@@ -34,7 +34,7 @@ namespace GraphTool
         /// @param [out] edgeDataString String representation of the edge data.
         /// @param [in] edgeDataStringCount Size of the provided string buffer, in number of characters.
         /// @return Number of characters written, which could be zero depending on the type, and where negative indicates an error.
-        static int StringFromEdgeData(const SEdgeBufferData<TEdgeData>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount);
+        static int StringFromEdgeData(const SEdge<TEdgeData>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount);
         
         
     public:
@@ -42,6 +42,6 @@ namespace GraphTool
         // See "GraphWriter.h" for documentation.
 
         virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination);
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdgeBufferData<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
     };
 }
