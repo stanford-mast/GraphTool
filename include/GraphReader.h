@@ -38,6 +38,16 @@ namespace GraphTool
         static const size_t kGraphReadBufferSize = (64ull * 1024ull * 1024ull);
         
         
+    protected:
+        // -------- INSTANCE VARIABLES ------------------------------------- //
+        
+        /// Specifies the number of vertices expected to be read in from the file.
+        TVertexCount numVerticesInFile;
+        
+        /// Specifies the number of edges expected to be read in from the file.
+        TEdgeCount numEdgesInFile;
+        
+        
     public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
         
@@ -65,6 +75,7 @@ namespace GraphTool
         
         /// Opens and performs any initial file reading tasks required to prepare the graph file for reading of edges.
         /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
+        /// Subclasses must set the numEdgesInFile and numVerticesInFile variables during this invocation.
         /// @param [in] filename File name of the file to be opened for reading.
         /// @return File handle for the opened file.
         virtual FILE* OpenAndInitializeGraphFileForRead(const char* const filename) = 0;

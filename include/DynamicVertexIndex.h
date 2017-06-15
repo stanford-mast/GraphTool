@@ -16,7 +16,8 @@
 #include "DynamicEdgeList.h"
 #include "Types.h"
 
-#include <map>
+#include <cstddef>
+#include <vector>
 
 
 namespace GraphTool
@@ -28,17 +29,17 @@ namespace GraphTool
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
-
+        
         /// Alias for the iterator type used by this class.
-        typedef typename std::map<TVertexID, DynamicEdgeList<TEdgeData>>::const_iterator VertexIterator;
-
-
+        typedef typename std::vector<DynamicEdgeList<TEdgeData>*>::const_iterator VertexIterator;
+        
+        
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
 
         /// Holds all vertex and edge information.
         /// Key is the vertex identifier, value is the corresponding edge list for the vertex.
-        std::map<TVertexID, DynamicEdgeList<TEdgeData>> vertexIndex;
+        std::vector<DynamicEdgeList<TEdgeData>*> vertexIndex;
         
         /// Holds the total number of edges present in this data structure.
         TEdgeCount numEdges;
@@ -54,6 +55,15 @@ namespace GraphTool
         DynamicVertexIndex(void);
 
 
+        // -------- OPERATORS ---------------------------------------------- //
+        
+        /// Faciliates random access to the vertex index.
+        inline DynamicEdgeList<TEdgeData>*& operator[](size_t n)
+        {
+            return vertexIndex[n];
+        }
+        
+        
         // -------- INSTANCE METHODS --------------------------------------- //
 
         /// Returns a read-only iterator for the beginning of the vertex index.
@@ -74,25 +84,10 @@ namespace GraphTool
         /// @return Degree of the specified vertex.
         inline TEdgeCount GetDegree(TVertexID vertex) const
         {
-            if (0 != vertexIndex.count(vertex))
-                return vertexIndex.at(vertex).GetDegree();
+            if (NULL != vertexIndex.at(vertex))
+                return vertexIndex.at(vertex)->GetDegree();
             else
                 return 0;
-        }
-        
-        /// Returns the identifier of the highest vertex in the index.
-        /// @return Highest vertex identifier in the index, or 0 (which may also be a valid return value) if the index is empty.
-        inline TVertexID GetMaximumVertexID(void) const
-        {
-            TVertexID maxVertexID = 0;
-
-            if (0 != vertexIndex.size())
-            {
-                auto it = --vertexIndex.cend();
-                maxVertexID = it->first;
-            }
-
-            return maxVertexID;
         }
         
         /// Returns the total number of edges in the index.
@@ -133,5 +128,14 @@ namespace GraphTool
         /// Does not remove any other references to the vertex within individual edge lists, just removes it from the index.
         /// @param [in] indexedVertex Top-level vertex to remove.
         void RemoveVertex(const TVertexID indexedVertex);
+        
+        
+        /// Sets the number of indexed vertices.
+        /// Constructs new vertices or destroys existing ones as appropriate.
+        /// @param [in] numVertices Number of vertices.
+        inline void SetNumVertices(const TVertexCount numVertices)
+        {
+            vertexIndex.resize(numVertices, NULL);
+        }
     };
 }

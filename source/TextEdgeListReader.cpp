@@ -63,19 +63,24 @@ namespace GraphTool
         if (NULL != graphfile)
         {
             char linebuf[1024];
-
-            // Skip over the two values that indicate the number of edges and vertices in a graph.
+            
+            // Read in the number of vertices.
             if (NULL == fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile))
             {
                 fclose(graphfile);
                 return NULL;
             }
-
+            
+            GraphReader<TEdgeData>::numVerticesInFile = strtoull(linebuf, NULL, 10);
+            
+            // Read in the number of edges.
             if (NULL == fgets(linebuf, sizeof(linebuf) / sizeof(linebuf[0]), graphfile))
             {
                 fclose(graphfile);
                 return NULL;
             }
+            
+            GraphReader<TEdgeData>::numEdgesInFile = strtoull(linebuf, NULL, 10);
         }
 
         return graphfile;

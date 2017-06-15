@@ -104,7 +104,7 @@ namespace GraphTool
         
             for (; (edgeIdx < writeBufferCount) && !(vertexIter == writeSpec->iterEnd); ++vertexIter)
             {
-                for (auto edgeIter = vertexIter->second.BeginIterator(); (edgeIdx < writeBufferCount) && !(edgeIter == vertexIter->second.EndIterator()); ++edgeIter)
+                for (auto edgeIter = (*vertexIter)->BeginIterator(); (edgeIdx < writeBufferCount) && !(edgeIter == (*vertexIter)->EndIterator()); ++edgeIter)
                 {
                     // TODO: write out edges properly by looking into the blocks and extracting bits.
 

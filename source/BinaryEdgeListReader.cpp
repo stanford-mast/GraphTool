@@ -32,8 +32,25 @@ namespace GraphTool
 
         if (NULL != graphfile)
         {
-            // Skip over the two values that indicate the number of edges and vertices in a graph.
-            fseek(graphfile, 16, SEEK_SET);
+            uint64_t headerQuantities = 0ull;
+            
+            // Read the number of vertices.
+            if (1 != fread((void*)&headerQuantities, sizeof(headerQuantities), 1, graphfile))
+            {
+                fclose(graphfile);
+                return NULL;
+            }
+            
+            GraphReader<TEdgeData>::numVerticesInFile = (TVertexCount)headerQuantities;
+            
+            // Read the number of edges.
+            if (1 != fread((void*)&headerQuantities, sizeof(headerQuantities), 1, graphfile))
+            {
+                fclose(graphfile);
+                return NULL;
+            }
+            
+            GraphReader<TEdgeData>::numEdgesInFile = (TEdgeCount)headerQuantities;
         }
 
         return graphfile;

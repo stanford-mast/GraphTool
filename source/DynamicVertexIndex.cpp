@@ -31,15 +31,18 @@ namespace GraphTool
 
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
-        const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex].GetDegree();
-        const size_t oldVectors = vertexIndex[edge.destinationVertex].GetNumVectors();
+        if (NULL == vertexIndex[edge.destinationVertex])
+            vertexIndex[edge.destinationVertex] = new DynamicEdgeList<TEdgeData>();
+        
+        const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
+        const size_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
 
-        vertexIndex[edge.destinationVertex].InsertEdgeBufferSource(edge);
+        vertexIndex[edge.destinationVertex]->InsertEdgeBufferSource(edge);
 
-        if (oldDegree < vertexIndex[edge.destinationVertex].GetDegree())
+        if (oldDegree < vertexIndex[edge.destinationVertex]->GetDegree())
             numEdges += 1;
         
-        if (oldVectors < vertexIndex[edge.destinationVertex].GetNumVectors())
+        if (oldVectors < vertexIndex[edge.destinationVertex]->GetNumVectors())
             numVectors += 1;
     }
 
@@ -47,15 +50,18 @@ namespace GraphTool
 
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge)
     {
-        const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex].GetDegree();
-        const size_t oldVectors = vertexIndex[edge.sourceVertex].GetNumVectors();
+        if (NULL == vertexIndex[edge.sourceVertex])
+            vertexIndex[edge.sourceVertex] = new DynamicEdgeList<TEdgeData>();
+        
+        const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
+        const size_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
 
-        vertexIndex[edge.sourceVertex].InsertEdgeBufferDestination(edge);
+        vertexIndex[edge.sourceVertex]->InsertEdgeBufferDestination(edge);
 
-        if (oldDegree < vertexIndex[edge.sourceVertex].GetDegree())
+        if (oldDegree < vertexIndex[edge.sourceVertex]->GetDegree())
             numEdges += 1;
         
-        if (oldVectors < vertexIndex[edge.sourceVertex].GetNumVectors())
+        if (oldVectors < vertexIndex[edge.sourceVertex]->GetNumVectors())
             numVectors += 1;
     }
 
@@ -63,21 +69,24 @@ namespace GraphTool
 
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
     {
-        if (0 != vertexIndex.count(indexedVertex))
+        if (NULL != vertexIndex[indexedVertex])
         {
-            const TEdgeCount oldDegree = vertexIndex[indexedVertex].GetDegree();
-            const size_t oldVectors = vertexIndex[indexedVertex].GetNumVectors();
+            const TEdgeCount oldDegree = vertexIndex[indexedVertex]->GetDegree();
+            const size_t oldVectors = vertexIndex[indexedVertex]->GetNumVectors();
 
-            vertexIndex[indexedVertex].RemoveEdge(otherVertex);
+            vertexIndex[indexedVertex]->RemoveEdge(otherVertex);
 
-            if (oldDegree > vertexIndex[indexedVertex].GetDegree())
+            if (oldDegree > vertexIndex[indexedVertex]->GetDegree())
                 numEdges -= 1;
             
-            if (oldVectors > vertexIndex[indexedVertex].GetNumVectors())
+            if (oldVectors > vertexIndex[indexedVertex]->GetNumVectors())
                 numVectors -= 1;
 
-            if (0 == vertexIndex[indexedVertex].GetDegree())
-                vertexIndex.erase(indexedVertex);
+            if (0 == vertexIndex[indexedVertex]->GetDegree())
+            {
+                delete vertexIndex[indexedVertex];
+                vertexIndex[indexedVertex] = NULL;
+            }
         }
     }
 
@@ -85,10 +94,13 @@ namespace GraphTool
 
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::RemoveVertex(const TVertexID indexedVertex)
     {
-        if (0 != vertexIndex.count(indexedVertex))
+        if (NULL != vertexIndex[indexedVertex])
         {
-            numEdges -= vertexIndex[indexedVertex].GetDegree();
-            vertexIndex.erase(indexedVertex);
+            numEdges -= vertexIndex[indexedVertex]->GetDegree();
+            numVectors -= vertexIndex[indexedVertex]->GetNumVectors();
+            
+            delete vertexIndex[indexedVertex];
+            vertexIndex[indexedVertex] = NULL;
         }
     }
     

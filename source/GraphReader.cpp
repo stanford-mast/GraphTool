@@ -32,7 +32,7 @@ namespace GraphTool
         FILE* file;                                                         ///< File handle.
         Graph<TEdgeData>* graph;                                            ///< Graph object to be filled.
         GraphReader<TEdgeData>* reader;                                     ///< Graph reader object.
-        SEdge<TEdgeData>* bufs[2];                                ///< Edge data buffers.
+        SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         bool readSuccessfulSoFar;                                           ///< Indicates the continued success of the read operation.
     };
@@ -137,7 +137,10 @@ namespace GraphTool
         FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);
         if (NULL == graphfile)
             return false;
-
+        
+        graph.SetNumVertices(numVerticesInFile);
+        
+        
         // Allocate some buffers for read data.
         SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
 

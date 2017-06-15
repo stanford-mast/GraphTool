@@ -69,13 +69,7 @@ namespace GraphTool
         /// @return Number of vertices in the graph.
         inline TVertexCount GetNumVertices(void) const
         {
-            const bool hasDestinationVertices = (0 != edgesByDestination.GetNumVertices());
-            const bool hasSourceVertices = (0 != edgesBySource.GetNumVertices());
-
-            const TVertexCount numDestinationVertices = (hasDestinationVertices ? 1 + edgesByDestination.GetMaximumVertexID() : 0);
-            const TVertexCount numSourceVertices = (hasSourceVertices? 1 + edgesBySource.GetMaximumVertexID() : 0);
-            
-            return (numDestinationVertices > numSourceVertices ? numDestinationVertices : numSourceVertices);
+            return edgesBySource.GetNumVertices();
         }
         
         /// Retrieves and returns the number of Vector-Sparse vectors required to represent the destination-grouped edges.
@@ -135,10 +129,18 @@ namespace GraphTool
         /// @param [in] vertex Identifier of the vertex to remove.
         inline void RemoveVertex(TVertexID vertex)
         {
-            edgesByDestination.RemoveVertex(vertex);
-            edgesBySource.RemoveVertex(vertex);
+            // TODO: Implement this method.
         }
-
+        
+        /// Sets the number of vertices in the graph.
+        /// This operation causes a change in the underlying graph data structures.
+        /// @param [in] numVertices Number of vertices.
+        inline void SetNumVertices(const TVertexCount numVertices)
+        {
+            edgesByDestination.SetNumVertices(numVertices);
+            edgesBySource.SetNumVertices(numVertices);
+        }
+        
         inline VertexIterator VertexIteratorDestinationBegin(void) const
         {
             return edgesByDestination.BeginIterator();
