@@ -237,8 +237,10 @@ namespace GraphTool
         if (graph.GetNumEdges() == numDestinationEdges && graph.GetNumEdges() == numSourceEdges)
             printf("Edge consistency check: PASS.\n");
         else
-            printf("Edge consistency check: FAIL.\n");
+            printf("Edge consistency check: FAIL: %llu %llu %llu.\n", (unsigned long long)graph.GetNumEdges(), (unsigned long long)numDestinationEdges, (unsigned long long)numSourceEdges);
         
+        printf("Number of vertices            = %llu\n", (unsigned long long)graph.GetNumVertices());
+        printf("Number of edges               = %llu\n", (unsigned long long)graph.GetNumEdges());
         printf("Number of destination vectors = %llu\n", (unsigned long long)graph.GetNumVectorsDestination());
         printf("Number of source vectors      = %llu\n", (unsigned long long)graph.GetNumVectorsSource());
 
