@@ -77,21 +77,54 @@ namespace GraphTool
                 return;
 
             // Read the buffer into the graph.
-            for (TEdgeCount i = 0; i < readSpec->counts[currentIndex]; ++i)
+            // Use different parallelization strategies based on the number of threads created.
+            switch (spindleGetLocalThreadCount())
             {
-                switch (spindleGetLocalThreadID())
+            case 1:
+                for (TEdgeCount i = 0; i < readSpec->counts[currentIndex]; ++i)
                 {
-                case 0:
                     readSpec->graph->InsertEdgeByDestination(readSpec->bufs[currentIndex][i]);
-                    break;
-
-                case 1:
                     readSpec->graph->InsertEdgeBySource(readSpec->bufs[currentIndex][i]);
-                    break;
-
-                default:
-                    break;
                 }
+                break;
+
+            case 2:
+                for (TEdgeCount i = 0; i < readSpec->counts[currentIndex]; ++i)
+                {
+                    switch (spindleGetLocalThreadID())
+                    {
+                    case 0:
+                        readSpec->graph->InsertEdgeByDestination(readSpec->bufs[currentIndex][i]);
+                        break;
+
+                    case 1:
+                        readSpec->graph->InsertEdgeBySource(readSpec->bufs[currentIndex][i]);
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+                break;
+
+            default:
+                for (TEdgeCount i = 0; i < readSpec->counts[currentIndex]; ++i)
+                {
+                    switch (spindleGetLocalThreadID())
+                    {
+                    case 0:
+                        readSpec->graph->InsertEdgeByDestination(readSpec->bufs[currentIndex][i]);
+                        break;
+
+                    case 1:
+                        readSpec->graph->InsertEdgeBySource(readSpec->bufs[currentIndex][i]);
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+                break;
             }
 
             // Switch to the other buffer to consume in parallel with edge production.
@@ -168,7 +201,7 @@ namespace GraphTool
         taskSpec[1].func = &EdgeConsumer;
         taskSpec[1].arg = (void*)&readSpec;
         taskSpec[1].numaNode = siloGetNUMANodeForVirtualAddress(bufs[0]);
-        taskSpec[1].numThreads = 2;
+        taskSpec[1].numThreads = 0;
         taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
 
         // Launch the graph read task.
