@@ -37,7 +37,7 @@ namespace GraphTool
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
 
-        vertexIndex[edge.destinationVertex]->InsertEdgeBufferSource(edge);
+        vertexIndex[edge.destinationVertex]->InsertEdgeUsingSource(edge);
 
         if (oldDegree < vertexIndex[edge.destinationVertex]->GetDegree())
             numEdges += 1;
@@ -56,7 +56,7 @@ namespace GraphTool
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
 
-        vertexIndex[edge.sourceVertex]->InsertEdgeBufferDestination(edge);
+        vertexIndex[edge.sourceVertex]->InsertEdgeUsingDestination(edge);
 
         if (oldDegree < vertexIndex[edge.sourceVertex]->GetDegree())
             numEdges += 1;

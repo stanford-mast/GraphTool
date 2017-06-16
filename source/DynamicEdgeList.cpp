@@ -26,136 +26,75 @@ namespace GraphTool
     }
     
     
+    // -------- HELPERS ---------------------------------------------------- //
+    // See "DynamicEdgeList.h" for documentation.
+
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::FillEdgeInfoFromEdge(SEdgeInfo<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex)
+    {
+        edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
+        edgeInfo.edgeData = edge.edgeData;
+    }
+
+    // --------
+
+    template <> void DynamicEdgeList<void>::FillEdgeInfoFromEdge(SEdgeInfo<void>& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
+    {
+        edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
+    }
+
+    
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "DynamicEdgeList.h" for documentation.
     
-    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferDestination(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge)
     {
-        const uint64_t block = ((uint64_t)edge.destinationVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-    
-        if (!(edgeList[block].edges & mask))
-        {
-            degree += 1;
-            
-            if (1 == (degree & 3))
-                numVectors += 1;
-        }
+        edgeList.emplace_front();
+        FillEdgeInfoFromEdge(edgeList.front(), edge, true);
+
+        degree += 1;
         
-        edgeList[block].edges |= mask;
-    
-        // TODO: insert the edge data properly
+        if (1 == (degree & 3))
+            numVectors += 1;
     }
     
     // --------
     
-    template <> void DynamicEdgeList<void>::InsertEdgeBufferDestination(const SEdge<void>& edge)
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingSource(const SEdge<TEdgeData>& edge)
     {
-        const uint64_t block = ((uint64_t)edge.destinationVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.destinationVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-        
-        if (!(edgeList[block].edges & mask))
-        {
-            degree += 1;
-            
-            if (1 == (degree & 3))
-                numVectors += 1;
-        }
+        edgeList.emplace_front();
+        FillEdgeInfoFromEdge(edgeList.front(), edge, true);
 
-        edgeList[block].edges |= mask;
-    }
-    
-    // --------
-    
-    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeBufferSource(const SEdge<TEdgeData>& edge)
-    {
-        const uint64_t block = ((uint64_t)edge.sourceVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
+        degree += 1;
 
-        if (!(edgeList[block].edges & mask))
-        {
-            degree += 1;
-            
-            if (1 == (degree & 3))
-                numVectors += 1;
-        }
-    
-        edgeList[block].edges |= mask;
-    
-        // TODO: insert the edge data properly
-    }
-    
-    // --------
-    
-    template <> void DynamicEdgeList<void>::InsertEdgeBufferSource(const SEdge<void>& edge)
-    {
-        const uint64_t block = ((uint64_t)edge.sourceVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)edge.sourceVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-
-        if (!(edgeList[block].edges & mask))
-        {
-            degree += 1;
-            
-            if (1 == (degree & 3))
-                numVectors += 1;
-        }
-    
-        edgeList[block].edges |= mask;
+        if (1 == (degree & 3))
+            numVectors += 1;
     }
     
     // --------
     
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
     {
-        const uint64_t block = ((uint64_t)otherVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-    
-        if (0 != edgeList.count(block))
+        auto currIt = edgeList.cbegin();
+        auto prevIt = edgeList.cbefore_begin();
+
+        while (currIt != edgeList.cend())
         {
-            if (edgeList[block].edges & mask)
+            if (otherVertex == currIt->otherVertex)
             {
+                edgeList.erase_after(prevIt);
+                currIt = prevIt;
+                ++currIt;
+
                 degree -= 1;
                 
                 if (0 == (degree & 3))
                     numVectors -= 1;
             }
-
-            edgeList[block].edges &= ~mask;
-    
-            if (0ull == edgeList[block].edges)
-                edgeList.erase(block);
-        }
-    
-        // TODO: remove the edge data properly
-    }
-    
-    // --------
-    
-    template <> void DynamicEdgeList<void>::RemoveEdge(const TVertexID otherVertex)
-    {
-        const uint64_t block = ((uint64_t)otherVertex) >> 5ull;
-        const uint8_t bit = (uint8_t)(((uint64_t)otherVertex) & 31ull);
-        const uint32_t mask = (1u << bit);
-
-        if (0 != edgeList.count(block))
-        {
-            if (edgeList[block].edges & mask)
+            else
             {
-                degree -= 1;
-                
-                if (0 == (degree & 3))
-                    numVectors -= 1;
+                ++prevIt;
+                ++currIt;
             }
-            
-            edgeList[block].edges &= ~mask;
-    
-            if (0ull == edgeList[block].edges)
-                edgeList.erase(block);
         }
     }
     

@@ -141,31 +141,45 @@ namespace GraphTool
             edgesBySource.SetNumVertices(numVertices);
         }
         
-        inline const DynamicVertexIndex<TEdgeData>& VertexIndexDestination(void) const
+        /// Obtains a read-only random-access iterator to the specified vertex within the destination-grouped vertex index.
+        /// @param [in] vertex Position within the vertex index.
+        /// @return Read-only iterator to the specified vertex within the index.
+        inline VertexIterator VertexIteratorDestinationAt(TVertexID vertex) const
         {
-            return edgesByDestination;
+            return edgesByDestination.BeginIterator() + vertex;
         }
         
-        inline const DynamicVertexIndex<TEdgeData>& VertexIndexSource(void) const
-        {
-            return edgesBySource;
-        }
-        
+        /// Obtains a read-only random-access iterator to the beginning of the destination-grouped vertex index.
+        /// @return Read-only iterator to the beginning of the vertex index.
         inline VertexIterator VertexIteratorDestinationBegin(void) const
         {
             return edgesByDestination.BeginIterator();
         }
         
+        /// Obtains a read-only random-access iterator to the past-the-end element of the destination-grouped vertex index.
+        /// @return Read-only iterator to the past-the-end element of the vertex index.
         inline VertexIterator VertexIteratorDestinationEnd(void) const
         {
             return edgesByDestination.EndIterator();
         }
         
+        /// Obtains a read-only random-access iterator to the specified vertex within the source-grouped vertex index.
+        /// @param [in] vertex Position within the vertex index.
+        /// @return Read-only iterator to the specified vertex within the index.
+        inline VertexIterator VertexIteratorSourceAt(TVertexID vertex) const
+        {
+            return edgesBySource.BeginIterator() + vertex;
+        }
+
+        /// Obtains a read-only random-access iterator to the beginning of the source-grouped vertex index.
+        /// @return Read-only iterator to the beginning of the vertex index.
         inline VertexIterator VertexIteratorSourceBegin(void) const
         {
             return edgesBySource.BeginIterator();
         }
 
+        /// Obtains a read-only random-access iterator to the past-the-end element of the source-grouped vertex index.
+        /// @return Read-only iterator to the past-the-end element of the vertex index.
         inline VertexIterator VertexIteratorSourceEnd(void) const
         {
             return edgesBySource.EndIterator();

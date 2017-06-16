@@ -15,28 +15,26 @@
 
 #include "Types.h"
 
+#include <forward_list>
 #include <map>
 
 
 namespace GraphTool
 {
     /// Specifies the information to be held for each edge.
-    /// Contains both the edge bit-mask and a pointer to edge data.
-    /// The bit-mask contains bit set to '1' if the corresponding edge is present and '0' otherwise.
-    /// The data points to an array of edge data for each '1' bit.
-    /// Which vertices are represented per instance is determined by the data structure that uses it, such as by position.
+    /// Contains both the other end of the edge and the edge data (i.e. weight).
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct SDynamicEdgeInfo
+    template <typename TEdgeData> struct SEdgeInfo
     {
-        uint32_t edges;                                                 ///< Edge presence bit-mask.
-        TEdgeData* data;                                                ///< Pointer to array of edge data.
+        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
+        TEdgeData edgeData;                                             ///< Edge data, such as a weight.
     };
 
     /// Specifies the information to be held for each edge.
-    /// This version is specialized for unweighted graphs and only contains the edge bit-mask.
-    template <> struct SDynamicEdgeInfo<void>
+    /// This version is specialized for unweighted graphs and only contains other end of the edge.
+    template <> struct SEdgeInfo<void>
     {
-        uint32_t edges;                                                 ///< Edge presence bit-mask.
+        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
     };
     
     /// Holds edges in a way optimized for fast insertion; useful for ingress.
@@ -50,7 +48,7 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::map<uint64_t, SDynamicEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
+        typedef typename std::forward_list<SEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
         
         
     private:
@@ -58,7 +56,7 @@ namespace GraphTool
 
         /// Holds all edge information.
         /// Key is the edge block identifier, value is the edge information structure.
-        std::map<uint64_t, SDynamicEdgeInfo<TEdgeData>> edgeList;
+        std::forward_list<SEdgeInfo<TEdgeData>> edgeList;
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
@@ -74,6 +72,17 @@ namespace GraphTool
         DynamicEdgeList(void);
 
 
+    private:
+        // -------- HELPERS ------------------------------------------------ //
+
+        /// Fills in an edge information structure with edge information.
+        /// @param [out] edgeInfo Edge information structure to fill.
+        /// @param [in] edge Edge to use as the data source.
+        /// @param [in] useDestinationVertex Specifies that the destination vertex, rather than the source vertex, in the edge should be used as the other vertex identifier.
+        void FillEdgeInfoFromEdge(SEdgeInfo<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex);
+
+        
+    public:
         // -------- INSTANCE METHODS --------------------------------------- //
 
         /// Returns a read-only iterator for the beginning of the edge list.
@@ -96,14 +105,6 @@ namespace GraphTool
         {
             return degree;
         }
-
-        /// Returns the number of blocks in this data structure.
-        /// This is a lower-level measurement related to the underlying data structure implementation.
-        /// @return Total number of blocks, which could be 0.
-        inline size_t GetNumBlocks(void) const
-        {
-            return edgeList.size();
-        }
         
         /// Returns the number of Vector-Sparse vectors needed to represent the edges in this data structure.
         /// @return Total number of vectors, which could be 0.
@@ -114,11 +115,11 @@ namespace GraphTool
 
         /// Inserts the specified edge into this data structure, using the destination as its data source.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferDestination(const SEdge<TEdgeData>& edge);
+        void InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as its data source.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferSource(const SEdge<TEdgeData>& edge);
+        void InsertEdgeUsingSource(const SEdge<TEdgeData>& edge);
 
         /// Removes the specified edge from this data structure.
         /// @param [in] otherVertex Vertex at the other end of the edge to remove.

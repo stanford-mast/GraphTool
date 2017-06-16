@@ -209,26 +209,24 @@ namespace GraphTool
         BenchmarkStart();
         
         uint64_t numDestinationEdges = 0ull;
-        
-        for (TVertexID i = 0; i < graph.GetNumVertices(); ++i)
+        for (auto vit = graph.VertexIteratorDestinationBegin(); vit != graph.VertexIteratorDestinationEnd(); ++vit)
         {
-            if (NULL == graph.VertexIndexDestination()[i]) continue;
-            
-            for (auto eit = graph.VertexIndexDestination()[i]->BeginIterator(); eit != graph.VertexIndexDestination()[i]->EndIterator(); ++eit)
+            if (NULL == *vit) continue;
+
+            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
             {
-                numDestinationEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
+                numDestinationEdges += 1ull;
             }
         }
-        
+
         uint64_t numSourceEdges = 0ull;
-        
-        for (TVertexID i = 0; i < graph.GetNumVertices(); ++i)
+        for (auto vit = graph.VertexIteratorSourceBegin(); vit != graph.VertexIteratorSourceEnd(); ++vit)
         {
-            if (NULL == graph.VertexIndexSource()[i]) continue;
-            
-            for (auto eit = graph.VertexIndexSource()[i]->BeginIterator(); eit != graph.VertexIndexSource()[i]->EndIterator(); ++eit)
+            if (NULL == *vit) continue;
+
+            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
             {
-                numSourceEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
+                numSourceEdges += 1ull;
             }
         }
         
