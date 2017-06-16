@@ -34,7 +34,7 @@ namespace GraphTool
         typename Graph<TEdgeData>::VertexIterator iterBegin;                ///< Iterator to the beginning of the graph's top-level vertices.
         typename Graph<TEdgeData>::VertexIterator iterEnd;                  ///< Iterator to the end of the graph's top-level vertices.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
-        SEdge<TEdgeData>* bufs[2];                                ///< Edge data buffers.
+        SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         bool groupedByDestination;                                          ///< Indicates that graph edges should be grouped by destination instead of by source.
         bool writeSuccessfulSoFar;                                          ///< Indicates the continued success of the write operation.

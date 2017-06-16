@@ -57,10 +57,10 @@ namespace GraphTool
 
         // -------- OPERATORS ---------------------------------------------- //
         
-        /// Faciliates random access to the vertex index.
-        inline DynamicEdgeList<TEdgeData>*& operator[](size_t n)
+        /// Faciliates read-only access to the vertex index.
+        inline const DynamicEdgeList<TEdgeData>*& operator[](size_t n) const
         {
-            return vertexIndex[n];
+            return (const DynamicEdgeList<TEdgeData>*&)vertexIndex[n];
         }
         
         

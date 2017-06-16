@@ -141,6 +141,16 @@ namespace GraphTool
             edgesBySource.SetNumVertices(numVertices);
         }
         
+        inline const DynamicVertexIndex<TEdgeData>& VertexIndexDestination(void) const
+        {
+            return edgesByDestination;
+        }
+        
+        inline const DynamicVertexIndex<TEdgeData>& VertexIndexSource(void) const
+        {
+            return edgesBySource;
+        }
+        
         inline VertexIterator VertexIteratorDestinationBegin(void) const
         {
             return edgesByDestination.BeginIterator();

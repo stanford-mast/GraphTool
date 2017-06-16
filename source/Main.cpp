@@ -209,22 +209,24 @@ namespace GraphTool
         BenchmarkStart();
         
         uint64_t numDestinationEdges = 0ull;
-        for (auto vit = graph.VertexIteratorDestinationBegin(); vit != graph.VertexIteratorDestinationEnd(); ++vit)
+        
+        for (TVertexID i = 0; i < graph.GetNumVertices(); ++i)
         {
-            if (NULL == *vit) continue;
+            if (NULL == graph.VertexIndexDestination()[i]) continue;
             
-            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
+            for (auto eit = graph.VertexIndexDestination()[i]->BeginIterator(); eit != graph.VertexIndexDestination()[i]->EndIterator(); ++eit)
             {
                 numDestinationEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
             }
         }
         
         uint64_t numSourceEdges = 0ull;
-        for (auto vit = graph.VertexIteratorSourceBegin(); vit != graph.VertexIteratorSourceEnd(); ++vit)
+        
+        for (TVertexID i = 0; i < graph.GetNumVertices(); ++i)
         {
-            if (NULL == *vit) continue;
+            if (NULL == graph.VertexIndexSource()[i]) continue;
             
-            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
+            for (auto eit = graph.VertexIndexSource()[i]->BeginIterator(); eit != graph.VertexIndexSource()[i]->EndIterator(); ++eit)
             {
                 numSourceEdges += (uint64_t)(_mm_popcnt_u32((unsigned int)eit->second.edges));
             }
@@ -232,7 +234,7 @@ namespace GraphTool
         
         timeElapsed = BenchmarkStop();
         
-        printf("Traversal took %.2lf msec (%.0lf Medges/sec)\n", timeElapsed, (double)graph.GetNumEdges() / timeElapsed / 500.0);
+        printf("Traversal took %.2lf msec (%.0lf Medges/sec).\n", timeElapsed, (double)graph.GetNumEdges() / timeElapsed / 500.0);
         
         if (graph.GetNumEdges() == numDestinationEdges && graph.GetNumEdges() == numSourceEdges)
             printf("Edge consistency check: PASS.\n");
