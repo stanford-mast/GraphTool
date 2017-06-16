@@ -48,8 +48,8 @@ namespace GraphTool
     
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge)
     {
-        edgeList.emplace_front();
-        FillEdgeInfoFromEdge(edgeList.front(), edge, true);
+        edgeList.emplace_back();
+        FillEdgeInfoFromEdge(edgeList.back(), edge, true);
 
         degree += 1;
         
@@ -61,8 +61,8 @@ namespace GraphTool
     
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingSource(const SEdge<TEdgeData>& edge)
     {
-        edgeList.emplace_front();
-        FillEdgeInfoFromEdge(edgeList.front(), edge, true);
+        edgeList.emplace_back();
+        FillEdgeInfoFromEdge(edgeList.back(), edge, true);
 
         degree += 1;
 
@@ -74,26 +74,15 @@ namespace GraphTool
     
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
     {
-        auto currIt = edgeList.cbegin();
-        auto prevIt = edgeList.cbefore_begin();
-
-        while (currIt != edgeList.cend())
+        for (auto it = edgeList.cbegin(); it != edgeList.cend(); ++it)
         {
-            if (otherVertex == currIt->otherVertex)
+            if (otherVertex == it->otherVertex)
             {
-                edgeList.erase_after(prevIt);
-                currIt = prevIt;
-                ++currIt;
-
-                degree -= 1;
+                auto prevIt = it;
+                --prevIt;
                 
-                if (0 == (degree & 3))
-                    numVectors -= 1;
-            }
-            else
-            {
-                ++prevIt;
-                ++currIt;
+                edgeList.erase(it);
+                it = prevIt;
             }
         }
     }

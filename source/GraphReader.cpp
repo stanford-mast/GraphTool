@@ -34,6 +34,7 @@ namespace GraphTool
         GraphReader<TEdgeData>* reader;                                     ///< Graph reader object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
+        size_t* refreshDegreeBuf;                                           ///< Buffer for refreshing degree information.
         bool readSuccessfulSoFar;                                           ///< Indicates the continued success of the read operation.
     };
 
@@ -110,25 +111,32 @@ namespace GraphTool
             default:
                 for (TEdgeCount i = 0; i < readSpec->counts[currentIndex]; ++i)
                 {
-                    switch (spindleGetLocalThreadID())
-                    {
-                    case 0:
-                        readSpec->graph->InsertEdgeByDestination(readSpec->bufs[currentIndex][i]);
-                        break;
-
-                    case 1:
-                        readSpec->graph->InsertEdgeBySource(readSpec->bufs[currentIndex][i]);
-                        break;
-
-                    default:
-                        break;
-                    }
+                    if (spindleGetLocalThreadID() == (readSpec->bufs[currentIndex][i].destinationVertex % spindleGetLocalThreadCount()))
+                        readSpec->graph->FastInsertEdgeByDestination(readSpec->bufs[currentIndex][i]);
+                    
+                    if (spindleGetLocalThreadID() == (readSpec->bufs[currentIndex][i].sourceVertex % spindleGetLocalThreadCount()))
+                        readSpec->graph->FastInsertEdgeBySource(readSpec->bufs[currentIndex][i]);
                 }
                 break;
             }
 
             // Switch to the other buffer to consume in parallel with edge production.
             currentIndex = (~currentIndex) & 1;
+        }
+        
+        // The fast insertion methods did not update the degree and vector counts, so do that here.
+        // These were only used with higher numbers of threads, so this is only needed in that case.
+        if (spindleGetLocalThreadCount() > 2)
+        {
+            if (0 == spindleGetLocalThreadID())
+                readSpec->refreshDegreeBuf = new size_t[spindleGetLocalThreadCount() << 1];
+            
+            spindleBarrierLocal();
+            readSpec->graph->ParallelRefreshDegreeInfo(readSpec->refreshDegreeBuf);
+            spindleBarrierLocal();
+            
+            if (0 == spindleGetLocalThreadID())
+                delete[] readSpec->refreshDegreeBuf;
         }
     }
 
@@ -187,6 +195,7 @@ namespace GraphTool
         readSpec.bufs[1] = bufs[1];
         readSpec.counts[0] = 0;
         readSpec.counts[1] = 0;
+        readSpec.refreshDegreeBuf = NULL;
         readSpec.readSuccessfulSoFar = true;
 
         // Define the parallelization strategy.

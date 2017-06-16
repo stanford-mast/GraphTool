@@ -58,6 +58,16 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
+        inline void FastInsertEdgeByDestination(const SEdge<TEdgeData>& edge)
+        {
+            edgesByDestination.FastInsertEdgeIndexedByDestination(edge);
+        }
+        
+        inline void FastInsertEdgeBySource(const SEdge<TEdgeData>& edge)
+        {
+            edgesBySource.FastInsertEdgeIndexedBySource(edge);
+        }
+        
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
         inline TEdgeCount GetNumEdges(void) const
@@ -106,14 +116,24 @@ namespace GraphTool
         /// @param [in] edge Edge to insert.
         inline void InsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
-            edgesByDestination.InsertEdgeBufferIndexedByDestination(edge);
+            edgesByDestination.InsertEdgeIndexedByDestination(edge);
         }
         
         /// Inserts an edge into the source-grouped representation using the specified edge buffer.
         /// @param [in] edge Edge to insert.
         inline void InsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
-            edgesBySource.InsertEdgeBufferIndexedBySource(edge);
+            edgesBySource.InsertEdgeIndexedBySource(edge);
+        }
+        
+        /// Refreshes the counts of edges and vectors in this data structure.
+        /// Intended to be called from within a Spindle parallelized region.
+        /// Required after invoking fast insertion methods, which do not update any counts.
+        /// @param [in] buf Temporary array allocated with two locations per thread.
+        inline void ParallelRefreshDegreeInfo(size_t* buf)
+        {
+            edgesByDestination.ParallelRefreshDegreeInfo(buf);
+            edgesBySource.ParallelRefreshDegreeInfo(buf);
         }
         
         /// Removes an edge from the graph.

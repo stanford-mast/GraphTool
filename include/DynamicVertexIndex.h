@@ -80,6 +80,30 @@ namespace GraphTool
             return vertexIndex.cend();
         }
 
+        /// Performs a simple and fast insertion of the specified edge into this data structure, using the destination as the top-level vertex.
+        /// Does not update any internal counters for vectors or edges.
+        /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// @param [in] edge Edge to insert.
+        inline void FastInsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
+        {
+            if (NULL == vertexIndex[edge.destinationVertex])
+                vertexIndex[edge.destinationVertex] = new DynamicEdgeList<TEdgeData>();
+            
+            vertexIndex[edge.destinationVertex]->InsertEdgeUsingSource(edge);
+        }
+        
+        /// Performs a simple and fast insertion of the specified edge into this data structure, using the source as the top-level vertex.
+        /// Does not update any internal counters for vectors or edges.
+        /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// @param [in] edge Edge to insert.
+        inline void FastInsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
+        {
+            if (NULL == vertexIndex[edge.sourceVertex])
+                vertexIndex[edge.sourceVertex] = new DynamicEdgeList<TEdgeData>();
+            
+            vertexIndex[edge.sourceVertex]->InsertEdgeUsingDestination(edge);
+        }
+        
         /// Returns the degree of a specific vertex.
         /// @return Degree of the specified vertex.
         inline TEdgeCount GetDegree(TVertexID vertex) const
@@ -113,12 +137,18 @@ namespace GraphTool
 
         /// Inserts the specified edge into this data structure, using the destination as the top-level vertex.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge);
+        void InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as the top-level vertex.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge);
+        void InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge);
 
+        /// Refreshes the counts of edges and vectors in this data structure.
+        /// Intended to be called from within a Spindle parallelized region.
+        /// Required after invoking fast insertion methods, which do not update any counts.
+        /// @param [in] buf Temporary array allocated with two locations per thread.
+        void ParallelRefreshDegreeInfo(size_t* buf);
+        
         /// Removes the specified edge from this data structure.
         /// @param [in] indexedVertex Top-level vertex to which the edge corresponds.
         /// @param [in] otherVertex Vertex at the other end of the edge to remove.

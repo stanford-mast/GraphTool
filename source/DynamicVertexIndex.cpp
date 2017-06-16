@@ -14,6 +14,8 @@
 #include "DynamicVertexIndex.h"
 #include "Types.h"
 
+#include <spindle.h>
+
 
 namespace GraphTool
 {
@@ -29,7 +31,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "DynamicVertexIndex.h" for documentation.
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedByDestination(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
         if (NULL == vertexIndex[edge.destinationVertex])
             vertexIndex[edge.destinationVertex] = new DynamicEdgeList<TEdgeData>();
@@ -48,7 +50,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeBufferIndexedBySource(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
     {
         if (NULL == vertexIndex[edge.sourceVertex])
             vertexIndex[edge.sourceVertex] = new DynamicEdgeList<TEdgeData>();
@@ -67,6 +69,42 @@ namespace GraphTool
 
     // --------
 
+    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::ParallelRefreshDegreeInfo(size_t* buf)
+    {
+        const size_t indexDegree = spindleGetLocalThreadID();
+        const size_t indexVector = spindleGetLocalThreadCount() + indexDegree;
+        
+        spindleBarrierLocal();
+        
+        buf[indexDegree] = 0;
+        buf[indexVector] = 0;
+        
+        for (size_t i = spindleGetLocalThreadID(); i < vertexIndex.size(); i += spindleGetLocalThreadCount())
+        {
+            if (NULL != vertexIndex[i])
+            {
+                buf[indexDegree] += vertexIndex[i]->GetDegree();
+                buf[indexVector] += vertexIndex[i]->GetNumVectors();
+            }
+        }
+        
+        spindleBarrierLocal();
+        
+        if (0 == spindleGetLocalThreadID())
+        {
+            numEdges = 0;
+            numVectors = 0;
+            
+            for (size_t i = 0; i < spindleGetLocalThreadCount(); ++i)
+            {
+                numEdges += buf[i];
+                numVectors += buf[i + spindleGetLocalThreadCount()];
+            }
+        }
+    }
+    
+    // --------
+    
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
     {
         if (NULL != vertexIndex[indexedVertex])

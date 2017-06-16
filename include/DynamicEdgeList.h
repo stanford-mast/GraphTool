@@ -15,9 +15,8 @@
 
 #include "Types.h"
 
-#include <forward_list>
-#include <map>
-
+#include <cstddef>
+#include <list>
 
 namespace GraphTool
 {
@@ -48,7 +47,7 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::forward_list<SEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
+        typedef typename std::list<SEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
         
         
     private:
@@ -56,7 +55,7 @@ namespace GraphTool
 
         /// Holds all edge information.
         /// Key is the edge block identifier, value is the edge information structure.
-        std::forward_list<SEdgeInfo<TEdgeData>> edgeList;
+        std::list<SEdgeInfo<TEdgeData>> edgeList;
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
