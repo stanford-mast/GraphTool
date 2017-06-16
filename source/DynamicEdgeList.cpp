@@ -46,6 +46,40 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "DynamicEdgeList.h" for documentation.
     
+    template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
+    {
+        if (topLevelIsDestination)
+        {
+            edge.destinationVertex = topLevelVertex;
+            edge.sourceVertex = position->otherVertex;
+        }
+        else
+        {
+            edge.destinationVertex = position->otherVertex;
+            edge.sourceVertex = topLevelVertex;
+        }
+
+        edge.edgeData = position->edgeData;
+    }
+
+    // --------
+
+    template <> void DynamicEdgeList<void>::FillEdge(EdgeIterator& position, SEdge<void>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
+    {
+        if (topLevelIsDestination)
+        {
+            edge.destinationVertex = topLevelVertex;
+            edge.sourceVertex = position->otherVertex;
+        }
+        else
+        {
+            edge.destinationVertex = position->otherVertex;
+            edge.sourceVertex = topLevelVertex;
+        }
+    }
+
+    // --------
+    
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge)
     {
         edgeList.emplace_back();
@@ -62,7 +96,7 @@ namespace GraphTool
     template <typename TEdgeData> void DynamicEdgeList<TEdgeData>::InsertEdgeUsingSource(const SEdge<TEdgeData>& edge)
     {
         edgeList.emplace_back();
-        FillEdgeInfoFromEdge(edgeList.back(), edge, true);
+        FillEdgeInfoFromEdge(edgeList.back(), edge, false);
 
         degree += 1;
 

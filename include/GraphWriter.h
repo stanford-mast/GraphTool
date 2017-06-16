@@ -70,7 +70,7 @@ namespace GraphTool
         /// @param [in] graph Graph to be written.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
         /// @return File handle for the opened file.
-        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination) = 0;
+        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination) = 0;
         
         /// Writes edge data from the specified buffer into the specified file.
         /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
@@ -91,6 +91,6 @@ namespace GraphTool
         /// @param [in] graph Graph object to be written to the file.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
         /// @return `true` if the graph was written successfully, `false` otherwise.
-        bool WriteGraphToFile(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination = false);
+        bool WriteGraphToFile(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination = false);
     };
 }

@@ -161,6 +161,20 @@ namespace GraphTool
             edgesBySource.SetNumVertices(numVertices);
         }
         
+        /// Enables direct random read-only access to the destination-grouped vertex index.
+        /// @return Read-only reference to destination-grouped vertex index.
+        inline const DynamicVertexIndex<TEdgeData>& VertexIndexDestination(void) const
+        {
+            return (const DynamicVertexIndex<TEdgeData>&)edgesByDestination;
+        }
+
+        /// Enables direct random read-only access to the source-grouped vertex index.
+        /// @return Read-only reference to source-grouped vertex index.
+        inline const DynamicVertexIndex<TEdgeData>& VertexIndexSource(void) const
+        {
+            return (const DynamicVertexIndex<TEdgeData>&)edgesBySource;
+        }
+        
         /// Obtains a read-only random-access iterator to the specified vertex within the destination-grouped vertex index.
         /// @param [in] vertex Position within the vertex index.
         /// @return Read-only iterator to the specified vertex within the index.

@@ -97,7 +97,14 @@ namespace GraphTool
         {
             return edgeList.cend();
         }
-
+        
+        /// Fills in an edge structure with information exported from the specified position in the edge list.
+        /// @param [in] position Iterator for the edge to use as the data source.
+        /// @param [out] edge Edge structure to fill.
+        /// @param [in] topLevelVertex Top-level vertex to place into the edge structure.
+        /// @param [in] topLevelIsDestination Specifies that the top-level vertex should be treated as the destination vertex, rather than the source vertex.
+        void FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
+        
         /// Returns the total number of edges in this data structure (i.e. the degree of the top-level vertex it represents).
         /// @return Total number of edges, which could be 0.
         inline TEdgeCount GetDegree(void) const

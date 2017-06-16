@@ -11,6 +11,8 @@
  *   various formats.
  *****************************************************************************/
 
+#include "DynamicEdgeList.h"
+#include "DynamicVertexIndex.h"
 #include "Graph.hpp"
 #include "GraphWriter.h"
 #include "Types.h"
@@ -30,9 +32,7 @@ namespace GraphTool
     template <typename TEdgeData> struct SGraphWriteSpec
     {
         FILE* file;                                                         ///< File handle.
-        Graph<TEdgeData>* graph;                                            ///< Graph object being written.
-        typename Graph<TEdgeData>::VertexIterator iterBegin;                ///< Iterator to the beginning of the graph's top-level vertices.
-        typename Graph<TEdgeData>::VertexIterator iterEnd;                  ///< Iterator to the end of the graph's top-level vertices.
+        const Graph<TEdgeData>* graph;                                      ///< Graph object being exported.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
@@ -95,20 +95,38 @@ namespace GraphTool
         uint32_t currentBufferIndex = 0;
         
         const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<void>));
-        auto vertexIter = writeSpec->iterBegin;
+        const DynamicVertexIndex<TEdgeData>& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
+        
+        TVertexID topLevelVertex = 0;
+        
+        while ((topLevelVertex < writeSpec->graph->GetNumVertices()) && (NULL == vertexIndex[topLevelVertex]))
+            topLevelVertex += 1;
+        
+        auto edgeIter = vertexIndex[topLevelVertex]->BeginIterator();
         
         while (true)
         {
             // Fill the buffer with edges.
             TEdgeCount edgeIdx = 0;
         
-            for (; (edgeIdx < writeBufferCount) && !(vertexIter == writeSpec->iterEnd); ++vertexIter)
+            while ((edgeIdx < writeBufferCount) && (topLevelVertex < writeSpec->graph->GetNumVertices()))
             {
-                for (auto edgeIter = (*vertexIter)->BeginIterator(); (edgeIdx < writeBufferCount) && !(edgeIter == (*vertexIter)->EndIterator()); ++edgeIter)
-                {
-                    // TODO: write out edges properly by looking into the blocks and extracting bits.
+                // Write out the edge.
+                vertexIndex[topLevelVertex]->FillEdge(edgeIter, writeSpec->bufs[currentBufferIndex][edgeIdx], topLevelVertex, writeSpec->groupedByDestination);
+                edgeIdx += 1;
 
-                    edgeIdx += 1;
+                // Advance to the next edge.
+                ++edgeIter;
+
+                if (vertexIndex[topLevelVertex]->EndIterator() == edgeIter)
+                {
+                    topLevelVertex += 1;
+
+                    while ((topLevelVertex < writeSpec->graph->GetNumVertices()) && (NULL == vertexIndex[topLevelVertex]))
+                        topLevelVertex += 1;
+                    
+                    if (topLevelVertex < writeSpec->graph->GetNumVertices())
+                        edgeIter = vertexIndex[topLevelVertex]->BeginIterator();
                 }
             }
         
@@ -130,7 +148,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, Graph<TEdgeData>& graph, const bool groupedByDestination)
+    template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForWrite(filename, graph, groupedByDestination);
@@ -144,8 +162,7 @@ namespace GraphTool
         SGraphWriteSpec<TEdgeData> writeSpec;
 
         writeSpec.file = graphfile;
-        writeSpec.iterBegin = (groupedByDestination ? graph.VertexIteratorDestinationBegin() : graph.VertexIteratorSourceBegin());
-        writeSpec.iterEnd = (groupedByDestination ? graph.VertexIteratorDestinationEnd() : graph.VertexIteratorSourceEnd());
+        writeSpec.graph = &graph;
         writeSpec.writer = this;
         writeSpec.bufs[0] = bufs[0];
         writeSpec.bufs[1] = bufs[1];
