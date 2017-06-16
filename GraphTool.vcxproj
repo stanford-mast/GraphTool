@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Benchmark.h" />
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
     <ClInclude Include="include\DynamicEdgeList.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="include\VersionInfo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Benchmark.cpp" />
     <ClCompile Include="source\BinaryEdgeListReader.cpp" />
     <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
     <ClCompile Include="source\DynamicEdgeList.cpp" />
