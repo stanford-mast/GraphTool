@@ -54,7 +54,7 @@ namespace GraphTool
         /// Default constructor.
         GraphReader(void);
         
-        /// Default destructor.
+        /// Destructor.
         virtual ~GraphReader(void);
         
         

@@ -148,7 +148,7 @@ namespace GraphTool
         /// Copy constructor.
         OptionContainer(const OptionContainer& other);
         
-        /// Default destructor.
+        /// Destructor.
         virtual ~OptionContainer(void);
         
         

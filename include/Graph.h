@@ -6,14 +6,14 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file Graph.hpp
- *   Implementation of the data structure used to represent a graph.
+ * @file Graph.h
+ *   Declaration of the top-level data structure used to represent a graph.
  *****************************************************************************/
 
 #pragma once
 
-#include "DynamicEdgeList.h"
-#include "DynamicVertexIndex.h"
+#include "EdgeList.h"
+#include "VertexIndex.h"
 #include "Types.h"
 
 #include <cstddef>
@@ -31,7 +31,7 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for read-only iterators over indexed vertices.
-        typedef typename DynamicVertexIndex<TEdgeData>::VertexIterator VertexIterator;
+        typedef typename VertexIndex<TEdgeData>::VertexIterator VertexIterator;
         
         
     private:
@@ -39,30 +39,37 @@ namespace GraphTool
         
         /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
-        DynamicVertexIndex<TEdgeData> edgesByDestination;
+        VertexIndex<TEdgeData> edgesByDestination;
         
         /// Source-grouped vertex data structure.
         /// Maps from a source vertex ID to a set of vertices to which out-edges exist.
-        DynamicVertexIndex<TEdgeData> edgesBySource;
+        VertexIndex<TEdgeData> edgesBySource;
         
         
     public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
-        Graph(void) : edgesByDestination(), edgesBySource()
-        {
-            // Nothing to do here.
-        }
+        Graph(void);
 
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
+        /// Performs a simple and fast insertion of the specified edge into the destination-grouped data structure.
+        /// Does not update any internal counters for vectors or edges, nor does it automatically maintain consistency.
+        /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// Intended to be invoked during ingress or during large batch updates.
+        /// @param [in] edge Edge to insert.
         inline void FastInsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
             edgesByDestination.FastInsertEdgeIndexedByDestination(edge);
         }
         
+        /// Performs a simple and fast insertion of the specified edge into the source-grouped data structure.
+        /// Does not update any internal counters for vectors or edges, nor does it automatically maintain consistency.
+        /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// Intended to be invoked during ingress or during large batch updates.
+        /// @param [in] edge Edge to insert.
         inline void FastInsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
             edgesBySource.FastInsertEdgeIndexedBySource(edge);
@@ -112,7 +119,18 @@ namespace GraphTool
             return edgesBySource.GetDegree(vertex);
         }
         
+        /// Inserts an edge into the graph.
+        /// Intended to perform minor updates to the graph after ingress.
+        /// @param [in] edge Edge to insert.
+        inline void InsertEdge(const SEdge<TEdgeData>& edge)
+        {
+            InsertEdgeByDestination(edge);
+            InsertEdgeBySource(edge);
+        }
+        
         /// Inserts an edge into the destination-grouped representation using the specified edge buffer.
+        /// Does not automatically maintain consistency.
+        /// Intended to be invoked during ingress or during large batch updates.
         /// @param [in] edge Edge to insert.
         inline void InsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
@@ -120,6 +138,8 @@ namespace GraphTool
         }
         
         /// Inserts an edge into the source-grouped representation using the specified edge buffer.
+        /// Does not automatically maintain consistency.
+        /// Intended to be invoked during ingress or during large batch updates.
         /// @param [in] edge Edge to insert.
         inline void InsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
@@ -139,7 +159,7 @@ namespace GraphTool
         /// Removes an edge from the graph.
         /// @param [in] fromVertex Identifies the source vertex of the edge.
         /// @param [in] toVertex Identifies the destination vertex of the edge.
-        inline void RemoveEdge(TVertexID fromVertex, TVertexID toVertex)
+        inline void RemoveEdge(const TVertexID fromVertex, const TVertexID toVertex)
         {
             edgesByDestination.RemoveEdge(toVertex, fromVertex);
             edgesBySource.RemoveEdge(fromVertex, toVertex);
@@ -147,10 +167,7 @@ namespace GraphTool
         
         /// Removes a vertex from the graph, including all edges that include it.
         /// @param [in] vertex Identifier of the vertex to remove.
-        inline void RemoveVertex(TVertexID vertex)
-        {
-            // TODO: Implement this method.
-        }
+        void RemoveVertex(const TVertexID vertex);
         
         /// Sets the number of vertices in the graph.
         /// This operation causes a change in the underlying graph data structures.
@@ -163,16 +180,16 @@ namespace GraphTool
         
         /// Enables direct random read-only access to the destination-grouped vertex index.
         /// @return Read-only reference to destination-grouped vertex index.
-        inline const DynamicVertexIndex<TEdgeData>& VertexIndexDestination(void) const
+        inline const VertexIndex<TEdgeData>& VertexIndexDestination(void) const
         {
-            return (const DynamicVertexIndex<TEdgeData>&)edgesByDestination;
+            return (const VertexIndex<TEdgeData>&)edgesByDestination;
         }
 
         /// Enables direct random read-only access to the source-grouped vertex index.
         /// @return Read-only reference to source-grouped vertex index.
-        inline const DynamicVertexIndex<TEdgeData>& VertexIndexSource(void) const
+        inline const VertexIndex<TEdgeData>& VertexIndexSource(void) const
         {
-            return (const DynamicVertexIndex<TEdgeData>&)edgesBySource;
+            return (const VertexIndex<TEdgeData>&)edgesBySource;
         }
         
         /// Obtains a read-only random-access iterator to the specified vertex within the destination-grouped vertex index.

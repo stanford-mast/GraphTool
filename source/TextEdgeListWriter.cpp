@@ -10,7 +10,7 @@
  *   Implementation of a graph writer for text edge list files.
  *****************************************************************************/
 
-#include "Graph.hpp"
+#include "Graph.h"
 #include "GraphWriter.h"
 #include "TextEdgeListWriter.h"
 #include "Types.h"

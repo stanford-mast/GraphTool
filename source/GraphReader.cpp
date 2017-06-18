@@ -11,7 +11,7 @@
  *   files of various formats.
  *****************************************************************************/
 
-#include "Graph.hpp"
+#include "Graph.h"
 #include "GraphReader.h"
 #include "Types.h"
 

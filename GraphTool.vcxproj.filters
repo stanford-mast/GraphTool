@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Graph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,16 +54,16 @@
     <ClInclude Include="include\PlatformFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DynamicEdgeList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MemoryPool.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DynamicVertexIndex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Benchmark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EdgeList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VertexIndex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,13 +101,16 @@
     <ClCompile Include="source\GraphWriterFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\DynamicEdgeList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\DynamicVertexIndex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\Benchmark.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\EdgeList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VertexIndex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

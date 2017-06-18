@@ -6,12 +6,12 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file DynamicVertexIndex.cpp
+ * @file VertexIndex.cpp
  *   Implementation of a container for indexing top-level vertices, optimized
- *   for fast insertion.
+ *   for easy modification and traversal.
  *****************************************************************************/
 
-#include "DynamicVertexIndex.h"
+#include "VertexIndex.h"
 #include "Types.h"
 
 #include <spindle.h>
@@ -20,21 +20,38 @@
 namespace GraphTool
 {
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
-    // See "DynamicVertexIndex.h" for documentation.
+    // See "VertexIndex.h" for documentation.
 
-    template <typename TEdgeData> DynamicVertexIndex<TEdgeData>::DynamicVertexIndex(void) : vertexIndex(), numEdges(0), numVectors(0)
+    template <typename TEdgeData> VertexIndex<TEdgeData>::VertexIndex(void) : vertexIndex(), numEdges(0), numVectors(0)
     {
         // Nothing to do here.
     }
 
+    // --------
+
+    template <typename TEdgeData> VertexIndex<TEdgeData>::~VertexIndex(void)
+    {
+        for (auto it = vertexIndex.begin(); it != vertexIndex.end(); ++it)
+        {
+            if (NULL != *it)
+            {
+                delete *it;
+                *it = NULL;
+            }
+        }
+    }
+
 
     // -------- INSTANCE METHODS ------------------------------------------- //
-    // See "DynamicVertexIndex.h" for documentation.
+    // See "VertexIndex.h" for documentation.
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
+        if (edge.destinationVertex >= vertexIndex.size())
+            vertexIndex.resize(1 + edge.destinationVertex);
+        
         if (NULL == vertexIndex[edge.destinationVertex])
-            vertexIndex[edge.destinationVertex] = new DynamicEdgeList<TEdgeData>();
+            vertexIndex[edge.destinationVertex] = new EdgeList<TEdgeData>();
         
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
@@ -50,10 +67,13 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
     {
+        if (edge.sourceVertex >= vertexIndex.size())
+            vertexIndex.resize(1 + edge.sourceVertex);
+
         if (NULL == vertexIndex[edge.sourceVertex])
-            vertexIndex[edge.sourceVertex] = new DynamicEdgeList<TEdgeData>();
+            vertexIndex[edge.sourceVertex] = new EdgeList<TEdgeData>();
         
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
@@ -69,7 +89,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::ParallelRefreshDegreeInfo(size_t* buf)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshDegreeInfo(size_t* buf)
     {
         const uint32_t localThreadID = spindleGetLocalThreadID();
         const uint32_t localThreadCount = spindleGetLocalThreadCount();
@@ -108,7 +128,7 @@ namespace GraphTool
     
     // --------
     
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
     {
         if (NULL != vertexIndex[indexedVertex])
         {
@@ -133,7 +153,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::RemoveVertex(const TVertexID indexedVertex)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::RemoveVertex(const TVertexID indexedVertex)
     {
         if (NULL != vertexIndex[indexedVertex])
         {
@@ -144,11 +164,30 @@ namespace GraphTool
             vertexIndex[indexedVertex] = NULL;
         }
     }
+
+    // --------
+
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::SetNumVertices(const TVertexCount numVertices)
+    {
+        if (numVertices < vertexIndex.size())
+        {
+            for (size_t i = numVertices; i < vertexIndex.size(); ++i)
+            {
+                if (NULL != vertexIndex[i])
+                {
+                    delete vertexIndex[i];
+                    vertexIndex[i] = NULL;
+                }
+            }
+        }
+        
+        vertexIndex.resize(numVertices, NULL);
+    }
     
     
     // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
 
-    template class DynamicVertexIndex<void>;
-    template class DynamicVertexIndex<uint64_t>;
-    template class DynamicVertexIndex<double>;
+    template class VertexIndex<void>;
+    template class VertexIndex<uint64_t>;
+    template class VertexIndex<double>;
 }

@@ -44,7 +44,7 @@ namespace GraphTool
         /// Default constructor.
         GraphWriter(void);
 
-        /// Default destructor.
+        /// Destructor.
         virtual ~GraphWriter(void);
         
         

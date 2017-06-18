@@ -6,14 +6,14 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file DynamicVertexIndex.h
+ * @file VertexIndex.h
  *   Declaration of a container for indexing top-level vertices, optimized
- *   for fast insertion.
+ *   for easy modification and traversal.
  *****************************************************************************/
 
 #pragma once
 
-#include "DynamicEdgeList.h"
+#include "EdgeList.h"
 #include "Types.h"
 
 #include <cstddef>
@@ -25,13 +25,13 @@ namespace GraphTool
     /// Indexes top-level vertices in a way optimized for fast insertion; useful for ingress.
     /// Whether the index is by source or destination is not specified by this data structure but rather is inferred based on how it is used.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class DynamicVertexIndex
+    template <typename TEdgeData> class VertexIndex
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::vector<DynamicEdgeList<TEdgeData>*>::const_iterator VertexIterator;
+        typedef typename std::vector<EdgeList<TEdgeData>*>::const_iterator VertexIterator;
         
         
     private:
@@ -39,7 +39,7 @@ namespace GraphTool
 
         /// Holds all vertex and edge information.
         /// Key is the vertex identifier, value is the corresponding edge list for the vertex.
-        std::vector<DynamicEdgeList<TEdgeData>*> vertexIndex;
+        std::vector<EdgeList<TEdgeData>*> vertexIndex;
         
         /// Holds the total number of edges present in this data structure.
         TEdgeCount numEdges;
@@ -52,15 +52,19 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
-        DynamicVertexIndex(void);
+        VertexIndex(void);
+
+        /// Destructor.
+        /// Destroys all edge lists.
+        ~VertexIndex(void);
 
 
         // -------- OPERATORS ---------------------------------------------- //
         
         /// Faciliates read-only access to the vertex index.
-        inline const DynamicEdgeList<TEdgeData>*& operator[](size_t n) const
+        inline const EdgeList<TEdgeData>*& operator[](size_t n) const
         {
-            return (const DynamicEdgeList<TEdgeData>*&)vertexIndex[n];
+            return (const EdgeList<TEdgeData>*&)vertexIndex[n];
         }
         
         
@@ -87,7 +91,7 @@ namespace GraphTool
         inline void FastInsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
         {
             if (NULL == vertexIndex[edge.destinationVertex])
-                vertexIndex[edge.destinationVertex] = new DynamicEdgeList<TEdgeData>();
+                vertexIndex[edge.destinationVertex] = new EdgeList<TEdgeData>();
             
             vertexIndex[edge.destinationVertex]->InsertEdgeUsingSource(edge);
         }
@@ -99,7 +103,7 @@ namespace GraphTool
         inline void FastInsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
         {
             if (NULL == vertexIndex[edge.sourceVertex])
-                vertexIndex[edge.sourceVertex] = new DynamicEdgeList<TEdgeData>();
+                vertexIndex[edge.sourceVertex] = new EdgeList<TEdgeData>();
             
             vertexIndex[edge.sourceVertex]->InsertEdgeUsingDestination(edge);
         }
@@ -163,9 +167,6 @@ namespace GraphTool
         /// Sets the number of indexed vertices.
         /// Constructs new vertices or destroys existing ones as appropriate.
         /// @param [in] numVertices Number of vertices.
-        inline void SetNumVertices(const TVertexCount numVertices)
-        {
-            vertexIndex.resize(numVertices, NULL);
-        }
+        void SetNumVertices(const TVertexCount numVertices);
     };
 }

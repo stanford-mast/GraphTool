@@ -6,9 +6,9 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file DynamicEdgeList.h
+ * @file EdgeList.h
  *   Declaration of a container for holding edges that correspond to a single
- *   top-level vertex, optimized for fast insertion.
+ *   top-level vertex, optimized for easy modification.
  *****************************************************************************/
 
 #pragma once
@@ -42,7 +42,7 @@ namespace GraphTool
     /// This indexed data structure represents unidirectional edges but does not specify the direction.
     /// Direction information depends on the usage semantics and is governed by the code that instantiates objects of this type.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class DynamicEdgeList
+    template <typename TEdgeData> class EdgeList
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
@@ -69,7 +69,7 @@ namespace GraphTool
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Default constructor.
-        DynamicEdgeList(void);
+        EdgeList(void);
 
 
     private:

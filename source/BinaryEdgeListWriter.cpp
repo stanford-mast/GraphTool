@@ -11,7 +11,7 @@
  *****************************************************************************/
 
 #include "BinaryEdgeListWriter.h"
-#include "Graph.hpp"
+#include "Graph.h"
 #include "GraphWriter.h"
 #include "Types.h"
 

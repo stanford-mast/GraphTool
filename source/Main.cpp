@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "Benchmark.h"
-#include "Graph.hpp"
+#include "Graph.h"
 #include "GraphReader.h"
 #include "GraphReaderFactory.h"
 #include "GraphWriter.h"

@@ -11,9 +11,9 @@
  *   various formats.
  *****************************************************************************/
 
-#include "DynamicEdgeList.h"
-#include "DynamicVertexIndex.h"
-#include "Graph.hpp"
+#include "EdgeList.h"
+#include "VertexIndex.h"
+#include "Graph.h"
 #include "GraphWriter.h"
 #include "Types.h"
 
@@ -95,7 +95,7 @@ namespace GraphTool
         uint32_t currentBufferIndex = 0;
         
         const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<void>));
-        const DynamicVertexIndex<TEdgeData>& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
+        const VertexIndex<TEdgeData>& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
         
         TVertexID topLevelVertex = 0;
         
