@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <list>
 
+
 namespace GraphTool
 {
     /// Specifies the information to be held for each edge.

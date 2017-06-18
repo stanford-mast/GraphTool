@@ -84,7 +84,7 @@ namespace GraphTool
     {
         edgeList.emplace_back();
         FillEdgeInfoFromEdge(edgeList.back(), edge, true);
-
+        
         degree += 1;
         
         if (1 == (degree & 3))

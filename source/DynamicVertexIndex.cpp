@@ -71,15 +71,18 @@ namespace GraphTool
 
     template <typename TEdgeData> void DynamicVertexIndex<TEdgeData>::ParallelRefreshDegreeInfo(size_t* buf)
     {
-        const size_t indexDegree = spindleGetLocalThreadID();
-        const size_t indexVector = spindleGetLocalThreadCount() + indexDegree;
+        const uint32_t localThreadID = spindleGetLocalThreadID();
+        const uint32_t localThreadCount = spindleGetLocalThreadCount();
+        
+        const size_t indexDegree = localThreadID;
+        const size_t indexVector = localThreadCount + indexDegree;
         
         spindleBarrierLocal();
         
         buf[indexDegree] = 0;
         buf[indexVector] = 0;
         
-        for (size_t i = spindleGetLocalThreadID(); i < vertexIndex.size(); i += spindleGetLocalThreadCount())
+        for (size_t i = localThreadID; i < vertexIndex.size(); i += localThreadCount)
         {
             if (NULL != vertexIndex[i])
             {
@@ -90,15 +93,15 @@ namespace GraphTool
         
         spindleBarrierLocal();
         
-        if (0 == spindleGetLocalThreadID())
+        if (0 == localThreadID)
         {
             numEdges = 0;
             numVectors = 0;
             
-            for (size_t i = 0; i < spindleGetLocalThreadCount(); ++i)
+            for (size_t i = 0; i < localThreadCount; ++i)
             {
                 numEdges += buf[i];
-                numVectors += buf[i + spindleGetLocalThreadCount()];
+                numVectors += buf[i + localThreadCount];
             }
         }
     }
