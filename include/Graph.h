@@ -7,7 +7,8 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file Graph.h
- *   Declaration of the top-level data structure used to represent a graph.
+ *   Declaration of the top-level data structure used to represent a mutable
+ *   graph in a format similar to Compressed-Sparse.
  *****************************************************************************/
 
 #pragma once
@@ -23,6 +24,7 @@
 namespace GraphTool
 {
     /// Represents a graph.
+    /// Internal format is like Compressed-Sparse and is optimized for mutability.
     /// Holds topology information and per-edge data, such as weights.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class Graph

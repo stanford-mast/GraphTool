@@ -7,7 +7,8 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file Graph.cpp
- *   Implementation of the top-level data structure used to represent a graph.
+ *   Implementation of the top-level data structure used to represent a
+ *   mutable graph in a format similar to Compressed-Sparse.
  *****************************************************************************/
 
 #include "EdgeList.h"
