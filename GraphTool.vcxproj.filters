@@ -66,6 +66,12 @@
     <ClInclude Include="include\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\VectorSparseGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VectorSparseElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp">
@@ -111,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VectorSparseGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

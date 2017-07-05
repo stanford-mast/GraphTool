@@ -15,6 +15,8 @@
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
     <ClInclude Include="include\EdgeList.h" />
+    <ClInclude Include="include\VectorSparseElement.h" />
+    <ClInclude Include="include\VectorSparseGraph.h" />
     <ClInclude Include="include\VertexIndex.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\GraphReader.h" />
@@ -35,6 +37,7 @@
     <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
     <ClCompile Include="source\EdgeList.cpp" />
     <ClCompile Include="source\Graph.cpp" />
+    <ClCompile Include="source\VectorSparseGraph.cpp" />
     <ClCompile Include="source\VertexIndex.cpp" />
     <ClCompile Include="source\GraphReader.cpp" />
     <ClCompile Include="source\GraphReaderFactory.cpp" />

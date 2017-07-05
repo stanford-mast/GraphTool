@@ -18,6 +18,7 @@
 #include "GraphWriterFactory.h"
 #include "OptionContainer.h"
 #include "Options.h"
+#include "VectorSparseGraph.h"
 #include "VersionInfo.h"
 
 #include <cstddef>
@@ -244,6 +245,8 @@ namespace GraphTool
         printf("Number of destination vectors = %llu\n", (unsigned long long)graph.GetNumVectorsDestination());
         printf("Number of source vectors      = %llu\n", (unsigned long long)graph.GetNumVectorsSource());
 
+        VectorSparseGraph<TEdgeData> testGraph(graph);
+        
         return 0;
     }
 }
