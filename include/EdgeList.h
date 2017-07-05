@@ -21,22 +21,6 @@
 
 namespace GraphTool
 {
-    /// Specifies the information to be held for each edge.
-    /// Contains both the other end of the edge and the edge data (i.e. weight).
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> struct SEdgeInfo
-    {
-        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
-        TEdgeData edgeData;                                             ///< Edge data, such as a weight.
-    };
-
-    /// Specifies the information to be held for each edge.
-    /// This version is specialized for unweighted graphs and only contains other end of the edge.
-    template <> struct SEdgeInfo<void>
-    {
-        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
-    };
-    
     /// Holds edges in a way optimized for fast insertion; useful for ingress.
     /// Represents graph topology data and can hold edge data, such as weights, as well.
     /// This indexed data structure represents unidirectional edges but does not specify the direction.
@@ -48,7 +32,7 @@ namespace GraphTool
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::list<SEdgeInfo<TEdgeData>>::const_iterator EdgeIterator;
+        typedef typename std::list<SIndexedEdge<TEdgeData>>::const_iterator EdgeIterator;
         
         
     private:
@@ -56,7 +40,7 @@ namespace GraphTool
 
         /// Holds all edge information.
         /// Key is the edge block identifier, value is the edge information structure.
-        std::list<SEdgeInfo<TEdgeData>> edgeList;
+        std::list<SIndexedEdge<TEdgeData>> edgeList;
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
@@ -79,7 +63,7 @@ namespace GraphTool
         /// @param [out] edgeInfo Edge information structure to fill.
         /// @param [in] edge Edge to use as the data source.
         /// @param [in] useDestinationVertex Specifies that the destination vertex, rather than the source vertex, in the edge should be used as the other vertex identifier.
-        void FillEdgeInfoFromEdge(SEdgeInfo<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex);
+        void FillEdgeInfoFromEdge(SIndexedEdge<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex);
 
         
     public:

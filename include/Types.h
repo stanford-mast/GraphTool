@@ -44,4 +44,20 @@ namespace GraphTool
         TVertexID sourceVertex;                                             ///< Identifier of the source vertex.
         TVertexID destinationVertex;                                        ///< Identifier of the destination vertex.
     };
+
+    /// Represents an individual edge within an index.
+    /// Contains both the other end of the edge and the edge data (i.e. weight).
+    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+    template <typename TEdgeData> struct SIndexedEdge
+    {
+        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
+        TEdgeData edgeData;                                             ///< Edge data, such as a weight.
+    };
+
+    /// Represents an individual edge within an index.
+    /// This version is specialized for unweighted graphs and only contains other end of the edge.
+    template <> struct SIndexedEdge<void>
+    {
+        TVertexID otherVertex;                                          ///< Vertex identifier for the other end of the edge.
+    };
 }

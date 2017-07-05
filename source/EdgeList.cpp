@@ -29,7 +29,7 @@ namespace GraphTool
     // -------- HELPERS ---------------------------------------------------- //
     // See "EdgeList.h" for documentation.
 
-    template <typename TEdgeData> void EdgeList<TEdgeData>::FillEdgeInfoFromEdge(SEdgeInfo<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex)
+    template <typename TEdgeData> void EdgeList<TEdgeData>::FillEdgeInfoFromEdge(SIndexedEdge<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex)
     {
         edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
         edgeInfo.edgeData = edge.edgeData;
@@ -37,7 +37,7 @@ namespace GraphTool
 
     // --------
 
-    template <> void EdgeList<void>::FillEdgeInfoFromEdge(SEdgeInfo<void>& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
+    template <> void EdgeList<void>::FillEdgeInfoFromEdge(SIndexedEdge<void>& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
     {
         edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
     }
