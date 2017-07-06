@@ -26,8 +26,11 @@ namespace GraphTool
     /// Represents an individual edge vector, containing graph topology information as well as edge data.
     template <typename TEdgeData> struct VectorSparseElement
     {
-        __m256i topology;                                                   ///< Graph topology information.
-        __m256i data;                                                       ///< Edge data, represented as a packed 4-element vector.
+        /// Graph topology information.
+        __m256i topology;
+
+        /// Edge data, represented as a packed 4-element vector.
+        __m256i data;
 
         /// Fills the contents of this Vector-Sparse element from the supplied edge information structure.
         /// @param [in] sharedVertex Identifier of the top-level vertex common to all edge information structures.
@@ -53,10 +56,10 @@ namespace GraphTool
 
             // Fill in the edge data.
             data = _mm256_set_epi64x(
-                (count > 3 ? (*(reinterpret_cast<uint64_t*>(&edges[3]->edgeData))) : 0ull),
-                (count > 2 ? (*(reinterpret_cast<uint64_t*>(&edges[2]->edgeData))) : 0ull),
-                (count > 1 ? (*(reinterpret_cast<uint64_t*>(&edges[1]->edgeData))) : 0ull),
-                (count > 0 ? (*(reinterpret_cast<uint64_t*>(&edges[0]->edgeData))) : 0ull),
+                (count > 3 ? (*(reinterpret_cast<const uint64_t*>(&edges[3].edgeData))) : 0ull),
+                (count > 2 ? (*(reinterpret_cast<const uint64_t*>(&edges[2].edgeData))) : 0ull),
+                (count > 1 ? (*(reinterpret_cast<const uint64_t*>(&edges[1].edgeData))) : 0ull),
+                (count > 0 ? (*(reinterpret_cast<const uint64_t*>(&edges[0].edgeData))) : 0ull)
             );
         }
         
@@ -90,7 +93,8 @@ namespace GraphTool
     /// Represents an individual edge vector, containing only graph topology information and specialized for unweighted graphs.
     template <> struct VectorSparseElement<void>
     {
-        __m256i topology;                                                   ///< Graph topology information.
+        /// Graph topology information.
+        __m256i topology;
         
         /// Fills the contents of this Vector-Sparse element from the supplied edge information structure.
         /// @param [in] sharedVertex Identifier of the top-level vertex common to all edge information structures.

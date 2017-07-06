@@ -244,8 +244,6 @@ namespace GraphTool
         printf("Number of edges               = %llu\n", (unsigned long long)graph.GetNumEdges());
         printf("Number of destination vectors = %llu\n", (unsigned long long)graph.GetNumVectorsDestination());
         printf("Number of source vectors      = %llu\n", (unsigned long long)graph.GetNumVectorsSource());
-
-        VectorSparseGraph<TEdgeData> testGraph(graph);
         
         return 0;
     }

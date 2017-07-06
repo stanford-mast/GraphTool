@@ -159,7 +159,68 @@ namespace GraphTool
             }
         }
 
+        // Create the Vector-Sparse edge lists.
+        // For each top-level vertex, create a Vector-Sparse element by grouping up to 4 edges into it.
 
+        {
+            // Destination-grouped edge list.
+            uint64_t nextVectorIndex = 0ull;
+
+            for (uint64_t i = 0; i < numVertices; ++i)
+            {
+                if (NULL != graph.VertexIndexDestination()[i])
+                {
+                    uint8_t edgeCount = 0;
+                    SIndexedEdge<TEdgeData> edges[4];
+                    
+                    for (auto it = graph.VertexIndexDestination()[i]->BeginIterator(); it != graph.VertexIndexDestination()[i]->EndIterator(); ++it)
+                    {
+                        if (4 == edgeCount)
+                        {
+                            vectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
+                            nextVectorIndex += 1;
+                            edgeCount = 0;
+                        }
+                        
+                        edges[edgeCount] = *it;
+                        edgeCount += 1;
+                    }
+                    
+                    vectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
+                    nextVectorIndex += 1;
+                }
+            }
+        }
+
+        {
+            // Source-grouped edge list.
+            uint64_t nextVectorIndex = 0ull;
+
+            for (uint64_t i = 0; i < numVertices; ++i)
+            {
+                if (NULL != graph.VertexIndexSource()[i])
+                {
+                    uint8_t edgeCount = 0;
+                    SIndexedEdge<TEdgeData> edges[4];
+
+                    for (auto it = graph.VertexIndexSource()[i]->BeginIterator(); it != graph.VertexIndexSource()[i]->EndIterator(); ++it)
+                    {
+                        if (4 == edgeCount)
+                        {
+                            vectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
+                            nextVectorIndex += 1;
+                            edgeCount = 0;
+                        }
+
+                        edges[edgeCount] = *it;
+                        edgeCount += 1;
+                    }
+
+                    vectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
+                    nextVectorIndex += 1;
+                }
+            }
+        }
     }
 
     
