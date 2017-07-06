@@ -29,18 +29,7 @@ namespace GraphTool
     
     template <typename TEdgeData> VectorSparseGraph<TEdgeData>::VectorSparseGraph(const Graph<TEdgeData>& graph) : isInitialized(false), numEdges(graph.GetNumEdges()), numVertices(graph.GetNumVertices()), numVectorsByDestination(graph.GetNumVectorsDestination()), numVectorsBySource(graph.GetNumVectorsSource())
     {
-        countsByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
-        indexByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
-        vectorsByDestination = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsByDestination);
-        
-        countsBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
-        indexBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
-        vectorsBySource = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsBySource);
-
-        if ((NULL == countsByDestination) || (NULL == indexByDestination) || (NULL == vectorsByDestination) || (NULL == countsBySource) || (NULL == indexBySource) || (NULL == vectorsBySource))
-            Deinitialize();
-        else
-            InitializeFromMutableGraph(graph);
+        InitializeFromMutableGraph(graph);
     }
     
     // --------
@@ -99,16 +88,34 @@ namespace GraphTool
 
     template <typename TEdgeData> void VectorSparseGraph<TEdgeData>::InitializeFromMutableGraph(const Graph<TEdgeData>& graph)
     {
+        if (IsInitialized())
+            return;
+
+        // Allocate memory.
+        uint64_t* tempCountsByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
+        uint64_t* tempIndexByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
+        VectorSparseElement<TEdgeData>* tempVectorsByDestination = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsByDestination);
+
+        uint64_t* tempCountsBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
+        uint64_t* tempIndexBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
+        VectorSparseElement<TEdgeData>* tempVectorsBySource = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsBySource);
+
+        if ((NULL == tempCountsByDestination) || (NULL == tempIndexByDestination) || (NULL == tempVectorsByDestination) || (NULL == tempCountsBySource) || (NULL == tempIndexBySource) || (NULL == tempVectorsBySource))
+        {
+            Deinitialize();
+            return;
+        }
+        
         // Initialize the vertex indices.
         // Default is to assume vertices are not present.
         // They will be marked present if they show up in the graph.
         for (uint64_t i = 0; i < numVertices; ++i)
         {
-            countsByDestination[i] = 0ull;
-            indexByDestination[i] = kVertexIndexVertexNotPresent;
+            tempCountsByDestination[i] = 0ull;
+            tempIndexByDestination[i] = kVertexIndexVertexNotPresent;
             
-            countsBySource[i] = 0ull;
-            indexBySource[i] = kVertexIndexVertexNotPresent;
+            tempCountsBySource[i] = 0ull;
+            tempIndexBySource[i] = kVertexIndexVertexNotPresent;
         }
 
         // Calculate the correct values for each position in the vertex index.
@@ -124,16 +131,16 @@ namespace GraphTool
             {
                 if (NULL != graph.VertexIndexDestination()[i])
                 {
-                    countsByDestination[i] = graph.VertexIndexDestination()[i]->GetNumVectors();
-                    indexByDestination[i] = previousTotalVectorIndices;
-                    previousTotalVectorIndices += countsByDestination[i];
+                    tempCountsByDestination[i] = graph.VertexIndexDestination()[i]->GetNumVectors();
+                    tempIndexByDestination[i] = previousTotalVectorIndices;
+                    previousTotalVectorIndices += tempCountsByDestination[i];
                     lastValidVertexSeen = i;
                 }
             }
 
             for (uint64_t i = (lastValidVertexSeen + 1); i < numVertices; ++i)
             {
-                indexByDestination[i] = kVertexIndexVertexPastEnd;
+                tempIndexByDestination[i] = kVertexIndexVertexPastEnd;
             }
         }
         
@@ -146,16 +153,16 @@ namespace GraphTool
             {
                 if (NULL != graph.VertexIndexSource()[i])
                 {
-                    countsBySource[i] = graph.VertexIndexSource()[i]->GetNumVectors();
-                    indexBySource[i] = previousTotalVectorIndices;
-                    previousTotalVectorIndices += countsBySource[i];
+                    tempCountsBySource[i] = graph.VertexIndexSource()[i]->GetNumVectors();
+                    tempIndexBySource[i] = previousTotalVectorIndices;
+                    previousTotalVectorIndices += tempCountsBySource[i];
                     lastValidVertexSeen = i;
                 }
             }
 
             for (uint64_t i = (lastValidVertexSeen + 1); i < numVertices; ++i)
             {
-                indexBySource[i] = kVertexIndexVertexPastEnd;
+                tempIndexBySource[i] = kVertexIndexVertexPastEnd;
             }
         }
 
@@ -177,7 +184,7 @@ namespace GraphTool
                     {
                         if (4 == edgeCount)
                         {
-                            vectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
+                            tempVectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
                             nextVectorIndex += 1;
                             edgeCount = 0;
                         }
@@ -186,7 +193,7 @@ namespace GraphTool
                         edgeCount += 1;
                     }
                     
-                    vectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
+                    tempVectorsByDestination[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
                     nextVectorIndex += 1;
                 }
             }
@@ -207,7 +214,7 @@ namespace GraphTool
                     {
                         if (4 == edgeCount)
                         {
-                            vectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
+                            tempVectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, 4);
                             nextVectorIndex += 1;
                             edgeCount = 0;
                         }
@@ -216,11 +223,23 @@ namespace GraphTool
                         edgeCount += 1;
                     }
 
-                    vectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
+                    tempVectorsBySource[nextVectorIndex].FillFromIndexedEdges(i, edges, edgeCount);
                     nextVectorIndex += 1;
                 }
             }
         }
+
+        // Save allocated memory buffer pointers back to this object.
+        // At this point they become read-only buffers.
+        countsByDestination = tempCountsByDestination;
+        indexByDestination = tempIndexByDestination;
+        vectorsByDestination = tempVectorsByDestination;
+        countsBySource = tempCountsBySource;
+        indexBySource = tempIndexBySource;
+        vectorsBySource = tempVectorsBySource;
+
+        // This graph is now initialized.
+        isInitialized = true;
     }
 
     

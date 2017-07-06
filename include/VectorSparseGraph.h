@@ -55,25 +55,25 @@ namespace GraphTool
         const TVertexCount numVertices;
         
         /// Number of vectors per vertex in the destination-grouped Vector-Sparse edge list.
-        uint64_t* countsByDestination;
+        const uint64_t* countsByDestination;
         
         /// Destination-grouped vertex index into the Vector-Sparse edge list.
-        uint64_t* indexByDestination;
+        const uint64_t* indexByDestination;
         
         /// Destination-grouped Vector-Sparse edge list.
-        VectorSparseElement<TEdgeData>* vectorsByDestination;
+        const VectorSparseElement<TEdgeData>* vectorsByDestination;
         
         /// Number of vectors in the destination-grouped Vector-Sparse edge list.
         const uint64_t numVectorsByDestination;
         
         /// Number of vectors per vertex in the source-grouped Vector-Sparse edge list.
-        uint64_t* countsBySource;
+        const uint64_t* countsBySource;
         
         /// Source-grouped vertex index into the Vector-Sparse edge list.
-        uint64_t* indexBySource;
+        const uint64_t* indexBySource;
         
         /// Source-grouped Vector-Sparse edge list.
-        VectorSparseElement<TEdgeData>* vectorsBySource;
+        const VectorSparseElement<TEdgeData>* vectorsBySource;
         
         /// Number of vectors in the source-grouped Vector-Sparse edge list.
         const uint64_t numVectorsBySource;
