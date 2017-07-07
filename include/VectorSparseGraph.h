@@ -69,10 +69,10 @@ namespace GraphTool
         const TVertexCount numVertices;
         
         /// In-degree of each vertex in the graph.
-        const uint64_t* indegree;
+        const TEdgeCount* indegree;
 
         /// Out-degree of each vertex in the graph.
-        const uint64_t* outdegree;
+        const TEdgeCount* outdegree;
         
         /// Destination-grouped vertex index into the Vector-Sparse edge list.
         const uint64_t* indexByDestination;
@@ -81,7 +81,7 @@ namespace GraphTool
         const SLayoutInfo* layoutByDestination;
 
         /// Number of SLayoutInfo structures used to determine the layout of the destination-grouped edge list.
-        const uint64_t layoutCountByDestination;
+        const TVertexCount layoutCountByDestination;
         
         /// Destination-grouped Vector-Sparse edge list.
         const VectorSparseElement<TEdgeData>* vectorsByDestination;
@@ -96,7 +96,7 @@ namespace GraphTool
         const SLayoutInfo* layoutBySource;
 
         /// Number of SLayoutInfo structures used to determine the layout of the source-grouped edge list.
-        const uint64_t layoutCountBySource;
+        const TVertexCount layoutCountBySource;
         
         /// Source-grouped Vector-Sparse edge list.
         const VectorSparseElement<TEdgeData>* vectorsBySource;
@@ -164,6 +164,70 @@ namespace GraphTool
         inline void FilterSourcesWithFrontier(VectorSparseElement<TEdgeData>* const filteredVectors, const uint64_t* const frontier) const
         {
             FilterWithFrontier(filteredVectors, frontier, false);
+        }
+                
+        /// Retrieves and returns the number of edges in the graph.
+        /// @return Number of edges in the graph.
+        inline TEdgeCount GetNumEdges(void) const
+        {
+            return numEdges;
+        }
+        
+        /// Retrieves and returns the number of vertices in the graph.
+        /// @return Number of vertices in the graph.
+        inline TVertexCount GetNumVertices(void) const
+        {
+            return numVertices;
+        }
+        
+        /// Retrieves and returns the number of vertices having non-zero indegree.
+        /// @return Number of vertices with in-edges.
+        inline TVertexCount GetNumVerticesPresentDestination(void) const
+        {
+            return layoutCountByDestination;
+        }
+                
+        /// Retrieves and returns the number of vertices having non-zero outdegree.
+        /// @return Number of vertices with out-edges.
+        inline TVertexCount GetNumVerticesPresentSource(void) const
+        {
+            return layoutCountBySource;
+        }
+        
+        /// Retrieves and returns the number of Vector-Sparse vectors required to represent the destination-grouped edges.
+        /// @return Number of vectors required.
+        inline uint64_t GetNumVectorsDestination(void) const
+        {
+            return numVectorsByDestination;
+        }
+        
+        /// Retrieves and returns the number of Vector-Sparse vectors required to represent the source-grouped edges.
+        /// @return Number of vectors required.
+        inline uint64_t GetNumVectorsSource(void) const
+        {
+            return numVectorsBySource;
+        }
+        
+        /// Retrieves and returns the in-degree of the specified vertex.
+        /// @param [in] vertex Identifier of the vertex of interest.
+        /// @return In-degree of the specified vertex. 0 is returned if the vertex has no in-edges or does not exist.
+        inline TEdgeCount GetVertexIndegree(TVertexID vertex) const
+        {
+            if (vertex < GetNumVertices())
+                return indegree[vertex];
+            else
+                return 0;
+        }
+        
+        /// Retrieves and returns the out-degree of the specified vertex.
+        /// @param [in] vertex Identifier of the vertex of interest.
+        /// @return Out-degree of the specified vertex. 0 is returned if the vertex has no out-edges or does not exist.
+        inline TEdgeCount GetVertexOutdegree(TVertexID vertex) const
+        {
+            if (vertex < GetNumVertices())
+                return outdegree[vertex];
+            else
+                return 0;
         }
         
         /// Specifies if initialization has succeeded on this object.

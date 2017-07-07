@@ -107,14 +107,14 @@ namespace GraphTool
         
         /// Retrieves and returns the number of Vector-Sparse vectors required to represent the destination-grouped edges.
         /// @return Number of vectors required.
-        inline size_t GetNumVectorsDestination(void) const
+        inline uint64_t GetNumVectorsDestination(void) const
         {
             return edgesByDestination.GetNumVectors();
         }
         
         /// Retrieves and returns the number of Vector-Sparse vectors required to represent the source-grouped edges.
         /// @return Number of vectors required.
-        inline size_t GetNumVectorsSource(void) const
+        inline uint64_t GetNumVectorsSource(void) const
         {
             return edgesBySource.GetNumVectors();
         }
@@ -166,7 +166,7 @@ namespace GraphTool
         /// Intended to be called from within a Spindle parallelized region.
         /// Required after invoking fast insertion methods, which do not update any counts.
         /// @param [in] buf Temporary array allocated with two locations per thread.
-        inline void ParallelRefreshMetadata(size_t* buf)
+        inline void ParallelRefreshMetadata(uint64_t* buf)
         {
             edgesByDestination.ParallelRefreshMetadata(buf);
             edgesBySource.ParallelRefreshMetadata(buf);

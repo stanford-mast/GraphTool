@@ -34,7 +34,7 @@ namespace GraphTool
         GraphReader<TEdgeData>* reader;                                     ///< Graph reader object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
-        size_t* refreshDegreeBuf;                                           ///< Buffer for refreshing degree information.
+        uint64_t* refreshDegreeBuf;                                         ///< Buffer for refreshing degree information.
         bool readSuccessfulSoFar;                                           ///< Indicates the continued success of the read operation.
     };
 
@@ -132,7 +132,7 @@ namespace GraphTool
         if (localThreadCount > 2)
         {
             if (0 == localThreadID)
-                readSpec->refreshDegreeBuf = new size_t[localThreadCount << 2];
+                readSpec->refreshDegreeBuf = new uint64_t[localThreadCount << 2];
             
             spindleBarrierLocal();
             readSpec->graph->ParallelRefreshMetadata(readSpec->refreshDegreeBuf);

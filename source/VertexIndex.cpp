@@ -57,7 +57,7 @@ namespace GraphTool
         }
         
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
-        const size_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
+        const uint64_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
 
         vertexIndex[edge.destinationVertex]->InsertEdgeUsingSource(edge);
 
@@ -82,7 +82,7 @@ namespace GraphTool
         }
         
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
-        const size_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
+        const uint64_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
 
         vertexIndex[edge.sourceVertex]->InsertEdgeUsingDestination(edge);
 
@@ -95,7 +95,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshMetadata(size_t* buf)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshMetadata(uint64_t* buf)
     {
         const uint32_t localThreadID = spindleGetLocalThreadID();
         const uint32_t localThreadCount = spindleGetLocalThreadCount();

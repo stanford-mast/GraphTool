@@ -48,7 +48,7 @@ namespace GraphTool
         TVertexCount numVerticesPresent;
         
         /// Holds the total number of Vector-Sparse vectors required to represent the edges in this data structure.
-        size_t numVectors;
+        uint64_t numVectors;
         
         
     public:
@@ -130,7 +130,7 @@ namespace GraphTool
         
         /// Returns the number of Vector-Sparse vectors required to represent the edges in this data structure.
         /// @return Number of vectors.
-        inline size_t GetNumVectors(void) const
+        inline uint64_t GetNumVectors(void) const
         {
             return numVectors;
         }
@@ -161,7 +161,7 @@ namespace GraphTool
         /// Intended to be called from within a Spindle parallelized region.
         /// Required after invoking fast insertion methods, which do not update any counts.
         /// @param [in] buf Temporary array allocated with four locations per thread.
-        void ParallelRefreshMetadata(size_t* buf);
+        void ParallelRefreshMetadata(uint64_t* buf);
         
         /// Removes the specified edge from this data structure.
         /// @param [in] indexedVertex Top-level vertex to which the edge corresponds.
