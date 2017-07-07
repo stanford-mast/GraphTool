@@ -132,10 +132,10 @@ namespace GraphTool
         if (localThreadCount > 2)
         {
             if (0 == localThreadID)
-                readSpec->refreshDegreeBuf = new size_t[localThreadCount << 1];
+                readSpec->refreshDegreeBuf = new size_t[localThreadCount << 2];
             
             spindleBarrierLocal();
-            readSpec->graph->ParallelRefreshDegreeInfo(readSpec->refreshDegreeBuf);
+            readSpec->graph->ParallelRefreshMetadata(readSpec->refreshDegreeBuf);
             spindleBarrierLocal();
             
             if (0 == localThreadID)

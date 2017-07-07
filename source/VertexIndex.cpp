@@ -22,7 +22,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "VertexIndex.h" for documentation.
 
-    template <typename TEdgeData> VertexIndex<TEdgeData>::VertexIndex(void) : vertexIndex(), numEdges(0), numVectors(0)
+    template <typename TEdgeData> VertexIndex<TEdgeData>::VertexIndex(void) : vertexIndex(), numEdges(0), numVerticesPresent(0), numVectors(0)
     {
         // Nothing to do here.
     }
@@ -51,7 +51,10 @@ namespace GraphTool
             vertexIndex.resize(1 + edge.destinationVertex);
         
         if (NULL == vertexIndex[edge.destinationVertex])
+        {
+            numVerticesPresent += 1;
             vertexIndex[edge.destinationVertex] = new EdgeList<TEdgeData>();
+        }
         
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.destinationVertex]->GetNumVectors();
@@ -73,7 +76,10 @@ namespace GraphTool
             vertexIndex.resize(1 + edge.sourceVertex);
 
         if (NULL == vertexIndex[edge.sourceVertex])
+        {
+            numVerticesPresent += 1;
             vertexIndex[edge.sourceVertex] = new EdgeList<TEdgeData>();
+        }
         
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
         const size_t oldVectors = vertexIndex[edge.sourceVertex]->GetNumVectors();
@@ -89,18 +95,20 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshDegreeInfo(size_t* buf)
+    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshMetadata(size_t* buf)
     {
         const uint32_t localThreadID = spindleGetLocalThreadID();
         const uint32_t localThreadCount = spindleGetLocalThreadCount();
         
         const size_t indexDegree = localThreadID;
         const size_t indexVector = localThreadCount + indexDegree;
+        const size_t indexVerticesPresent = (localThreadCount << 1) + indexDegree;
         
         spindleBarrierLocal();
         
         buf[indexDegree] = 0;
         buf[indexVector] = 0;
+        buf[indexVerticesPresent] = 0;
         
         for (size_t i = localThreadID; i < vertexIndex.size(); i += localThreadCount)
         {
@@ -108,6 +116,7 @@ namespace GraphTool
             {
                 buf[indexDegree] += vertexIndex[i]->GetDegree();
                 buf[indexVector] += vertexIndex[i]->GetNumVectors();
+                buf[indexVerticesPresent] += 1;
             }
         }
         
@@ -117,11 +126,13 @@ namespace GraphTool
         {
             numEdges = 0;
             numVectors = 0;
+            numVerticesPresent = 0;
             
             for (size_t i = 0; i < localThreadCount; ++i)
             {
                 numEdges += buf[i];
                 numVectors += buf[i + localThreadCount];
+                numVerticesPresent += buf[i + (localThreadCount << 1)];
             }
         }
     }
@@ -147,6 +158,7 @@ namespace GraphTool
             {
                 delete vertexIndex[indexedVertex];
                 vertexIndex[indexedVertex] = NULL;
+                numVerticesPresent -= 1;
             }
         }
     }
@@ -162,6 +174,7 @@ namespace GraphTool
             
             delete vertexIndex[indexedVertex];
             vertexIndex[indexedVertex] = NULL;
+            numVerticesPresent -= 1;
         }
     }
 
@@ -177,6 +190,7 @@ namespace GraphTool
                 {
                     delete vertexIndex[i];
                     vertexIndex[i] = NULL;
+                    numVerticesPresent -= 1;
                 }
             }
         }

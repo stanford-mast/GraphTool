@@ -43,6 +43,9 @@ namespace GraphTool
         
         /// Holds the total number of edges present in this data structure.
         TEdgeCount numEdges;
+
+        /// Holds the number of vertices that have valid edge lists.
+        TVertexCount numVerticesPresent;
         
         /// Holds the total number of Vector-Sparse vectors required to represent the edges in this data structure.
         size_t numVectors;
@@ -139,6 +142,13 @@ namespace GraphTool
             return vertexIndex.size();
         }
 
+        /// Returns the number of top-level vertices in the index having a valid edge list associated with them.
+        /// @return Number of indexed vertices with edge lists.
+        inline TVertexCount GetNumVerticesPresent(void) const
+        {
+            return numVerticesPresent;
+        }
+
         /// Inserts the specified edge into this data structure, using the destination as the top-level vertex.
         /// @param [in] edge Edge to insert.
         void InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge);
@@ -147,11 +157,11 @@ namespace GraphTool
         /// @param [in] edge Edge to insert.
         void InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge);
 
-        /// Refreshes the counts of edges and vectors in this data structure.
+        /// Refreshes metadata, such as degree information.
         /// Intended to be called from within a Spindle parallelized region.
         /// Required after invoking fast insertion methods, which do not update any counts.
-        /// @param [in] buf Temporary array allocated with two locations per thread.
-        void ParallelRefreshDegreeInfo(size_t* buf);
+        /// @param [in] buf Temporary array allocated with four locations per thread.
+        void ParallelRefreshMetadata(size_t* buf);
         
         /// Removes the specified edge from this data structure.
         /// @param [in] indexedVertex Top-level vertex to which the edge corresponds.

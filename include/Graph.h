@@ -90,6 +90,20 @@ namespace GraphTool
         {
             return edgesBySource.GetNumVertices();
         }
+
+        /// Retrieves and returns the number of vertices having non-zero indegree.
+        /// @return Number of vertices with in-edges.
+        inline TVertexCount GetNumVerticesPresentDestination(void) const
+        {
+            return edgesByDestination.GetNumVerticesPresent();
+        }
+
+        /// Retrieves and returns the number of vertices having non-zero outdegree.
+        /// @return Number of vertices with out-edges.
+        inline TVertexCount GetNumVerticesPresentSource(void) const
+        {
+            return edgesBySource.GetNumVerticesPresent();
+        }
         
         /// Retrieves and returns the number of Vector-Sparse vectors required to represent the destination-grouped edges.
         /// @return Number of vectors required.
@@ -148,14 +162,14 @@ namespace GraphTool
             edgesBySource.InsertEdgeIndexedBySource(edge);
         }
         
-        /// Refreshes the counts of edges and vectors in this data structure.
+        /// Refreshes graph metadata, such as degree information.
         /// Intended to be called from within a Spindle parallelized region.
         /// Required after invoking fast insertion methods, which do not update any counts.
         /// @param [in] buf Temporary array allocated with two locations per thread.
-        inline void ParallelRefreshDegreeInfo(size_t* buf)
+        inline void ParallelRefreshMetadata(size_t* buf)
         {
-            edgesByDestination.ParallelRefreshDegreeInfo(buf);
-            edgesBySource.ParallelRefreshDegreeInfo(buf);
+            edgesByDestination.ParallelRefreshMetadata(buf);
+            edgesBySource.ParallelRefreshMetadata(buf);
         }
         
         /// Removes an edge from the graph.
