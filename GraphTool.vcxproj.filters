@@ -72,6 +72,9 @@
     <ClInclude Include="include\VectorSparseElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Atomic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Main.cpp">
