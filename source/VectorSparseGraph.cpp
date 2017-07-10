@@ -57,6 +57,12 @@ namespace GraphTool
             outdegree = NULL;
         }
         
+        if (NULL != countsByDestination)
+        {
+            free((void*)countsByDestination);
+            countsByDestination = NULL;
+        }
+
         if (NULL != indexByDestination)
         {
             free((void*)indexByDestination);
@@ -73,6 +79,12 @@ namespace GraphTool
         {
             free((void*)vectorsByDestination);
             vectorsByDestination = NULL;
+        }
+        
+        if (NULL != countsBySource)
+        {
+            free((void*)countsBySource);
+            countsBySource = NULL;
         }
         
         if (NULL != indexBySource)
@@ -98,26 +110,21 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VectorSparseGraph<TEdgeData>::FilterWithFrontier(VectorSparseElement<TEdgeData>* const filteredVectors, const uint64_t* const frontier, const bool useVectorsByDestination) const
-    {
-
-    }
-
-    // --------
-
     template <typename TEdgeData> void VectorSparseGraph<TEdgeData>::InitializeFromMutableGraph(const Graph<TEdgeData>& graph)
     {
         if (IsInitialized())
-            return;
+            Deinitialize();
 
         // Allocate memory.
         uint64_t* tempIndegree = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
         uint64_t* tempOutdegree = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
 
+        uint64_t* tempCountsByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
         uint64_t* tempIndexByDestination = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
         SLayoutInfo* tempLayoutByDestination = (SLayoutInfo*)malloc(sizeof(SLayoutInfo) * layoutCountByDestination);
         VectorSparseElement<TEdgeData>* tempVectorsByDestination = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsByDestination);
 
+        uint64_t* tempCountsBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
         uint64_t* tempIndexBySource = (uint64_t*)malloc(sizeof(uint64_t) * numVertices);
         SLayoutInfo* tempLayoutBySource = (SLayoutInfo*)malloc(sizeof(SLayoutInfo) * layoutCountBySource);
         VectorSparseElement<TEdgeData>* tempVectorsBySource = (VectorSparseElement<TEdgeData>*)malloc(sizeof(VectorSparseElement<TEdgeData>) * numVectorsBySource);
@@ -126,14 +133,16 @@ namespace GraphTool
         // When accessed outside this method, all buffers will be read-only.
         indegree = tempIndegree;
         outdegree = tempOutdegree;
+        countsByDestination = tempCountsByDestination;
         indexByDestination = tempIndexByDestination;
         layoutByDestination = tempLayoutByDestination;
         vectorsByDestination = tempVectorsByDestination;
+        countsBySource = tempCountsBySource;
         indexBySource = tempIndexBySource;
         layoutBySource = tempLayoutBySource;
         vectorsBySource = tempVectorsBySource;
         
-        if ((NULL == tempIndexByDestination) || (NULL == tempLayoutByDestination) || (NULL == tempVectorsByDestination) || (NULL == tempIndexBySource) || (NULL == tempLayoutBySource) || (NULL == tempVectorsBySource))
+        if ((NULL == tempCountsByDestination) || (NULL == tempIndexByDestination) || (NULL == tempLayoutByDestination) || (NULL == tempVectorsByDestination) || (NULL == tempCountsBySource) || (NULL == tempIndexBySource) || (NULL == tempLayoutBySource) || (NULL == tempVectorsBySource))
         {
             Deinitialize();
             return;
@@ -146,7 +155,11 @@ namespace GraphTool
         {
             tempIndegree[i] = 0ull;
             tempOutdegree[i] = 0ull;
+            
+            tempCountsByDestination[i] = 0ull;
             tempIndexByDestination[i] = kVertexIndexVertexNotPresent;
+            
+            tempCountsBySource[i] = 0ull;
             tempIndexBySource[i] = kVertexIndexVertexNotPresent;
         }
 
@@ -165,9 +178,10 @@ namespace GraphTool
                 if (NULL != graph.VertexIndexDestination()[i])
                 {
                     tempIndegree[i] = graph.VertexIndexDestination()[i]->GetDegree();
-                    
+                    tempCountsByDestination[i] = graph.VertexIndexDestination()[i]->GetNumVectors();
+
                     tempLayoutByDestination[nextLayoutIndex].index = previousTotalVectorIndices;
-                    tempLayoutByDestination[nextLayoutIndex].count = graph.VertexIndexDestination()[i]->GetNumVectors();
+                    tempLayoutByDestination[nextLayoutIndex].count = tempCountsByDestination[i];
 
                     tempIndexByDestination[i] = previousTotalVectorIndices;
                     
@@ -194,9 +208,10 @@ namespace GraphTool
                 if (NULL != graph.VertexIndexSource()[i])
                 {
                     tempOutdegree[i] = graph.VertexIndexSource()[i]->GetDegree();
+                    tempCountsBySource[i] = graph.VertexIndexSource()[i]->GetNumVectors();
 
                     tempLayoutBySource[nextLayoutIndex].index = previousTotalVectorIndices;
-                    tempLayoutBySource[nextLayoutIndex].count = graph.VertexIndexSource()[i]->GetNumVectors();
+                    tempLayoutBySource[nextLayoutIndex].count = tempCountsBySource[i];
 
                     tempIndexBySource[i] = previousTotalVectorIndices;
 

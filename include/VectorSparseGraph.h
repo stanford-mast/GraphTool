@@ -74,6 +74,9 @@ namespace GraphTool
         /// Out-degree of each vertex in the graph.
         const TEdgeCount* outdegree;
         
+        /// Number of vectors per vertex in the destination-grouped Vector-Sparse edge list.
+        const uint64_t* countsByDestination;
+        
         /// Destination-grouped vertex index into the Vector-Sparse edge list.
         const uint64_t* indexByDestination;
 
@@ -88,6 +91,9 @@ namespace GraphTool
         
         /// Number of vectors in the destination-grouped Vector-Sparse edge list.
         const uint64_t numVectorsByDestination;
+        
+        /// Number of vectors per vertex in the source-grouped Vector-Sparse edge list.
+        const uint64_t* countsBySource;
         
         /// Source-grouped vertex index into the Vector-Sparse edge list.
         const uint64_t* indexBySource;
@@ -125,46 +131,14 @@ namespace GraphTool
         /// Resets fields to their uninitialized states.
         void Deinitialize(void);
         
-        /// Uses the supplied frontier to filter the specified Vector-Sparse edge list and write the result to the specified memory location.
-        /// The frontier is a bit-mask, in which `1` means the corresponding vertex is active and `0` means it is inactive.
-        /// If using the destination-grouped edge list, the frontier is interpreted as referring to source vertices.
-        /// If using the source-grouped edge list, the frontier is interpreted as referring to destination vertices.
-        /// Individual vertices within each Vector-Sparse element are filtered, but shared vertices are not.
-        /// In other words, this method pre-performs a weak frontier check but leaves strong frontier detection alone.
-        /// @param [out] filteredVectors Location to which to write the filtered Vector-Sparse edge list.
-        /// @param [in] frontier Location of the frontier bit-mask.
-        /// @param [in] useVectorsByDestination If `true` specifies that the destination-grouped edge list should be used; otherwise the source-grouped edge list is used.
-        void FilterWithFrontier(VectorSparseElement<TEdgeData>* const filteredVectors, const uint64_t* const frontier, const bool useVectorsByDestination) const;
-
         /// Initializes the Vector-Sparse data structures of this graph, given a mutable graph as a data source.
+        /// If this object is already initialized with graph data structures, erases them and re-initializes to the newly-supplied graph.
         /// @param [in] graph Mutable graph to read.
         void InitializeFromMutableGraph(const Graph<TEdgeData>& graph);
         
         
     public:
         // -------- INSTANCE METHODS --------------------------------------- //
-
-        /// Uses the supplied frontier to filter the destination-grouped Vector-Sparse edge list and write the result to the specified memory location.
-        /// The frontier is a bit-mask, in which `1` means the corresponding source vertex is active and `0` means it is inactive.
-        /// Individual vertices within each Vector-Sparse element are filtered, but shared vertices are not.
-        /// In other words, this method pre-performs a weak frontier check but leaves strong frontier detection alone.
-        /// @param [out] filteredVectors Location to which to write the filtered Vector-Sparse edge list.
-        /// @param [in] frontier Location of the frontier bit-mask.
-        inline void FilterDestinationsWithFrontier(VectorSparseElement<TEdgeData>* const filteredVectors, const uint64_t* const frontier) const
-        {
-            FilterWithFrontier(filteredVectors, frontier, true);
-        }
-
-        /// Uses the supplied frontier to filter the source-grouped Vector-Sparse edge list and write the result to the specified memory location.
-        /// The frontier is a bit-mask, in which `1` means the corresponding destination vertex is active and `0` means it is inactive.
-        /// Individual vertices within each Vector-Sparse element are filtered, but shared vertices are not.
-        /// In other words, this method pre-performs a weak frontier check but leaves strong frontier detection alone.
-        /// @param [out] filteredVectors Location to which to write the filtered Vector-Sparse edge list.
-        /// @param [in] frontier Location of the frontier bit-mask.
-        inline void FilterSourcesWithFrontier(VectorSparseElement<TEdgeData>* const filteredVectors, const uint64_t* const frontier) const
-        {
-            FilterWithFrontier(filteredVectors, frontier, false);
-        }
                 
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
