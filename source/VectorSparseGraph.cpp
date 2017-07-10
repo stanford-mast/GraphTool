@@ -313,7 +313,7 @@ namespace GraphTool
 
                 for (uint64_t j = 0; j < 4; ++j)
                 {
-                    if (1 == _bittest64((const int64_t*)&vec[j], 63))
+                    if (vec[j] & 0x8000000000000000ull)
                     {
                         const uint64_t bitPositionToSet = vec[j] & 0x0000ffffffffffffull;
                         const uint64_t frontierIndexToSet = bitPositionToSet >> 6ull;
