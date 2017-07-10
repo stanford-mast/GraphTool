@@ -54,6 +54,10 @@ namespace GraphTool
         
         /// Value in the vertex index indicating that a vertex is not present because it is past the end of the edge list.
         static const uint64_t kVertexIndexVertexPastEnd = 0xffffffffffffffffull;
+
+        /// Mask value for bitwise-AND to check if the index entry indicates validity.
+        /// If the result of the AND operation is `0` then the entry is valid.
+        static const uint64_t kVertexIndexValidityMask = 0xc000000000000000ull;
         
         
     private:
@@ -135,11 +139,19 @@ namespace GraphTool
         /// If this object is already initialized with graph data structures, erases them and re-initializes to the newly-supplied graph.
         /// @param [in] graph Mutable graph to read.
         void InitializeFromMutableGraph(const Graph<TEdgeData>& graph);
+
+        /// Uses the specified vertex identifier as a top-level vertex and sets all bits to `1` in the specified frontier for each individual vertex that appears in its corresponding edge vectors.
+        /// Can be invoked in parallel by multiple threads, ideally with different top-level vertex identifiers to avoid wasted work.
+        /// All operations are idempotent but expensive; caller should ensure only one invocation occurs per top-level vertex.
+        /// @param [in] vertex Top-level vertex identifier.
+        /// @param [out] frontier Frontier bit-mask to set.
+        /// @param [in] useDestination `true` if the destination-grouped data structures should be used, `false` otherwise.
+        void TranslateVertexToFrontier(const TVertexID vertex, uint64_t* const frontier, const bool useDestination);
         
         
     public:
         // -------- INSTANCE METHODS --------------------------------------- //
-                
+        
         /// Retrieves and returns the number of edges in the graph.
         /// @return Number of edges in the graph.
         inline TEdgeCount GetNumEdges(void) const
@@ -207,5 +219,25 @@ namespace GraphTool
         /// Specifies if initialization has succeeded on this object.
         /// If this method returns `false` then initialization has failed and this object should be destroyed.
         bool IsInitialized(void);
+
+        /// Sets to `1` all bit positions in the specified frontier that correspond to in-neighbors of the specified destination vertex.
+        /// Can be invoked in parallel by multiple threads, ideally with different top-level vertex identifiers to avoid wasted work.
+        /// All operations are idempotent but expensive; caller should ensure only one invocation occurs per top-level vertex.
+        /// @param [in] vertex Top-level vertex identifier.
+        /// @param [out] frontier Frontier bit-mask to set.
+        inline void TranslateDestinationVertexToFrontier(const TVertexID vertex, uint64_t* const frontier)
+        {
+            TranslateVertexToFrontier(vertex, frontier, true);
+        }
+
+        /// Sets to `1` all bit positions in the specified frontier that correspond to out-neighbors of the specified source vertex.
+        /// Can be invoked in parallel by multiple threads, ideally with different top-level vertex identifiers to avoid wasted work.
+        /// All operations are idempotent but expensive; caller should ensure only one invocation occurs per top-level vertex.
+        /// @param [in] vertex Top-level vertex identifier.
+        /// @param [out] frontier Frontier bit-mask to set.
+        inline void TranslateSourceVertexToFrontier(const TVertexID vertex, uint64_t* const frontier)
+        {
+            TranslateVertexToFrontier(vertex, frontier, false);
+        }
     };
 }

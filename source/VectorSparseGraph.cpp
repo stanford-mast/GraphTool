@@ -11,6 +11,7 @@
  *   immutable graph in Vector-Sparse format.
  *****************************************************************************/
 
+#include "Atomic.h"
 #include "Graph.h"
 #include "Types.h"
 #include "VectorSparseElement.h"
@@ -294,6 +295,36 @@ namespace GraphTool
         isInitialized = true;
     }
 
+    // --------
+
+    template <typename TEdgeData> void VectorSparseGraph<TEdgeData>::TranslateVertexToFrontier(const TVertexID vertex, uint64_t* const frontier, const bool useDestination)
+    {
+        const uint64_t* const counts = (useDestination ? countsByDestination : countsBySource);
+        const uint64_t* const index = (useDestination ? indexByDestination : indexBySource);
+        const VectorSparseElement<TEdgeData>* const vectors = (useDestination ? vectorsByDestination : vectorsBySource);
+
+        if (0ull != counts[vertex])
+        {
+            const VectorSparseElement<TEdgeData>* const base = &vectors[index[vertex]];
+            
+            for (uint64_t i = 0; i < counts[vertex]; ++i)
+            {
+                const uint64_t* const vec = (const uint64_t*)&base[i].topology;
+
+                for (uint64_t j = 0; j < 4; ++j)
+                {
+                    if (1 == _bittest64((const int64_t*)&vec[j], 63))
+                    {
+                        const uint64_t bitPositionToSet = vec[j] & 0x0000ffffffffffffull;
+                        const uint64_t frontierIndexToSet = bitPositionToSet >> 6ull;
+                        const uint64_t frontierMaskToSet = 1ull << (bitPositionToSet & 63ull);
+
+                        AtomicOr64((volatile int64_t*)&frontier[frontierIndexToSet], (int64_t)frontierMaskToSet);
+                    }
+                }
+            }
+        }
+    }
     
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "VectorSparseGraph.h" for documentation.
