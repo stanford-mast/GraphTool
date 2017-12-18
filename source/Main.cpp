@@ -184,7 +184,6 @@ namespace GraphTool
 
         // Read the input graph.
         Graph<TEdgeData> graph;
-        double timeElapsed = 0.0;
         
         if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
             return __LINE__;

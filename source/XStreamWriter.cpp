@@ -45,9 +45,9 @@ namespace GraphTool
     {
         // Obtain the filename of the metadata file.
         char metafilename[2048];
-        int nMetafilename = snprintf(metafilename, sizeof(metafilename) / sizeof(metafilename[0]), "%s.ini", filename);
+        unsigned int nMetafilename = (unsigned int)snprintf(metafilename, sizeof(metafilename) / sizeof(metafilename[0]), "%s.ini", filename);
 
-        if (!((nMetafilename > 0) && (nMetafilename < (sizeof(metafilename) / sizeof(metafilename[0])))))
+        if (nMetafilename >= (sizeof(metafilename) / sizeof(metafilename[0])))
             return NULL;
 
         // Write the metadata file.
