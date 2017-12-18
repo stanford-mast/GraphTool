@@ -10,7 +10,6 @@
 *   Program entry point and primary control flow.
 *****************************************************************************/
 
-#include "Benchmark.h"
 #include "Graph.h"
 #include "GraphReader.h"
 #include "GraphReaderFactory.h"
@@ -18,7 +17,6 @@
 #include "GraphWriterFactory.h"
 #include "OptionContainer.h"
 #include "Options.h"
-#include "VectorSparseGraph.h"
 #include "VersionInfo.h"
 
 #include <cstddef>
@@ -188,65 +186,19 @@ namespace GraphTool
         Graph<TEdgeData> graph;
         double timeElapsed = 0.0;
         
-        BenchmarkStart();
-        
         if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
             return __LINE__;
-        
-        timeElapsed = BenchmarkStop();
-        printf("Reading graph took %.2lf msec.\n", timeElapsed);
 
         // Perform transformations.
         // TODO
 
         // Write the output graphs.
-        //for (size_t i = 0; i < writers.size(); ++i)
-        //{
-        //    if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
-        //        return __LINE__;
-        //}
-        
-        
-        BenchmarkStart();
-        
-        uint64_t numDestinationEdges = 0ull;
-        for (auto vit = graph.VertexIteratorDestinationBegin(); vit != graph.VertexIteratorDestinationEnd(); ++vit)
+        for (size_t i = 0; i < writers.size(); ++i)
         {
-            if (NULL == *vit) continue;
-
-            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
-            {
-                numDestinationEdges += 1ull;
-            }
+            if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
+                return __LINE__;
         }
 
-        uint64_t numSourceEdges = 0ull;
-        for (auto vit = graph.VertexIteratorSourceBegin(); vit != graph.VertexIteratorSourceEnd(); ++vit)
-        {
-            if (NULL == *vit) continue;
-
-            for (auto eit = (*vit)->BeginIterator(); eit != (*vit)->EndIterator(); ++eit)
-            {
-                numSourceEdges += 1ull;
-            }
-        }
-        
-        timeElapsed = BenchmarkStop();
-        
-        printf("Traversal took %.2lf msec (%.0lf Medges/sec).\n", timeElapsed, (double)graph.GetNumEdges() / timeElapsed / 500.0);
-        
-        if (graph.GetNumEdges() == numDestinationEdges && graph.GetNumEdges() == numSourceEdges)
-            printf("Edge consistency check: PASS.\n");
-        else
-            printf("Edge consistency check: FAIL: %llu %llu %llu.\n", (unsigned long long)graph.GetNumEdges(), (unsigned long long)numDestinationEdges, (unsigned long long)numSourceEdges);
-        
-        printf("Number of vertices            = %llu\n", (unsigned long long)graph.GetNumVertices());
-        printf("Number of edges               = %llu\n", (unsigned long long)graph.GetNumEdges());
-        printf("Number of destination vectors = %llu\n", (unsigned long long)graph.GetNumVectorsDestination());
-        printf("Number of source vectors      = %llu\n", (unsigned long long)graph.GetNumVectorsSource());
-        
-        VectorSparseGraph<TEdgeData> testGraph(graph);
-        
         return 0;
     }
 }

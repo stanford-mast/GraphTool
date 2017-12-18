@@ -23,11 +23,12 @@ namespace GraphTool
 
 
     /// Enumerates known GraphWriter object types.
-    /// Each corresponds to a different graph file format that can be read.
+    /// Each corresponds to a different graph file format that can be written.
     enum EGraphWriterType : int64_t
     {
         GraphWriterTypeBinaryEdgeList,                                      ///< BinaryEdgeListWriter
         GraphWriterTypeTextEdgeList,                                        ///< TextEdgeListWriter
+        GraphWriterTypeXStream,                                             ///< XStreamWriter
     };
 
     /// Factory for creating GraphWriter objects of various types.

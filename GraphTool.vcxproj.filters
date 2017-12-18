@@ -54,9 +54,6 @@
     <ClInclude Include="include\PlatformFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Benchmark.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\EdgeList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,13 +63,10 @@
     <ClInclude Include="include\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VectorSparseGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VectorSparseElement.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Atomic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XStreamWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -110,9 +104,6 @@
     <ClCompile Include="source\GraphWriterFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Benchmark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\EdgeList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -122,7 +113,7 @@
     <ClCompile Include="source\Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\VectorSparseGraph.cpp">
+    <ClCompile Include="source\XStreamWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

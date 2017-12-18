@@ -14,6 +14,7 @@
 #include "GraphWriter.h"
 #include "GraphWriterFactory.h"
 #include "TextEdgeListWriter.h"
+#include "XStreamWriter.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -34,6 +35,13 @@ namespace GraphTool
         { "textedgelist",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "textEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "TextEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
+
+        { "XStream",                                EGraphWriterType::GraphWriterTypeXStream },
+        { "Xstream",                                EGraphWriterType::GraphWriterTypeXStream },
+        { "xstream",                                EGraphWriterType::GraphWriterTypeXStream },
+        { "X-Stream",                               EGraphWriterType::GraphWriterTypeXStream },
+        { "X-stream",                               EGraphWriterType::GraphWriterTypeXStream },
+        { "x-stream",                               EGraphWriterType::GraphWriterTypeXStream },
     };
 
 
@@ -52,6 +60,10 @@ namespace GraphTool
 
         case EGraphWriterType::GraphWriterTypeTextEdgeList:
             result = new TextEdgeListWriter<TEdgeData>();
+            break;
+
+        case EGraphWriterType::GraphWriterTypeXStream:
+            result = new XStreamWriter<TEdgeData>();
             break;
 
         default:

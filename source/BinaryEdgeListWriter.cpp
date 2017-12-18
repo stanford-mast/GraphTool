@@ -12,7 +12,6 @@
 
 #include "BinaryEdgeListWriter.h"
 #include "Graph.h"
-#include "GraphWriter.h"
 #include "Types.h"
 
 #include <cstddef>
