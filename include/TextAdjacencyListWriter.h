@@ -25,18 +25,6 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class TextAdjacencyListWriter : public GraphWriter<TEdgeData>
     {
-    private:
-        // -------- CLASS METHODS ------------------------------------------ //
-
-        /// Creates a string from the edge data in the specified edge.
-        /// Formatting is type-dependent, so a specialized version must be provided for each supported type.
-        /// @param [in] edgeBuf Edge buffer of interest.
-        /// @param [out] edgeDataString String representation of the edge data.
-        /// @param [in] edgeDataStringCount Size of the provided string buffer, in number of characters.
-        /// @return Number of characters written, which could be zero depending on the type, and where negative indicates an error.
-        static int StringFromEdgeData(const SEdge<TEdgeData>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount);
-        
-        
     public:
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.h" for documentation.

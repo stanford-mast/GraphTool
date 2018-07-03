@@ -24,29 +24,6 @@
 
 namespace GraphTool
 {
-    // -------- CLASS METHODS ---------------------------------------------- //
-    // See "TextAdjacencyListWriter.h" for documentation.
-
-    template <> int TextAdjacencyListWriter<void>::StringFromEdgeData(const SEdge<void>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
-    {
-        return 0;
-    }
-
-    // --------
-
-    template <> int TextAdjacencyListWriter<uint64_t>::StringFromEdgeData(const SEdge<uint64_t>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
-    {
-        return snprintf(edgeDataString, edgeDataStringCount, "%llu", (long long unsigned int)edgeBuf.edgeData);
-    }
-
-    // --------
-
-    template <> int TextAdjacencyListWriter<double>::StringFromEdgeData(const SEdge<double>& edgeBuf, char* const edgeDataString, const size_t edgeDataStringCount)
-    {
-        return snprintf(edgeDataString, edgeDataStringCount, "%.10lf", edgeBuf.edgeData);
-    }
-
-
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
@@ -74,6 +51,18 @@ namespace GraphTool
 
         return graphfile;
     }
+    
+    template <> FILE* TextAdjacencyListWriter<uint64_t>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<uint64_t>& graph, const bool groupedByDestination)
+    {
+        // This format does not currently support weighted graphs.
+        return NULL;
+    }
+    
+    template <> FILE* TextAdjacencyListWriter<double>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<double>& graph, const bool groupedByDestination)
+    {
+        // This format does not currently support weighted graphs.
+        return NULL;
+    }
 
     // --------
 
@@ -82,21 +71,11 @@ namespace GraphTool
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)
         {
-            // First, write the source or destination vertex, depending on the grouping.
+            // Write the source or destination vertex, depending on the grouping.
             if (groupedByDestination)
-                fprintf(graphfile, "%llu", (long long unsigned int)buf[i].sourceVertex);
+                fprintf(graphfile, "%llu\n", (long long unsigned int)buf[i].sourceVertex);
             else
-                fprintf(graphfile, "%llu", (long long unsigned int)buf[i].destinationVertex);
-        
-            // Next, see if edge data are available for writing.
-            char edgeDataString[128];
-            const size_t edgeDataStringLength = StringFromEdgeData(buf[i], edgeDataString, sizeof(edgeDataString) / sizeof(edgeDataString[0]));
-        
-            if (0 < edgeDataStringLength)
-                fprintf(graphfile, " %s", edgeDataString);
-        
-            // End the line.
-            fprintf(graphfile, "\n");
+                fprintf(graphfile, "%llu\n", (long long unsigned int)buf[i].destinationVertex);
         }
     }
 
