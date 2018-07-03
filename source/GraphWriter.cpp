@@ -129,7 +129,7 @@ namespace GraphTool
                         edgeIter = vertexIndex[topLevelVertex]->BeginIterator();
                 }
             }
-        
+            
             writeSpec->counts[currentBufferIndex] = edgeIdx;
         
             // Synchronize with the consumer.

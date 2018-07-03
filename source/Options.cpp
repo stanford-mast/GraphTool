@@ -264,13 +264,21 @@ namespace GraphTool
 
         // Attempt to submit the option value.
         OptionContainer* optionContainer = specifiedOptions.at(optionName.c_str());
-
-        if (EOptionValueSubmitResult::OptionValueSubmitResultOk != optionContainer->ParseAndSubmitValue(optionValue))
+        
+        switch (optionContainer->ParseAndSubmitValue(optionValue))
         {
+        case EOptionValueSubmitResult::OptionValueSubmitResultOk:
+            break;
+            
+        case EOptionValueSubmitResult::OptionValueSubmitResultTooMany:
+            PrintErrorTooMany(optionName.c_str());
+            return false;
+            
+        default:
             PrintErrorValueRejected(optionName.c_str(), optionValue.c_str());
             return false;
         }
-
+        
         return true;
     }
 

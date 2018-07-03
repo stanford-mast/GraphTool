@@ -69,17 +69,17 @@ namespace GraphTool
 
     /// Lists the command-line options that can be used to request help.
     static const std::vector<std::string> cmdlineHelpStrings = {
-    #ifdef __PLATFORM_WINDOWS
+#ifdef __PLATFORM_WINDOWS
         "?",
-    #endif
+#endif
         "help",
     };
 
     /// Lists the prefixes that are allowed at the start of command-line options.
     static const std::vector<std::string> cmdlinePrefixStrings = {
-    #ifdef __PLATFORM_WINDOWS
+#ifdef __PLATFORM_WINDOWS
         "/",
-    #endif
+#endif
         "--",
     };
 
@@ -180,8 +180,32 @@ namespace GraphTool
             return __LINE__;
 
         // Submit input and output options to all of the readers and writers, respectively.
-        // TODO
-
+        optionValues = commandLineOptions.GetOptionValues(kOptionInputOptions);
+        if (NULL == optionValues)
+            return __LINE__;
+        
+        {
+            std::string inputOptions;
+            if (!(optionValues->QueryValue(inputOptions)))
+                return __LINE__;
+        
+            // TODO: submit reader options
+        }
+        
+        optionValues = commandLineOptions.GetOptionValues(kOptionOutputOptions);
+        if (NULL == optionValues)
+            return __LINE__;
+        
+        for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+        {
+            std::string outputOptions;
+            
+            if (!(optionValues->QueryValueAt(i, outputOptions)))
+                return __LINE__;
+            
+            // TODO: submit writer options
+        }
+        
         // Read the input graph.
         Graph<TEdgeData> graph;
         

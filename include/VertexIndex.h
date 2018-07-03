@@ -173,7 +173,6 @@ namespace GraphTool
         /// @param [in] indexedVertex Top-level vertex to remove.
         void RemoveVertex(const TVertexID indexedVertex);
         
-        
         /// Sets the number of indexed vertices.
         /// Constructs new vertices or destroys existing ones as appropriate.
         /// @param [in] numVertices Number of vertices.
