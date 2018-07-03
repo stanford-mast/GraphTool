@@ -218,7 +218,7 @@ namespace GraphTool
         // Write the output graphs.
         for (size_t i = 0; i < writers.size(); ++i)
         {
-            if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, true)))
+            if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, false)))
                 return __LINE__;
         }
 

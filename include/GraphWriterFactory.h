@@ -27,6 +27,7 @@ namespace GraphTool
     enum EGraphWriterType : int64_t
     {
         GraphWriterTypeBinaryEdgeList,                                      ///< BinaryEdgeListWriter
+        GraphWriterTypeTextAdjacencyList,                                   ///< TextAdjacencyListWriter
         GraphWriterTypeTextEdgeList,                                        ///< TextEdgeListWriter
         GraphWriterTypeXStream,                                             ///< XStreamWriter
     };

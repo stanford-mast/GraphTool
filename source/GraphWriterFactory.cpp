@@ -13,6 +13,7 @@
 #include "BinaryEdgeListWriter.h"
 #include "GraphWriter.h"
 #include "GraphWriterFactory.h"
+#include "TextAdjacencyListWriter.h"
 #include "TextEdgeListWriter.h"
 #include "XStreamWriter.h"
 
@@ -32,6 +33,12 @@ namespace GraphTool
         { "binaryEdgeList",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
         { "BinaryEdgeList",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
 
+        { "adjacencygraph",                         EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "AdjacencyGraph",                         EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "textadjacencylist",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "textAdjacencyList",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "TextAdjacencyList",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        
         { "textedgelist",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "textEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "TextEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
@@ -58,6 +65,10 @@ namespace GraphTool
             result = new BinaryEdgeListWriter<TEdgeData>();
             break;
 
+        case EGraphWriterType::GraphWriterTypeTextAdjacencyList:
+            result = new TextAdjacencyListWriter<TEdgeData>();
+            break;
+        
         case EGraphWriterType::GraphWriterTypeTextEdgeList:
             result = new TextEdgeListWriter<TEdgeData>();
             break;
