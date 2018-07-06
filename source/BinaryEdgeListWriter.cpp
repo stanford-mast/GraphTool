@@ -25,7 +25,7 @@ namespace GraphTool
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> FILE* BinaryEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination)
+    template <typename TEdgeData> FILE* BinaryEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This class writes files in binary mode.
         FILE* graphfile = fopen(filename, "wb");
@@ -42,7 +42,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
         fwrite((void*)buf, sizeof(const SEdge<TEdgeData>), count, graphfile);
     }

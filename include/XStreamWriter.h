@@ -44,7 +44,7 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.h" for documentation.
         
-        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination);
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
+        virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination);
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
     };
 }

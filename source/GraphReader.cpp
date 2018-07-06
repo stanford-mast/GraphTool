@@ -30,7 +30,7 @@ namespace GraphTool
     template <typename TEdgeData> struct SGraphReadSpec
     {
         FILE* file;                                                         ///< File handle.
-        Graph<TEdgeData>* graph;                                            ///< Graph object to be filled.
+        Graph* graph;                                                       ///< Graph object to be filled.
         GraphReader<TEdgeData>* reader;                                     ///< Graph reader object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
@@ -175,7 +175,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "GraphReader.h" for documentation.
 
-    template <typename TEdgeData> bool GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph<TEdgeData>& graph)
+    template <typename TEdgeData> bool GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph& graph)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);

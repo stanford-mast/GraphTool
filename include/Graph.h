@@ -13,9 +13,8 @@
 
 #pragma once
 
-#include "EdgeList.h"
-#include "VertexIndex.h"
 #include "Types.h"
+#include "VertexIndex.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -26,14 +25,13 @@ namespace GraphTool
     /// Represents a graph.
     /// Internal format is like Compressed-Sparse and is optimized for mutability.
     /// Holds topology information and per-edge data, such as weights.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class Graph
+    class Graph
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for read-only iterators over indexed vertices.
-        typedef typename VertexIndex<TEdgeData>::VertexIterator VertexIterator;
+        typedef typename VertexIndex::VertexIterator VertexIterator;
         
         
     private:
@@ -41,11 +39,11 @@ namespace GraphTool
         
         /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
-        VertexIndex<TEdgeData> edgesByDestination;
+        VertexIndex edgesByDestination;
         
         /// Source-grouped vertex data structure.
         /// Maps from a source vertex ID to a set of vertices to which out-edges exist.
-        VertexIndex<TEdgeData> edgesBySource;
+        VertexIndex edgesBySource;
         
         
     public:
@@ -61,8 +59,9 @@ namespace GraphTool
         /// Does not update any internal counters for vectors or edges, nor does it automatically maintain consistency.
         /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
         /// Intended to be invoked during ingress or during large batch updates.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void FastInsertEdgeByDestination(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void FastInsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
             edgesByDestination.FastInsertEdgeIndexedByDestination(edge);
         }
@@ -71,8 +70,9 @@ namespace GraphTool
         /// Does not update any internal counters for vectors or edges, nor does it automatically maintain consistency.
         /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
         /// Intended to be invoked during ingress or during large batch updates.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void FastInsertEdgeBySource(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void FastInsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
             edgesBySource.FastInsertEdgeIndexedBySource(edge);
         }
@@ -137,8 +137,9 @@ namespace GraphTool
         
         /// Inserts an edge into the graph.
         /// Intended to perform minor updates to the graph after ingress.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void InsertEdge(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void InsertEdge(const SEdge<TEdgeData>& edge)
         {
             InsertEdgeByDestination(edge);
             InsertEdgeBySource(edge);
@@ -147,8 +148,9 @@ namespace GraphTool
         /// Inserts an edge into the destination-grouped representation using the specified edge buffer.
         /// Does not automatically maintain consistency.
         /// Intended to be invoked during ingress or during large batch updates.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void InsertEdgeByDestination(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void InsertEdgeByDestination(const SEdge<TEdgeData>& edge)
         {
             edgesByDestination.InsertEdgeIndexedByDestination(edge);
         }
@@ -156,8 +158,9 @@ namespace GraphTool
         /// Inserts an edge into the source-grouped representation using the specified edge buffer.
         /// Does not automatically maintain consistency.
         /// Intended to be invoked during ingress or during large batch updates.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void InsertEdgeBySource(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void InsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
             edgesBySource.InsertEdgeIndexedBySource(edge);
         }
@@ -196,16 +199,16 @@ namespace GraphTool
         
         /// Enables direct random read-only access to the destination-grouped vertex index.
         /// @return Read-only reference to destination-grouped vertex index.
-        inline const VertexIndex<TEdgeData>& VertexIndexDestination(void) const
+        inline const VertexIndex& VertexIndexDestination(void) const
         {
-            return (const VertexIndex<TEdgeData>&)edgesByDestination;
+            return (const VertexIndex&)edgesByDestination;
         }
 
         /// Enables direct random read-only access to the source-grouped vertex index.
         /// @return Read-only reference to source-grouped vertex index.
-        inline const VertexIndex<TEdgeData>& VertexIndexSource(void) const
+        inline const VertexIndex& VertexIndexSource(void) const
         {
-            return (const VertexIndex<TEdgeData>&)edgesBySource;
+            return (const VertexIndex&)edgesBySource;
         }
         
         /// Obtains a read-only random-access iterator to the specified vertex within the destination-grouped vertex index.

@@ -207,7 +207,7 @@ namespace GraphTool
         }
         
         // Read the input graph.
-        Graph<TEdgeData> graph;
+        Graph graph;
         
         if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
             return __LINE__;

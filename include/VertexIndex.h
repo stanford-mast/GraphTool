@@ -24,14 +24,13 @@ namespace GraphTool
 {
     /// Indexes top-level vertices in a way optimized for fast insertion; useful for ingress.
     /// Whether the index is by source or destination is not specified by this data structure but rather is inferred based on how it is used.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class VertexIndex
+    class VertexIndex
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::vector<EdgeList<TEdgeData>*>::const_iterator VertexIterator;
+        typedef typename std::vector<EdgeList*>::const_iterator VertexIterator;
         
         
     private:
@@ -39,7 +38,7 @@ namespace GraphTool
 
         /// Holds all vertex and edge information.
         /// Key is the vertex identifier, value is the corresponding edge list for the vertex.
-        std::vector<EdgeList<TEdgeData>*> vertexIndex;
+        std::vector<EdgeList*> vertexIndex;
         
         /// Holds the total number of edges present in this data structure.
         TEdgeCount numEdges;
@@ -65,9 +64,9 @@ namespace GraphTool
         // -------- OPERATORS ---------------------------------------------- //
         
         /// Faciliates read-only access to the vertex index.
-        inline const EdgeList<TEdgeData>*& operator[](size_t n) const
+        inline const EdgeList*& operator[](size_t n) const
         {
-            return (const EdgeList<TEdgeData>*&)vertexIndex[n];
+            return (const EdgeList*&)vertexIndex[n];
         }
         
         
@@ -90,11 +89,12 @@ namespace GraphTool
         /// Performs a simple and fast insertion of the specified edge into this data structure, using the destination as the top-level vertex.
         /// Does not update any internal counters for vectors or edges.
         /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void FastInsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void FastInsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
         {
             if (NULL == vertexIndex[edge.destinationVertex])
-                vertexIndex[edge.destinationVertex] = new EdgeList<TEdgeData>();
+                vertexIndex[edge.destinationVertex] = new EdgeList();
             
             vertexIndex[edge.destinationVertex]->InsertEdgeUsingSource(edge);
         }
@@ -102,11 +102,12 @@ namespace GraphTool
         /// Performs a simple and fast insertion of the specified edge into this data structure, using the source as the top-level vertex.
         /// Does not update any internal counters for vectors or edges.
         /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        inline void FastInsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
+        template <typename TEdgeData> inline void FastInsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
         {
             if (NULL == vertexIndex[edge.sourceVertex])
-                vertexIndex[edge.sourceVertex] = new EdgeList<TEdgeData>();
+                vertexIndex[edge.sourceVertex] = new EdgeList();
             
             vertexIndex[edge.sourceVertex]->InsertEdgeUsingDestination(edge);
         }
@@ -150,12 +151,14 @@ namespace GraphTool
         }
 
         /// Inserts the specified edge into this data structure, using the destination as the top-level vertex.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge);
+        template <typename TEdgeData> void InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as the top-level vertex.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge);
+        template <typename TEdgeData> void InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge);
 
         /// Refreshes metadata, such as degree information.
         /// Intended to be called from within a Spindle parallelized region.

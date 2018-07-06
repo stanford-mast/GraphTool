@@ -32,7 +32,7 @@ namespace GraphTool
     template <typename TEdgeData> struct SGraphWriteSpec
     {
         FILE* file;                                                         ///< File handle.
-        const Graph<TEdgeData>* graph;                                      ///< Graph object being exported.
+        const Graph* graph;                                                 ///< Graph object being exported.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
@@ -95,7 +95,7 @@ namespace GraphTool
         uint32_t currentBufferIndex = 0;
         
         const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<void>));
-        const VertexIndex<TEdgeData>& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
+        const VertexIndex& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
         
         TVertexID topLevelVertex = 0;
         
@@ -148,7 +148,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination)
+    template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForWrite(filename, graph, groupedByDestination);

@@ -49,7 +49,7 @@ namespace GraphTool
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> FILE* TextEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination)
+    template <typename TEdgeData> FILE* TextEdgeListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This class writes files in text mode.
         FILE* graphfile = fopen(filename, "w");
@@ -65,7 +65,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void TextEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)

@@ -22,14 +22,14 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "VertexIndex.h" for documentation.
 
-    template <typename TEdgeData> VertexIndex<TEdgeData>::VertexIndex(void) : vertexIndex(), numEdges(0), numVerticesPresent(0), numVectors(0)
+    VertexIndex::VertexIndex(void) : vertexIndex(), numEdges(0), numVerticesPresent(0), numVectors(0)
     {
         // Nothing to do here.
     }
 
     // --------
 
-    template <typename TEdgeData> VertexIndex<TEdgeData>::~VertexIndex(void)
+    VertexIndex::~VertexIndex(void)
     {
         for (auto it = vertexIndex.begin(); it != vertexIndex.end(); ++it)
         {
@@ -45,7 +45,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "VertexIndex.h" for documentation.
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void VertexIndex::InsertEdgeIndexedByDestination(const SEdge<TEdgeData>& edge)
     {
         if (edge.destinationVertex >= vertexIndex.size())
             vertexIndex.resize(1 + edge.destinationVertex);
@@ -53,7 +53,7 @@ namespace GraphTool
         if (NULL == vertexIndex[edge.destinationVertex])
         {
             numVerticesPresent += 1;
-            vertexIndex[edge.destinationVertex] = new EdgeList<TEdgeData>();
+            vertexIndex[edge.destinationVertex] = new EdgeList();
         }
         
         const TEdgeCount oldDegree = vertexIndex[edge.destinationVertex]->GetDegree();
@@ -70,7 +70,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void VertexIndex::InsertEdgeIndexedBySource(const SEdge<TEdgeData>& edge)
     {
         if (edge.sourceVertex >= vertexIndex.size())
             vertexIndex.resize(1 + edge.sourceVertex);
@@ -78,7 +78,7 @@ namespace GraphTool
         if (NULL == vertexIndex[edge.sourceVertex])
         {
             numVerticesPresent += 1;
-            vertexIndex[edge.sourceVertex] = new EdgeList<TEdgeData>();
+            vertexIndex[edge.sourceVertex] = new EdgeList();
         }
         
         const TEdgeCount oldDegree = vertexIndex[edge.sourceVertex]->GetDegree();
@@ -95,7 +95,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::ParallelRefreshMetadata(uint64_t* buf)
+    void VertexIndex::ParallelRefreshMetadata(uint64_t* buf)
     {
         const uint32_t localThreadID = spindleGetLocalThreadID();
         const uint32_t localThreadCount = spindleGetLocalThreadCount();
@@ -139,7 +139,7 @@ namespace GraphTool
     
     // --------
     
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
+    void VertexIndex::RemoveEdge(const TVertexID indexedVertex, const TVertexID otherVertex)
     {
         if (NULL != vertexIndex[indexedVertex])
         {
@@ -165,7 +165,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::RemoveVertex(const TVertexID indexedVertex)
+    void VertexIndex::RemoveVertex(const TVertexID indexedVertex)
     {
         if (NULL != vertexIndex[indexedVertex])
         {
@@ -180,7 +180,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void VertexIndex<TEdgeData>::SetNumVertices(const TVertexCount numVertices)
+    void VertexIndex::SetNumVertices(const TVertexCount numVertices)
     {
         if (numVertices < vertexIndex.size())
         {
@@ -201,7 +201,11 @@ namespace GraphTool
     
     // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
 
-    template class VertexIndex<void>;
-    template class VertexIndex<uint64_t>;
-    template class VertexIndex<double>;
+    template void VertexIndex::InsertEdgeIndexedByDestination(const SEdge<void>& edge);
+    template void VertexIndex::InsertEdgeIndexedByDestination(const SEdge<uint64_t>& edge);
+    template void VertexIndex::InsertEdgeIndexedByDestination(const SEdge<double>& edge);
+    
+    template void VertexIndex::InsertEdgeIndexedBySource(const SEdge<void>& edge);
+    template void VertexIndex::InsertEdgeIndexedBySource(const SEdge<uint64_t>& edge);
+    template void VertexIndex::InsertEdgeIndexedBySource(const SEdge<double>& edge);
 }

@@ -27,7 +27,7 @@ namespace GraphTool
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> FILE* TextAdjacencyListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<TEdgeData>& graph, const bool groupedByDestination)
+    template <typename TEdgeData> FILE* TextAdjacencyListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This class writes files in text mode.
         FILE* graphfile = fopen(filename, "w");
@@ -38,7 +38,7 @@ namespace GraphTool
             fprintf(graphfile, "AdjacencyGraph\n%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
             
             // Write out the vertex index.
-            const VertexIndex<TEdgeData>& vertexIndex = (groupedByDestination ? graph.VertexIndexDestination() : graph.VertexIndexSource());
+            const VertexIndex& vertexIndex = (groupedByDestination ? graph.VertexIndexDestination() : graph.VertexIndexSource());
             const TVertexCount numVertices = vertexIndex.GetNumVertices();
             TVertexCount currentDegree = 0;
             
@@ -52,13 +52,13 @@ namespace GraphTool
         return graphfile;
     }
     
-    template <> FILE* TextAdjacencyListWriter<uint64_t>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<uint64_t>& graph, const bool groupedByDestination)
+    template <> FILE* TextAdjacencyListWriter<uint64_t>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This format does not currently support weighted graphs.
         return NULL;
     }
     
-    template <> FILE* TextAdjacencyListWriter<double>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph<double>& graph, const bool groupedByDestination)
+    template <> FILE* TextAdjacencyListWriter<double>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This format does not currently support weighted graphs.
         return NULL;
@@ -66,7 +66,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void TextAdjacencyListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph<TEdgeData>& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void TextAdjacencyListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
     {
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)

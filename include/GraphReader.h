@@ -21,7 +21,7 @@
 
 namespace GraphTool
 {
-    template <typename TEdgeData> class Graph;
+    class Graph;
 
     
     /// Base class for all object types that are used to interpret graph files of various formats.
@@ -96,6 +96,6 @@ namespace GraphTool
         /// @param [in] filename File name of the file to be read.
         /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
         /// @return `true` on successful read, `false` on error.
-        bool ReadGraphFromFile(const char* const filename, Graph<TEdgeData>& graph);
+        bool ReadGraphFromFile(const char* const filename, Graph& graph);
     };
 }

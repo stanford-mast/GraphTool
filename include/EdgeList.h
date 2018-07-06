@@ -25,14 +25,13 @@ namespace GraphTool
     /// Represents graph topology data and can hold edge data, such as weights, as well.
     /// This indexed data structure represents unidirectional edges but does not specify the direction.
     /// Direction information depends on the usage semantics and is governed by the code that instantiates objects of this type.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class EdgeList
+    class EdgeList
     {
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
         /// Alias for the iterator type used by this class.
-        typedef typename std::list<SIndexedEdge<TEdgeData>>::const_iterator EdgeIterator;
+        typedef typename std::list<SIndexedEdge>::const_iterator EdgeIterator;
         
         
     private:
@@ -40,7 +39,7 @@ namespace GraphTool
 
         /// Holds all edge information.
         /// Key is the edge block identifier, value is the edge information structure.
-        std::list<SIndexedEdge<TEdgeData>> edgeList;
+        std::list<SIndexedEdge> edgeList;
 
         /// Holds the total number of edges present in this data structure.
         TEdgeCount degree;
@@ -60,10 +59,11 @@ namespace GraphTool
         // -------- HELPERS ------------------------------------------------ //
 
         /// Fills in an edge information structure with edge information.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [out] edgeInfo Edge information structure to fill.
         /// @param [in] edge Edge to use as the data source.
         /// @param [in] useDestinationVertex Specifies that the destination vertex, rather than the source vertex, in the edge should be used as the other vertex identifier.
-        void FillEdgeInfoFromEdge(SIndexedEdge<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex);
+        template <typename TEdgeData> void FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex);
 
         
     public:
@@ -84,11 +84,12 @@ namespace GraphTool
         }
         
         /// Fills in an edge structure with information exported from the specified position in the edge list.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] position Iterator for the edge to use as the data source.
         /// @param [out] edge Edge structure to fill.
         /// @param [in] topLevelVertex Top-level vertex to place into the edge structure.
         /// @param [in] topLevelIsDestination Specifies that the top-level vertex should be treated as the destination vertex, rather than the source vertex.
-        void FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
+        template <typename TEdgeData> void FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
         
         /// Returns the total number of edges in this data structure (i.e. the degree of the top-level vertex it represents).
         /// @return Total number of edges, which could be 0.
@@ -105,12 +106,14 @@ namespace GraphTool
         }
 
         /// Inserts the specified edge into this data structure, using the destination as its data source.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge);
+        template <typename TEdgeData> void InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge);
 
         /// Inserts the specified edge into this data structure, using the source as its data source.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
         /// @param [in] edge Edge to insert.
-        void InsertEdgeUsingSource(const SEdge<TEdgeData>& edge);
+        template <typename TEdgeData> void InsertEdgeUsingSource(const SEdge<TEdgeData>& edge);
 
         /// Removes the specified edge from this data structure.
         /// @param [in] otherVertex Vertex at the other end of the edge to remove.

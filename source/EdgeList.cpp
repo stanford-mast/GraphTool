@@ -20,7 +20,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "EdgeList.h" for documentation.
     
-    template <typename TEdgeData> EdgeList<TEdgeData>::EdgeList(void) : edgeList(), degree(0), numVectors(0)
+    EdgeList::EdgeList(void) : edgeList(), degree(0), numVectors(0)
     {
         // Nothing to do here.
     }
@@ -29,7 +29,7 @@ namespace GraphTool
     // -------- HELPERS ---------------------------------------------------- //
     // See "EdgeList.h" for documentation.
 
-    template <typename TEdgeData> void EdgeList<TEdgeData>::FillEdgeInfoFromEdge(SIndexedEdge<TEdgeData>& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex)
+    template <typename TEdgeData> void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<TEdgeData>& edge, bool useDestinationVertex)
     {
         edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
         edgeInfo.edgeData = edge.edgeData;
@@ -37,16 +37,17 @@ namespace GraphTool
 
     // --------
 
-    template <> void EdgeList<void>::FillEdgeInfoFromEdge(SIndexedEdge<void>& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
+    template <> void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
     {
         edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
+        edgeInfo.edgeData = UINT64_MAX;
     }
 
     
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "EdgeList.h" for documentation.
     
-    template <typename TEdgeData> void EdgeList<TEdgeData>::FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
+    template <typename TEdgeData> void EdgeList::FillEdge(EdgeIterator& position, SEdge<TEdgeData>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
     {
         if (topLevelIsDestination)
         {
@@ -64,7 +65,7 @@ namespace GraphTool
 
     // --------
 
-    template <> void EdgeList<void>::FillEdge(EdgeIterator& position, SEdge<void>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
+    template <> void EdgeList::FillEdge(EdgeIterator& position, SEdge<void>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const
     {
         if (topLevelIsDestination)
         {
@@ -80,7 +81,7 @@ namespace GraphTool
 
     // --------
     
-    template <typename TEdgeData> void EdgeList<TEdgeData>::InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void EdgeList::InsertEdgeUsingDestination(const SEdge<TEdgeData>& edge)
     {
         edgeList.emplace_back();
         FillEdgeInfoFromEdge(edgeList.back(), edge, true);
@@ -93,7 +94,7 @@ namespace GraphTool
     
     // --------
     
-    template <typename TEdgeData> void EdgeList<TEdgeData>::InsertEdgeUsingSource(const SEdge<TEdgeData>& edge)
+    template <typename TEdgeData> void EdgeList::InsertEdgeUsingSource(const SEdge<TEdgeData>& edge)
     {
         edgeList.emplace_back();
         FillEdgeInfoFromEdge(edgeList.back(), edge, false);
@@ -106,7 +107,7 @@ namespace GraphTool
     
     // --------
     
-    template <typename TEdgeData> void EdgeList<TEdgeData>::RemoveEdge(const TVertexID otherVertex)
+    void EdgeList::RemoveEdge(const TVertexID otherVertex)
     {
         for (auto it = edgeList.cbegin(); it != edgeList.cend(); ++it)
         {
@@ -124,7 +125,19 @@ namespace GraphTool
     
     // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
     
-    template class EdgeList<void>;
-    template class EdgeList<uint64_t>;
-    template class EdgeList<double>;
+    template void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex);
+    template void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<uint64_t>& edge, bool useDestinationVertex);
+    template void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<double>& edge, bool useDestinationVertex);
+    
+    template void EdgeList::FillEdge(EdgeIterator& position, SEdge<void>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
+    template void EdgeList::FillEdge(EdgeIterator& position, SEdge<uint64_t>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
+    template void EdgeList::FillEdge(EdgeIterator& position, SEdge<double>& edge, TVertexID topLevelVertex, bool topLevelIsDestination) const;
+    
+    template void EdgeList::InsertEdgeUsingDestination(const SEdge<void>& edge);
+    template void EdgeList::InsertEdgeUsingDestination(const SEdge<uint64_t>& edge);
+    template void EdgeList::InsertEdgeUsingDestination(const SEdge<double>& edge);
+    
+    template void EdgeList::InsertEdgeUsingSource(const SEdge<void>& edge);
+    template void EdgeList::InsertEdgeUsingSource(const SEdge<uint64_t>& edge);
+    template void EdgeList::InsertEdgeUsingSource(const SEdge<double>& edge);
 }

@@ -11,10 +11,9 @@
  *   mutable graph in a format similar to Compressed-Sparse.
  *****************************************************************************/
 
-#include "EdgeList.h"
 #include "Graph.h"
-#include "VertexIndex.h"
 #include "Types.h"
+#include "VertexIndex.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -25,7 +24,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "Graph.h" for documentation.
 
-    template <typename TEdgeData> Graph<TEdgeData>::Graph(void) : edgesByDestination(), edgesBySource()
+    Graph::Graph(void) : edgesByDestination(), edgesBySource()
     {
         // Nothing to do here.
     }
@@ -34,7 +33,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "Graph.h" for documentation.
 
-    template <typename TEdgeData> void Graph<TEdgeData>::RemoveVertex(const TVertexID vertex)
+    void Graph::RemoveVertex(const TVertexID vertex)
     {
         if (vertex >= GetNumVertices())
             return;
@@ -57,11 +56,4 @@ namespace GraphTool
         edgesByDestination.RemoveVertex(vertex);
         edgesBySource.RemoveVertex(vertex);
     }
-
-    
-    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
-
-    template class Graph<void>;
-    template class Graph<uint64_t>;
-    template class Graph<double>;
 }
