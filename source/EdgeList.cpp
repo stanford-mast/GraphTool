@@ -40,7 +40,7 @@ namespace GraphTool
     template <> void EdgeList::FillEdgeInfoFromEdge(SIndexedEdge& edgeInfo, const SEdge<void>& edge, bool useDestinationVertex)
     {
         edgeInfo.otherVertex = (useDestinationVertex ? edge.destinationVertex : edge.sourceVertex);
-        edgeInfo.edgeData = UINT64_MAX;
+        edgeInfo.edgeData.Invalidate();
     }
 
     
