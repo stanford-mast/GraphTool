@@ -28,7 +28,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "Options.h" for documentation.
 
-    Options::Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases, const std::vector<std::string>* prefixStrings, const std::vector<std::string>* helpStrings) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), specifiedOptions(specifiedOptions), supportedAliases(supportedAliases)
+    Options::Options(const char* const commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::vector<std::string>* const prefixStrings, const std::vector<std::string>* const versionStrings, const std::vector<std::string>* const helpStrings, const std::string* const documentationString, const std::string* versionString) : commandLine(commandLine), helpStrings(helpStrings), prefixStrings(prefixStrings), versionStrings(versionStrings), documentationString(documentationString), versionString(versionString), specifiedOptions(specifiedOptions)
     {
 
     }
@@ -43,6 +43,24 @@ namespace GraphTool
             std::string testString(optionString);
 
             for (auto it = helpStrings->cbegin(); it != helpStrings->cend(); ++it)
+            {
+                if (*it == testString)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    
+    // --------
+    
+    bool Options::IsVersionString(const char* optionString) const
+    {
+        if (UsingVersionStrings() && (NULL != optionString))
+        {
+            std::string testString(optionString);
+
+            for (auto it = versionStrings->cbegin(); it != versionStrings->cend(); ++it)
             {
                 if (*it == testString)
                     return true;
@@ -70,32 +88,24 @@ namespace GraphTool
 
     // --------
 
-    void Options::PrintErrorAliasConflict(const char* optionAlias, const char* optionName) const
-    {
-        fprintf(stderr, "%s: '%s' conflicts with '%s'.\n", commandLine.c_str(), optionAlias, optionName);
-        PrintErrorCommon();
-    }
-
-    // --------
-
     void Options::PrintErrorCommon(void) const
     {
         if (UsingHelpStrings())
-            fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine.c_str(), (UsingPrefixStrings() ? (*prefixStrings)[0].c_str() : ""), (*helpStrings)[0].c_str());
+            fprintf(stderr, "Try '%s %s%s' for more information.\n", commandLine, (UsingPrefixStrings() ? (*prefixStrings)[0].c_str() : ""), (*helpStrings)[0].c_str());
     }
 
     // --------
 
     void Options::PrintErrorInternal(void) const
     {
-        fprintf(stderr, "%s: Internal error while processing options.\n", commandLine.c_str());
+        fprintf(stderr, "%s: Internal error while processing options.\n", commandLine);
     }
 
     // --------
 
     void Options::PrintErrorMalformed(const char* optionString) const
     {
-        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionString);
+        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine, optionString);
         PrintErrorCommon();
     }
 
@@ -103,7 +113,7 @@ namespace GraphTool
 
     void Options::PrintErrorMissing(const char* optionName) const
     {
-        fprintf(stderr, "%s: Missing required option '%s'.\n", commandLine.c_str(), optionName);
+        fprintf(stderr, "%s: Missing required option '%s'.\n", commandLine, optionName);
         PrintErrorCommon();
     }
 
@@ -111,7 +121,7 @@ namespace GraphTool
 
     void Options::PrintErrorQuantityMismatch(const char* optionName1, const char* optionName2) const
     {
-        fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", commandLine.c_str(), optionName1, optionName2);
+        fprintf(stderr, "%s: Mismatch between options '%s' and '%s'.\n", commandLine, optionName1, optionName2);
         PrintErrorCommon();
     }
 
@@ -119,7 +129,7 @@ namespace GraphTool
 
     void Options::PrintErrorTooMany(const char* optionName) const
     {
-        fprintf(stderr, "%s: Option '%s' specified too many times.\n", commandLine.c_str(), optionName);
+        fprintf(stderr, "%s: Option '%s' specified too many times.\n", commandLine, optionName);
         PrintErrorCommon();
     }
 
@@ -127,7 +137,7 @@ namespace GraphTool
 
     void Options::PrintErrorUnsupported(const char* optionName) const
     {
-        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine.c_str(), optionName);
+        fprintf(stderr, "%s: Invalid option '%s'.\n", commandLine, optionName);
         PrintErrorCommon();
     }
 
@@ -135,7 +145,7 @@ namespace GraphTool
 
     void Options::PrintErrorValueRejected(const char* optionName, const char* optionValue) const
     {
-        fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", commandLine.c_str(), optionValue, optionName);
+        fprintf(stderr, "%s: Invalid value '%s' for option '%s'.\n", commandLine, optionValue, optionName);
         PrintErrorCommon();
     }
 
@@ -143,7 +153,16 @@ namespace GraphTool
 
     void Options::PrintHelp(void) const
     {
-        fprintf(stderr, "TODO: Help message goes here.\n");
+        if (NULL != documentationString)
+            fputs(documentationString->c_str(), stderr);
+    }
+    
+    // --------
+    
+    void Options::PrintVersion(void) const
+    {
+        if (NULL != versionString)
+            fputs(versionString->c_str(), stderr);
     }
 
     // --------
@@ -155,16 +174,16 @@ namespace GraphTool
 
     // --------
 
-    bool Options::UsingOptionAliases(void) const
-    {
-        return (NULL != supportedAliases);
-    }
-
-    // --------
-
     bool Options::UsingPrefixStrings(void) const
     {
         return (NULL != prefixStrings);
+    }
+    
+    // --------
+    
+    bool Options::UsingVersionStrings(void) const
+    {
+        return (NULL != versionStrings);
     }
 
 
@@ -222,10 +241,13 @@ namespace GraphTool
             PrintHelp();
             return false;
         }
-
-        // Check if an alias is being used and, if so, get the actual command-line value string for it.
-        if (UsingOptionAliases() && (0 != supportedAliases->count(stringToParse)))
-            stringToParse = supportedAliases->at(stringToParse).c_str();
+        
+        // Check if the option is a version information string.
+        if (UsingVersionStrings() && IsVersionString(stringToParse))
+        {
+            PrintVersion();
+            return false;
+        }
 
         // Parse the string into a name and a value.
         const char* posEqualsSign = strchr(stringToParse, '=');

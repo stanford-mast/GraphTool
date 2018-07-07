@@ -30,29 +30,35 @@ namespace GraphTool
         // -------- INSTANCE VARIABLES ------------------------------------- //
 
         /// Holds the command-line string to use for printing messages.
-        const std::string& commandLine;
+        const char* const commandLine;
         
         /// Holds all supported strings for requesting help.
         /// May be `NULL`, in which case help strings are not used.
-        const std::vector<std::string>* helpStrings;
+        const std::vector<std::string>* const helpStrings;
 
         /// Holds all supported command-line option prefix strings.
-        const std::vector<std::string>* prefixStrings;
+        /// May be `NULL`, in which case prefix strings are not used.
+        const std::vector<std::string>* const prefixStrings;
+        
+        /// Holds all supported strings for requesting version information.
+        /// May be `NULL`, in which case help strings are not used.
+        const std::vector<std::string>* const versionStrings;
+        
+        /// Holds the documentation string to display when help is requested.
+        const std::string* const documentationString;
+        
+        /// Holds the version string to display when version information is requested.
+        const std::string* const versionString;
         
         /// Holds all supplied command-line option values, which the user would supply as --[option]=[value].
         std::map<std::string, OptionContainer*>& specifiedOptions;
-
-        /// Holds all supported command-line aliases, which do not accept any argument values and would be specified as --[alias].
-        /// Maps from possible command-line options to their expanded forms, which would then be parsed normally.
-        /// May be `NULL`, in which case aliases are not used at all.
-        const std::map<std::string, std::string>* supportedAliases;
         
     
     public:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
         /// Constructs an instance of this object, given all required strings and maps.
-        Options(const std::string& commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::map<std::string, std::string>* supportedAliases = NULL, const std::vector<std::string>* prefixStrings = NULL, const std::vector<std::string>* helpStrings = NULL);
+        Options(const char* const commandLine, std::map<std::string, OptionContainer*>& specifiedOptions, const std::vector<std::string>* const prefixStrings = NULL, const std::vector<std::string>* const versionStrings = NULL, const std::vector<std::string>* const helpStrings = NULL, const std::string* const documentationString = NULL, const std::string* versionString = NULL);
 
 
     private:
@@ -63,17 +69,17 @@ namespace GraphTool
         /// @return `true` if the string is a supported help-requesting string, `false` otherwise.
         bool IsHelpString(const char* optionString) const;
         
+        /// Checks if the specified option string is a version-requesting string.
+        /// @param [in] optionString String to check.
+        /// @return `true` if the string is a supported version-requesting string, `false` otherwise.
+        bool IsVersionString(const char* optionString) const;
+        
         /// Specifies the number of characters of command-line option prefix to skip.
         /// Checks the input string for a valid prefix and returns its length.
         /// For example, if the input string starts with "--" and this is a valid prefix then the length is 2.
         /// @param [in] optionString String to check.
         /// @return Length of the prefix within the string being checked, with 0 indicating no valid prefix found (and this is likely an error).
         size_t PrefixLength(const char* optionString) const;
-
-        /// Prints an error for a command-line option alias that conflicts with an already-specified command-line option.
-        /// @param [in] optionAlias Alias specified that is causing the conflict.
-        /// @param [in] optionName Option with which the alias conflicts.
-        void PrintErrorAliasConflict(const char* optionAlias, const char* optionName) const;
 
         /// Prints the final part of a command-line option error.
         void PrintErrorCommon(void) const;
@@ -109,18 +115,21 @@ namespace GraphTool
 
         /// Prints the help message for this application.
         void PrintHelp(void) const;
+        
+        /// Prints the version information for this application.
+        void PrintVersion(void) const;
 
         /// Checks if help strings are in use.
         /// @return `true` if so, `false` otherwise.
         bool UsingHelpStrings(void) const;
-
-        /// Checks if option aliases are in use.
-        /// @return `true` if so, `false` otherwise.
-        bool UsingOptionAliases(void) const;
         
         /// Checks if prefix strings are in use.
         /// @return `true` if so, `false` otherwise.
         bool UsingPrefixStrings(void) const;
+        
+        /// Checks if version strings are in use.
+        /// @return `true` if so, `false` otherwise.
+        bool UsingVersionStrings(void) const;
 
         
     public:

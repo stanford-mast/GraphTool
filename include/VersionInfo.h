@@ -17,6 +17,7 @@
 // -------- CONSTANTS ------------------------------------------------------ //
 
 #define __PROGRAM_NAME                          "GraphTool"
+#define __PROGRAM_VERSION                       "1.0"
 
 
 // -------- PLATFORM-SPECIFIC CHECKS AND MACROS ---------------------------- //
