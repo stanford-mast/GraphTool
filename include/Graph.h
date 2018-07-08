@@ -37,6 +37,10 @@ namespace GraphTool
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
         
+        /// Edge data type indicator.
+        /// Set by objects that modify the graph to indicate the type of data held at each edge.
+        EEdgeDataType edgeDataType;
+        
         /// Destination-grouped edge data structure.
         /// Maps from a destination vertex ID to a set of vertices from which in-edges exist.
         VertexIndex edgesByDestination;
@@ -75,6 +79,13 @@ namespace GraphTool
         template <typename TEdgeData> inline void FastInsertEdgeBySource(const SEdge<TEdgeData>& edge)
         {
             edgesBySource.FastInsertEdgeIndexedBySource(edge);
+        }
+        
+        /// Retrieves and returns the type of data held at each edge.
+        /// @return Edge data type.
+        inline EEdgeDataType GetEdgeDataType(void) const
+        {
+            return edgeDataType;
         }
         
         /// Retrieves and returns the number of edges in the graph.
@@ -187,6 +198,10 @@ namespace GraphTool
         /// Removes a vertex from the graph, including all edges that include it.
         /// @param [in] vertex Identifier of the vertex to remove.
         void RemoveVertex(const TVertexID vertex);
+        
+        /// Sets the edge data type based on the template parameter.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+        template <typename TEdgeData> void SetEdgeDataType(void);
         
         /// Sets the number of vertices in the graph.
         /// This operation causes a change in the underlying graph data structures.

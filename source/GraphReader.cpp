@@ -182,8 +182,9 @@ namespace GraphTool
         if (NULL == graphfile)
             return EGraphFileResult::GraphFileResultErrorCannotOpenFile;
         
+        // Initialize some graph metadata fields.
+        graph.SetEdgeDataType<TEdgeData>();
         graph.SetNumVertices(numVerticesInFile);
-        
         
         // Allocate some buffers for read data.
         SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };

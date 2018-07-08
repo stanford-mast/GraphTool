@@ -376,6 +376,11 @@ int main(const int argc, const char* const argv[])
         PrintGraphFileError(argv[0], inputGraphFile.c_str(), fileResult, true);
         return __LINE__;
     }
+    else
+    {
+        printf("Read graph %s.\n", inputGraphFile.c_str());
+        printf("Graph contains %llu vertices and %llu edges.\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
+    }
 
     // Perform transformations.
     // TODO
@@ -388,7 +393,14 @@ int main(const int argc, const char* const argv[])
         {
             PrintGraphFileError(argv[0], outputGraphFiles[i].c_str(), fileResult, false);
         }
+        else
+        {
+            printf("Wrote graph %s.\n", outputGraphFiles[i].c_str());
+        }
     }
+    
+    // Print final messages and exit.
+    printf("Exiting.\n");
 
     return 0;
 }

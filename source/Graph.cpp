@@ -24,7 +24,7 @@ namespace GraphTool
     // -------- CONSTRUCTION AND DESTRUCTION ------------------------------- //
     // See "Graph.h" for documentation.
 
-    Graph::Graph(void) : edgesByDestination(), edgesBySource()
+    Graph::Graph(void) : edgeDataType(EEdgeDataType::EdgeDataTypeVoid), edgesByDestination(), edgesBySource()
     {
         // Nothing to do here.
     }
@@ -55,5 +55,26 @@ namespace GraphTool
         // Remove the top-level vertices.
         edgesByDestination.RemoveVertex(vertex);
         edgesBySource.RemoveVertex(vertex);
+    }
+    
+    // --------
+    
+    template <> void Graph::SetEdgeDataType<void>(void)
+    {
+        edgeDataType = EEdgeDataType::EdgeDataTypeVoid;
+    }
+    
+    // --------
+    
+    template <> void Graph::SetEdgeDataType<uint64_t>(void)
+    {
+        edgeDataType = EEdgeDataType::EdgeDataTypeInteger;
+    }
+    
+    // --------
+    
+    template <> void Graph::SetEdgeDataType<double>(void)
+    {
+        edgeDataType = EEdgeDataType::EdgeDataTypeFloatingPoint;
     }
 }
