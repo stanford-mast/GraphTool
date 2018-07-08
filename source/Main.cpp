@@ -46,6 +46,9 @@ namespace GraphTool
     /// Command-line option that specifies output file format.
     static const std::string kOptionOutputFormat = "outputformat";
 
+    /// Command-line option that specifies output vertex grouping.
+    static const std::string kOptionOutputGrouping = "outputgroup";
+    
     /// Command-line option that specifies output processing options.
     static const std::string kOptionOutputOptions = "outputoptions";
 
@@ -97,6 +100,31 @@ namespace GraphTool
         { "float",                                                          EEdgeDataType::EdgeDataTypeFloatingPoint },
         { "double",                                                         EEdgeDataType::EdgeDataTypeFloatingPoint },
     };
+    
+    /// Holds a mapping from command-line option string to output edge grouping value.
+    static const std::map<std::string, int64_t> cmdlineOutputGroupingEnum = {
+        { "s",                                                              0ll },
+        { "src",                                                            0ll },
+        { "source",                                                         0ll },
+        { "sourcevertex",                                                   0ll },
+        { "S",                                                              0ll },
+        { "Src",                                                            0ll },
+        { "Source",                                                         0ll },
+        { "Sourcevertex",                                                   0ll },
+        { "SourceVertex",                                                   0ll },
+        
+        { "d",                                                              1ll },
+        { "dst",                                                            1ll },
+        { "dest",                                                           1ll },
+        { "destination",                                                    1ll },
+        { "destinationvertex",                                              1ll },
+        { "D",                                                              1ll },
+        { "Dst",                                                            1ll },
+        { "Dest",                                                           1ll },
+        { "Destination",                                                    1ll },
+        { "Destinationvertex",                                              1ll },
+        { "DestinationVertex",                                              1ll },
+    };
 
     /// Holds all specified command-line options, mapped from the strings used to identify them.
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
@@ -105,6 +133,7 @@ namespace GraphTool
         { kOptionInputOptions,                                              new OptionContainer("") },
         { kOptionOutputFile,                                                new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputFormat,                                              new EnumOptionContainer(*(GraphWriterFactory::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputGrouping,                                            new EnumOptionContainer(cmdlineOutputGroupingEnum, 0ll, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputOptions,                                             new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
     
@@ -243,6 +272,15 @@ namespace GraphTool
         docstring += "        Optional; may be specified at most once per output file.\n";
         docstring += "        See documentation for supported values and defaults.\n";
         
+        docstring += "  ";
+        docstring += cmdlinePrefixStrings[0];
+        docstring += kOptionOutputGrouping;
+        docstring += "=<output-vertex-grouping>\n";
+        docstring += "        Output edge grouping mode.\n";
+        docstring += "        Specifies that edges should be grouped by source or destination vertex.\n";
+        docstring += "        Optional; may be specified at most once per output file.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
+        
         return docstring;
     }
     
@@ -335,6 +373,23 @@ int main(const int argc, const char* const argv[])
 
         writers[i] = writer;
     }
+    
+    // Figure out the correct grouping mode for each writer.
+    std::vector<bool> writerGroupByDestination(writers.size());
+    
+    optionValues = commandLineOptions.GetOptionValues(kOptionOutputGrouping);
+    if (NULL == optionValues)
+        return __LINE__;
+    
+    for (size_t i = 0; i < writers.size(); ++i)
+    {
+        int64_t optionOutputGroupingEnum;
+        
+        if (!(optionValues->QueryValueAt(i, optionOutputGroupingEnum)))
+            return __LINE__;
+        
+        writerGroupByDestination[i] = ((0ll == optionOutputGroupingEnum) ? false : true);
+    }
 
     // Consistency check.
     if (!(writers.size() == outputGraphFiles.size()))
@@ -388,14 +443,14 @@ int main(const int argc, const char* const argv[])
     // Write the output graphs.
     for (size_t i = 0; i < writers.size(); ++i)
     {
-        fileResult = writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, false);
+        fileResult = writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, writerGroupByDestination[i]);
         if (EGraphFileResult::GraphFileResultSuccess != fileResult)
         {
             PrintGraphFileError(argv[0], outputGraphFiles[i].c_str(), fileResult, false);
         }
         else
         {
-            printf("Wrote graph %s.\n", outputGraphFiles[i].c_str());
+            printf("Wrote %s-grouped graph %s.\n", (writerGroupByDestination[i] ? "destination" : "source"), outputGraphFiles[i].c_str());
         }
     }
     
