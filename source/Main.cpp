@@ -55,6 +55,15 @@ namespace GraphTool
     /// Application version information string.
     static const std::string applicationVersionString = __PROGRAM_NAME " v" __PROGRAM_VERSION " for " __PLATFORM_NAME ", compiled on " __DATE__ " at " __TIME__ ".\n";
     
+    /// Holds a mapping from graph file result code to error string.
+    static const std::map<EGraphFileResult, std::string> graphErrorStrings = {
+        { EGraphFileResult::GraphFileResultSuccess,                         "Success" },
+        { EGraphFileResult::GraphFileResultErrorNoMemory,                   "Failed to allocate memory" },
+        { EGraphFileResult::GraphFileResultErrorCannotOpenFile,             "Unable to open file" },
+        { EGraphFileResult::GraphFileResultErrorIO,                         "I/O error" },
+        { EGraphFileResult::GraphFileResultErrorUnknown,                    "Unknown error" },
+    };
+    
     /// Lists the command-line options that can be used to request help.
     static const std::vector<std::string> cmdlineHelpStrings = {
 #ifdef __PLATFORM_WINDOWS
@@ -75,28 +84,28 @@ namespace GraphTool
 #endif
         "--",
     };
-
+    
     /// Holds a mapping from command-line option string to edge data type enumeration value.
     static const std::map<std::string, int64_t> cmdlineEdgeDataTypeStrings = {
-        { "void",                                   EEdgeDataType::EdgeDataTypeVoid },
-        { "none",                                   EEdgeDataType::EdgeDataTypeVoid },
+        { "void",                                                           EEdgeDataType::EdgeDataTypeVoid },
+        { "none",                                                           EEdgeDataType::EdgeDataTypeVoid },
 
-        { "int",                                    EEdgeDataType::EdgeDataTypeInteger },
-        { "integer",                                EEdgeDataType::EdgeDataTypeInteger },
-        { "uint",                                   EEdgeDataType::EdgeDataTypeInteger },
+        { "int",                                                            EEdgeDataType::EdgeDataTypeInteger },
+        { "integer",                                                        EEdgeDataType::EdgeDataTypeInteger },
+        { "uint",                                                           EEdgeDataType::EdgeDataTypeInteger },
 
-        { "float",                                  EEdgeDataType::EdgeDataTypeFloatingPoint },
-        { "double",                                 EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "float",                                                          EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "double",                                                         EEdgeDataType::EdgeDataTypeFloatingPoint },
     };
 
     /// Holds all specified command-line options, mapped from the strings used to identify them.
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
-        { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
-        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
-        { kOptionInputOptions,                      new OptionContainer("") },
-        { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
-        { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
+        { kOptionInputFile,                                                 new OptionContainer(EOptionValueType::OptionValueTypeString) },
+        { kOptionInputFormat,                                               new EnumOptionContainer(*(GraphReaderFactory::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionInputOptions,                                              new OptionContainer("") },
+        { kOptionOutputFile,                                                new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputFormat,                                              new EnumOptionContainer(*(GraphWriterFactory::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputOptions,                                             new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
     
     /// Dynamically builds the documentation string to use to display help to the user.
@@ -236,6 +245,16 @@ namespace GraphTool
         
         return docstring;
     }
+    
+    /// Prints an error message about a graph file operation to the standard error console.
+    /// @param [in] cmdline Command-line path to display in the string.
+    /// @param [in] filename Filename to display in the string.
+    /// @param [in] code Error code that should be printed.
+    /// @param [in] operationIsRead `true` to show that an error occurred during read, `false` to show that it happened during write.
+    void PrintGraphFileError(const char* const cmdline, const char* const filename, const EGraphFileResult code, const bool operationIsRead)
+    {
+        fprintf(stderr, "%s: Error %s %s: %s.\n", cmdline, (operationIsRead ? "reading" : "writing"), filename, graphErrorStrings.at(code).c_str());
+    }
 }
 
 
@@ -247,7 +266,7 @@ using namespace GraphTool;
 /// @param [in] argc Number of command-line arguments.
 /// @param [in] argv Command-line argument strings.
 /// @return Program exit code. 0 means successful termination, anything else indicates an error.
-int main(int argc, const char* argv[])
+int main(const int argc, const char* const argv[])
 {
     // Build the string to display when requesting help.
     const std::string documentationString = MakeDocumentationString(argv[0]);
@@ -350,9 +369,13 @@ int main(int argc, const char* argv[])
     
     // Read the input graph.
     Graph graph;
+    EGraphFileResult fileResult = reader->ReadGraphFromFile(inputGraphFile.c_str(), graph);
     
-    if (!(reader->ReadGraphFromFile(inputGraphFile.c_str(), graph)))
+    if (EGraphFileResult::GraphFileResultSuccess != fileResult)
+    {
+        PrintGraphFileError(argv[0], inputGraphFile.c_str(), fileResult, true);
         return __LINE__;
+    }
 
     // Perform transformations.
     // TODO
@@ -360,8 +383,11 @@ int main(int argc, const char* argv[])
     // Write the output graphs.
     for (size_t i = 0; i < writers.size(); ++i)
     {
-        if (!(writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, false)))
-            return __LINE__;
+        fileResult = writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, false);
+        if (EGraphFileResult::GraphFileResultSuccess != fileResult)
+        {
+            PrintGraphFileError(argv[0], outputGraphFiles[i].c_str(), fileResult, false);
+        }
     }
 
     return 0;

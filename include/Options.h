@@ -140,7 +140,7 @@ namespace GraphTool
         /// @param [in] count Number of strings in the array.
         /// @param [in] strings Array of strings to submit.
         /// @return `true` if all option strings were accepted, `false` in the event of an error.
-        bool FillFromStringArray(const size_t count, const char* strings[]);
+        bool FillFromStringArray(const size_t count, const char* const strings[]);
         
         /// Retrieves the container that holds values for the specified option.
         /// @param [in] optionName Name of the option. Should be one of the constants defined in this class.

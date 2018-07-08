@@ -30,26 +30,26 @@ namespace GraphTool
 
     /// Maps strings to the internal edge list type.
     static const std::map<std::string, int64_t> graphWriterStrings = {
-        { "binaryedgelist",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
-        { "binaryEdgeList",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
-        { "BinaryEdgeList",                         EGraphWriterType::GraphWriterTypeBinaryEdgeList },
+        { "binaryedgelist",                                                 EGraphWriterType::GraphWriterTypeBinaryEdgeList },
+        { "binaryEdgeList",                                                 EGraphWriterType::GraphWriterTypeBinaryEdgeList },
+        { "BinaryEdgeList",                                                 EGraphWriterType::GraphWriterTypeBinaryEdgeList },
 
-        { "adjacencygraph",                         EGraphWriterType::GraphWriterTypeTextAdjacencyList },
-        { "AdjacencyGraph",                         EGraphWriterType::GraphWriterTypeTextAdjacencyList },
-        { "textadjacencylist",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
-        { "textAdjacencyList",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
-        { "TextAdjacencyList",                      EGraphWriterType::GraphWriterTypeTextAdjacencyList },
-        
-        { "textedgelist",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
-        { "textEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
-        { "TextEdgeList",                           EGraphWriterType::GraphWriterTypeTextEdgeList },
+        { "adjacencygraph",                                                 EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "AdjacencyGraph",                                                 EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "textadjacencylist",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "textAdjacencyList",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "TextAdjacencyList",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
 
-        { "XStream",                                EGraphWriterType::GraphWriterTypeXStream },
-        { "Xstream",                                EGraphWriterType::GraphWriterTypeXStream },
-        { "xstream",                                EGraphWriterType::GraphWriterTypeXStream },
-        { "X-Stream",                               EGraphWriterType::GraphWriterTypeXStream },
-        { "X-stream",                               EGraphWriterType::GraphWriterTypeXStream },
-        { "x-stream",                               EGraphWriterType::GraphWriterTypeXStream },
+        { "textedgelist",                                                   EGraphWriterType::GraphWriterTypeTextEdgeList },
+        { "textEdgeList",                                                   EGraphWriterType::GraphWriterTypeTextEdgeList },
+        { "TextEdgeList",                                                   EGraphWriterType::GraphWriterTypeTextEdgeList },
+
+        { "XStream",                                                        EGraphWriterType::GraphWriterTypeXStream },
+        { "Xstream",                                                        EGraphWriterType::GraphWriterTypeXStream },
+        { "xstream",                                                        EGraphWriterType::GraphWriterTypeXStream },
+        { "X-Stream",                                                       EGraphWriterType::GraphWriterTypeXStream },
+        { "X-stream",                                                       EGraphWriterType::GraphWriterTypeXStream },
+        { "x-stream",                                                       EGraphWriterType::GraphWriterTypeXStream },
     };
 
 

@@ -37,7 +37,7 @@ namespace GraphTool
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         bool groupedByDestination;                                          ///< Indicates that graph edges should be grouped by destination instead of by source.
-        bool writeSuccessfulSoFar;                                          ///< Indicates the continued success of the write operation.
+        EGraphFileResult writeResult;                                       ///< Indicates the result of the write operation.
     };
 
 
@@ -72,7 +72,7 @@ namespace GraphTool
             spindleBarrierGlobal();
 
             // Check for termination or I/O errors detected previously.
-            if (0 == writeSpec->counts[currentBufferIndex] || false == writeSpec->writeSuccessfulSoFar)
+            if (0 == writeSpec->counts[currentBufferIndex] || EGraphFileResult::GraphFileResultSuccess != writeSpec->writeResult)
                 break;
 
             // Consume the buffer and write edges to the file.
@@ -80,7 +80,7 @@ namespace GraphTool
 
             // Check for any I/O errors.
             if (ferror(writeSpec->file))
-                writeSpec->writeSuccessfulSoFar = false;
+                writeSpec->writeResult = EGraphFileResult::GraphFileResultErrorIO;
 
             // Switch to the other buffer to consume in parallel with edge production.
             currentBufferIndex = (~currentBufferIndex) & 1;
@@ -136,7 +136,7 @@ namespace GraphTool
             spindleBarrierGlobal();
         
             // Check for termination or I/O errors.
-            if (0 == writeSpec->counts[currentBufferIndex] || false == writeSpec->writeSuccessfulSoFar)
+            if (0 == writeSpec->counts[currentBufferIndex] || EGraphFileResult::GraphFileResultSuccess != writeSpec->writeResult)
                 break;
         
             // Switch to the other buffer to read from file during a consumption operation.
@@ -148,15 +148,17 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "GraphWriter.h" for documentation.
 
-    template <typename TEdgeData> bool GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination)
+    template <typename TEdgeData> EGraphFileResult GraphWriter<TEdgeData>::WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForWrite(filename, graph, groupedByDestination);
         if (NULL == graphfile)
-            return false;
+            return EGraphFileResult::GraphFileResultErrorCannotOpenFile;
 
         // Allocate some buffers for read data.
         SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphWriteBufferSize]) };
+        if (NULL == bufs[0] || NULL == bufs[1])
+            return EGraphFileResult::GraphFileResultErrorNoMemory;
 
         // Define the graph write task.
         SGraphWriteSpec<TEdgeData> writeSpec;
@@ -169,7 +171,7 @@ namespace GraphTool
         writeSpec.counts[0] = 0;
         writeSpec.counts[1] = 0;
         writeSpec.groupedByDestination = groupedByDestination;
-        writeSpec.writeSuccessfulSoFar = true;
+        writeSpec.writeResult = EGraphFileResult::GraphFileResultSuccess;
 
         // Define the parallelization strategy.
         SSpindleTaskSpec taskSpec[2];
@@ -187,14 +189,15 @@ namespace GraphTool
         taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
 
         // Launch the graph write task.
-        spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
+        if (0 != spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true))
+            return EGraphFileResult::GraphFileResultErrorUnknown;
 
         // Clean up.
         fclose(graphfile);
         delete[] bufs[0];
         delete[] bufs[1];
 
-        return writeSpec.writeSuccessfulSoFar;
+        return writeSpec.writeResult;
     }
 
 

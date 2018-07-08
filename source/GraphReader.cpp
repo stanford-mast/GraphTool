@@ -35,7 +35,7 @@ namespace GraphTool
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         uint64_t* refreshDegreeBuf;                                         ///< Buffer for refreshing degree information.
-        bool readSuccessfulSoFar;                                           ///< Indicates the continued success of the read operation.
+        EGraphFileResult readResult;                                        ///< Indicates the result of the read operation.
     };
 
 
@@ -77,7 +77,7 @@ namespace GraphTool
                 break;
 
             // Check for I/O errors.
-            if (false == readSpec->readSuccessfulSoFar)
+            if (EGraphFileResult::GraphFileResultSuccess != readSpec->readResult)
                 return;
 
             // Read the buffer into the graph.
@@ -157,13 +157,13 @@ namespace GraphTool
 
             // Check for any I/O errors.
             if (ferror(readSpec->file))
-                readSpec->readSuccessfulSoFar = false;
+                readSpec->readResult = EGraphFileResult::GraphFileResultErrorIO;
 
             // Synchronize with consumers.
             spindleBarrierGlobal();
 
             // Check for termination or I/O errors detected previously.
-            if (0 == readSpec->counts[currentBufferIndex] || false == readSpec->readSuccessfulSoFar)
+            if (0 == readSpec->counts[currentBufferIndex] || EGraphFileResult::GraphFileResultSuccess != readSpec->readResult)
                 break;
 
             // Switch to the other buffer to read from file during a consumption operation.
@@ -175,18 +175,20 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "GraphReader.h" for documentation.
 
-    template <typename TEdgeData> bool GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph& graph)
+    template <typename TEdgeData> EGraphFileResult GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph& graph)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);
         if (NULL == graphfile)
-            return false;
+            return EGraphFileResult::GraphFileResultErrorCannotOpenFile;
         
         graph.SetNumVertices(numVerticesInFile);
         
         
         // Allocate some buffers for read data.
         SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
+        if (NULL == bufs[0] || NULL == bufs[1])
+            return EGraphFileResult::GraphFileResultErrorNoMemory;
 
         // Define the graph read task.
         SGraphReadSpec<TEdgeData> readSpec;
@@ -199,7 +201,7 @@ namespace GraphTool
         readSpec.counts[0] = 0;
         readSpec.counts[1] = 0;
         readSpec.refreshDegreeBuf = NULL;
-        readSpec.readSuccessfulSoFar = true;
+        readSpec.readResult = EGraphFileResult::GraphFileResultSuccess;
 
         // Define the parallelization strategy.
         SSpindleTaskSpec taskSpec[2];
@@ -217,14 +219,15 @@ namespace GraphTool
         taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
 
         // Launch the graph read task.
-        spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
+        if (0 != spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true))
+            return EGraphFileResult::GraphFileResultErrorUnknown;
 
         // Clean up.
         fclose(graphfile);
         delete[] bufs[0];
         delete[] bufs[1];
 
-        return readSpec.readSuccessfulSoFar;
+        return readSpec.readResult;
     }
 
 

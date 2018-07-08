@@ -190,7 +190,7 @@ namespace GraphTool
     // -------- INSTANCE METHODS ------------------------------------------- //
     // See "Options.h" for documentation.
 
-    bool Options::FillFromStringArray(const size_t count, const char* strings[])
+    bool Options::FillFromStringArray(const size_t count, const char* const strings[])
     {
         if (NULL == strings)
             return false;

@@ -88,6 +88,6 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "IGraphWriter.h" for documentation.
         
-        virtual bool WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false);
+        virtual EGraphFileResult WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false);
     };
 }

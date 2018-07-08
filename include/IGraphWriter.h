@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 
 namespace GraphTool
 {
@@ -28,7 +30,7 @@ namespace GraphTool
         /// @param [in] filename File name of the file to be written.
         /// @param [in] graph Graph object to be written to the file.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
-        /// @return `true` if the graph was written successfully, `false` otherwise.
-        virtual bool WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false) = 0;
+        /// @return Result of the write operation.
+        virtual EGraphFileResult WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false) = 0;
     };
 }

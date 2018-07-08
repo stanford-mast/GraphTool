@@ -28,13 +28,13 @@ namespace GraphTool
 
     /// Maps strings to the internal edge list type.
     static const std::map<std::string, int64_t> graphReaderStrings = {
-        { "binaryedgelist",                         EGraphReaderType::GraphReaderTypeBinaryEdgeList },
-        { "binaryEdgeList",                         EGraphReaderType::GraphReaderTypeBinaryEdgeList },
-        { "BinaryEdgeList",                         EGraphReaderType::GraphReaderTypeBinaryEdgeList },
+        { "binaryedgelist",                                                 EGraphReaderType::GraphReaderTypeBinaryEdgeList },
+        { "binaryEdgeList",                                                 EGraphReaderType::GraphReaderTypeBinaryEdgeList },
+        { "BinaryEdgeList",                                                 EGraphReaderType::GraphReaderTypeBinaryEdgeList },
 
-        { "textedgelist",                           EGraphReaderType::GraphReaderTypeTextEdgeList },
-        { "textEdgeList",                           EGraphReaderType::GraphReaderTypeTextEdgeList },
-        { "TextEdgeList",                           EGraphReaderType::GraphReaderTypeTextEdgeList },
+        { "textedgelist",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },
+        { "textEdgeList",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },
+        { "TextEdgeList",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },
     };
 
     

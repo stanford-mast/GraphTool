@@ -29,6 +29,16 @@ namespace GraphTool
     /// Specifies the type to use for counting edges.
     typedef uint64_t TEdgeCount;
 
+    /// Defines codes for indicating the result of graph file operations.
+    enum EGraphFileResult
+    {
+        GraphFileResultSuccess = 0,                                         ///< Graph file operation was successful.
+        GraphFileResultErrorNoMemory,                                       ///< Unable to allocate memory required by the file input/output process.
+        GraphFileResultErrorCannotOpenFile,                                 ///< Unable to open the file specified.
+        GraphFileResultErrorIO,                                             ///< An I/O error occurred while reading or writing the file.
+        GraphFileResultErrorUnknown,                                        ///< Some other error occurred during the graph read or write process.
+    };
+    
     /// Enumerates all supported data types for edge data (i.e. edge weights).
     enum EEdgeDataType : int64_t
     {

@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 
 namespace GraphTool
 {
@@ -27,7 +29,7 @@ namespace GraphTool
         /// Reads a graph from the specified file.
         /// @param [in] filename File name of the file to be read.
         /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
-        /// @return `true` on successful read, `false` on error.
-        virtual bool ReadGraphFromFile(const char* const filename, Graph& graph) = 0;
+        /// @return Result of the read operation.
+        virtual EGraphFileResult ReadGraphFromFile(const char* const filename, Graph& graph) = 0;
     };
 }
