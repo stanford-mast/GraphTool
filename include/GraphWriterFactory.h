@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 #include <cstdint>
 #include <map>
 #include <string>
@@ -34,13 +36,14 @@ namespace GraphTool
 
     /// Factory for creating GraphWriter objects of various types.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class GraphWriterFactory
+    class GraphWriterFactory
     {
     private:
         // -------- CONSTRUCTION AND DESTRUCTION --------------------------- //
 
-        /// Default constructor. Should never be invoked.
-        GraphWriterFactory(void);
+        /// Default constructor.
+        /// This is a deleted function.
+        GraphWriterFactory(void) = delete;
 
 
     public:
@@ -48,8 +51,9 @@ namespace GraphTool
 
         /// Creates and returns a pointer to a GraphWriter object of the specified type.
         /// @param [in] type Type of GraphWriter object to create.
+        /// @param [in] edgedatatype Type of data that the GraphWriter object should write for each edge.
         /// @return Pointer to the GraphWriter object, or `NULL` in the event of an error.
-        static GraphWriter<TEdgeData>* CreateGraphWriter(EGraphWriterType type);
+        static GraphWriter<void>* CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype);
 
         /// Returns a pointer to a mapping from strings to EGraphWriterType enumerators.
         /// @return Pointer to the enumerator mapping.

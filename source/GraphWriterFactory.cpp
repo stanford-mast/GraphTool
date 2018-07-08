@@ -15,6 +15,7 @@
 #include "GraphWriterFactory.h"
 #include "TextAdjacencyListWriter.h"
 #include "TextEdgeListWriter.h"
+#include "Types.h"
 #include "XStreamWriter.h"
 
 #include <cstddef>
@@ -52,10 +53,13 @@ namespace GraphTool
     };
 
 
-    // -------- CLASS METHODS ---------------------------------------------- //
-    // See "GraphWriterFactory.h" for documentation.
-
-    template <typename TEdgeData> GraphWriter<TEdgeData>* GraphWriterFactory<TEdgeData>::CreateGraphWriter(EGraphWriterType type)
+    // -------- HELPERS ---------------------------------------------------- //
+    
+    /// Creates and returns a pointer to a GraphWriter object of the specified type.
+    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+    /// @param [in] type Type of GraphWriter object to create.
+    /// @return Pointer to the GraphWriter object, or `NULL` in the event of an error.
+    template <typename TEdgeData> static GraphWriter<TEdgeData>* CreateGraphWriterInternal(EGraphWriterType type)
     {
         GraphWriter<TEdgeData>* result = NULL;
 
@@ -83,18 +87,40 @@ namespace GraphTool
 
         return result;
     }
+    
+    
+    // -------- CLASS METHODS ---------------------------------------------- //
+    // See "GraphWriterFactory.h" for documentation.
+
+    GraphWriter<void>* GraphWriterFactory::CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype)
+    {
+        GraphWriter<void>* result = NULL;
+        
+        switch (edgedatatype)
+        {
+        case EEdgeDataType::EdgeDataTypeVoid:
+            result = CreateGraphWriterInternal<void>(type);
+            break;
+        
+        case EEdgeDataType::EdgeDataTypeInteger:
+            result = CreateGraphWriterInternal<void>(type);
+            break;
+            
+        case EEdgeDataType::EdgeDataTypeFloatingPoint:
+            result = CreateGraphWriterInternal<void>(type);
+            break;
+            
+        default:
+            break;
+        }
+        
+        return result;
+    }
 
     // --------
 
-    template <typename TEdgeData> const std::map<std::string, int64_t>* GraphWriterFactory<TEdgeData>::GetGraphWriterStrings(void)
+    const std::map<std::string, int64_t>* GraphWriterFactory::GetGraphWriterStrings(void)
     {
         return &graphWriterStrings;
     }
-
-
-    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
-
-    template class GraphWriterFactory<void>;
-    template class GraphWriterFactory<uint64_t>;
-    template class GraphWriterFactory<double>;
 }

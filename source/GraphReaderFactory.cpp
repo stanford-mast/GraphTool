@@ -14,6 +14,7 @@
 #include "GraphReader.h"
 #include "GraphReaderFactory.h"
 #include "TextEdgeListReader.h"
+#include "Types.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -36,11 +37,14 @@ namespace GraphTool
         { "TextEdgeList",                           EGraphReaderType::GraphReaderTypeTextEdgeList },
     };
 
-
-    // -------- CLASS METHODS ---------------------------------------------- //
-    // See "GraphReaderFactory.h" for documentation.
-
-    template <typename TEdgeData> GraphReader<TEdgeData>* GraphReaderFactory<TEdgeData>::CreateGraphReader(EGraphReaderType type)
+    
+    // -------- HELPERS ---------------------------------------------------- //
+    
+    /// Creates and returns a pointer to a GraphReader object of the specified type.
+    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+    /// @param [in] type Type of GraphReader object to create.
+    /// @return Pointer to the GraphReader object, or `NULL` in the event of an error.
+    template <typename TEdgeData> static GraphReader<TEdgeData>* CreateGraphReaderInternal(EGraphReaderType type)
     {
         GraphReader<TEdgeData>* result = NULL;
 
@@ -60,18 +64,39 @@ namespace GraphTool
 
         return result;
     }
+    
+    // -------- CLASS METHODS ---------------------------------------------- //
+    // See "GraphReaderFactory.h" for documentation.
+
+    GraphReader<void>* GraphReaderFactory::CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype)
+    {
+        GraphReader<void>* result = NULL;
+        
+        switch (edgedatatype)
+        {
+        case EEdgeDataType::EdgeDataTypeVoid:
+            result = CreateGraphReaderInternal<void>(type);
+            break;
+        
+        case EEdgeDataType::EdgeDataTypeInteger:
+            result = CreateGraphReaderInternal<void>(type);
+            break;
+            
+        case EEdgeDataType::EdgeDataTypeFloatingPoint:
+            result = CreateGraphReaderInternal<void>(type);
+            break;
+            
+        default:
+            break;
+        }
+        
+        return result;
+    }
 
     // --------
 
-    template <typename TEdgeData> const std::map<std::string, int64_t>* GraphReaderFactory<TEdgeData>::GetGraphReaderStrings(void)
+    const std::map<std::string, int64_t>* GraphReaderFactory::GetGraphReaderStrings(void)
     {
         return &graphReaderStrings;
     }
-
-
-    // -------- EXPLICIT TEMPLATE INSTANTIATIONS --------------------------- //
-
-    template class GraphReaderFactory<void>;
-    template class GraphReaderFactory<uint64_t>;
-    template class GraphReaderFactory<double>;
 }

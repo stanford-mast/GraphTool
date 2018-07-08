@@ -51,17 +51,6 @@ namespace GraphTool
     static const std::string kOptionOutputOptions = "outputoptions";
 
 
-    // -------- TYPE DEFINITIONS ------------------------------------------- //
-
-    /// Enumerates all supported data types for edge data (i.e. edge weights).
-    enum EEdgeDataType : int64_t
-    {
-        EdgeDataTypeVoid,                                                   ///< No edge data (i.e. an unweighted graph).
-        EdgeDataTypeInteger,                                                ///< Edge data are integral. Currently this means 64-bit unsigned.
-        EdgeDataTypeFloatingPoint                                           ///< Edge data are floating-point. Currently this means double-precision.
-    };
-
-
     // -------- LOCALS ----------------------------------------------------- //
 
     /// Application version information string.
@@ -105,10 +94,10 @@ namespace GraphTool
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
         //{ kOptionEdgeData,                          new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, 1) },
         { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
-        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory<void>::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
         { kOptionInputOptions,                      new OptionContainer("") },
         { kOptionOutputFile,                        new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
-        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory<void>::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputFormat,                      new EnumOptionContainer(*(GraphWriterFactory::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputOptions,                     new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
     
@@ -235,17 +224,17 @@ namespace GraphTool
         docstring += "=<input-options-string>\n";
         docstring += "        Comma-delimited list of input graph options and values.\n";
         docstring += "        Fine-tunes the behavior of graph reading functionality.\n";
-        docstring += "        Optional; must be specified at most once.\n";
-        docstring += "        See documentation for supported values.\n";
+        docstring += "        Optional; may be specified at most once.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
         
         docstring += "  ";
         docstring += cmdlinePrefixStrings[0];
         docstring += kOptionOutputOptions;
-        docstring += "=<input-options-string>\n";
+        docstring += "=<output-options-string>\n";
         docstring += "        Comma-delimited list of output graph options and values.\n";
         docstring += "        Fine-tunes the behavior of graph writing functionality.\n";
-        docstring += "        Optional; must be specified at most once per output file.\n";
-        docstring += "        See documentation for supported values.\n";
+        docstring += "        Optional; may be specified at most once per output file.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
         
         return docstring;
     }
@@ -265,6 +254,7 @@ int main(int argc, const char* argv[])
     // Build the string to display when requesting help.
     const std::string documentationString = MakeDocumentationString(argv[0]);
     
+    // Initialize the command-line option parser.
     Options commandLineOptions(argv[0], cmdlineSpecifiedOptions, &cmdlinePrefixStrings, &cmdlineVersionStrings, &cmdlineHelpStrings, &documentationString, &applicationVersionString);
 
     // Submit all command-line options for parsing.
@@ -306,7 +296,7 @@ int main(int argc, const char* argv[])
     if (!(optionValues->QueryValue(optionGraphFormatEnum)))
         return __LINE__;
 
-    GraphReader<void>* reader = GraphReaderFactory<void>::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum);
+    GraphReader<void>* reader = GraphReaderFactory::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
     if (NULL == reader)
         return __LINE__;
 
@@ -322,7 +312,7 @@ int main(int argc, const char* argv[])
         if (!(optionValues->QueryValueAt(i, optionGraphFormatEnum)))
             return __LINE__;
 
-        GraphWriter<void>* writer = GraphWriterFactory<void>::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum);
+        GraphWriter<void>* writer = GraphWriterFactory::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
         if (NULL == writer)
             return __LINE__;
 

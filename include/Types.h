@@ -29,6 +29,14 @@ namespace GraphTool
     /// Specifies the type to use for counting edges.
     typedef uint64_t TEdgeCount;
 
+    /// Enumerates all supported data types for edge data (i.e. edge weights).
+    enum EEdgeDataType : int64_t
+    {
+        EdgeDataTypeVoid,                                                   ///< No edge data (i.e. an unweighted graph).
+        EdgeDataTypeInteger,                                                ///< Edge data are integral. Currently this means 64-bit unsigned.
+        EdgeDataTypeFloatingPoint                                           ///< Edge data are floating-point. Currently this means double-precision.
+    };
+    
     /// Holds edge data, such as a weight, using multiple possible representations.
     union UEdgeData
     {
