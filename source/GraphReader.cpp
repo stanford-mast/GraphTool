@@ -35,7 +35,7 @@ namespace GraphTool
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
         TEdgeCount counts[2];                                               ///< Edge data buffer counts.
         uint64_t* refreshDegreeBuf;                                         ///< Buffer for refreshing degree information.
-        EGraphFileResult readResult;                                        ///< Indicates the result of the read operation.
+        EGraphResult readResult;                                            ///< Indicates the result of the read operation.
     };
 
 
@@ -77,7 +77,7 @@ namespace GraphTool
                 break;
 
             // Check for I/O errors.
-            if (EGraphFileResult::GraphFileResultSuccess != readSpec->readResult)
+            if (EGraphResult::GraphResultSuccess != readSpec->readResult)
                 return;
 
             // Read the buffer into the graph.
@@ -157,13 +157,13 @@ namespace GraphTool
 
             // Check for any I/O errors.
             if (ferror(readSpec->file))
-                readSpec->readResult = EGraphFileResult::GraphFileResultErrorIO;
+                readSpec->readResult = EGraphResult::GraphResultErrorIO;
 
             // Synchronize with consumers.
             spindleBarrierGlobal();
 
             // Check for termination or I/O errors detected previously.
-            if (0 == readSpec->counts[currentBufferIndex] || EGraphFileResult::GraphFileResultSuccess != readSpec->readResult)
+            if (0 == readSpec->counts[currentBufferIndex] || EGraphResult::GraphResultSuccess != readSpec->readResult)
                 break;
 
             // Switch to the other buffer to read from file during a consumption operation.
@@ -172,15 +172,15 @@ namespace GraphTool
     }
 
 
-    // -------- INSTANCE METHODS ------------------------------------------- //
+    // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphReader.h" for documentation.
 
-    template <typename TEdgeData> EGraphFileResult GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph& graph)
+    template <typename TEdgeData> EGraphResult GraphReader<TEdgeData>::ReadGraphFromFile(const char* const filename, Graph& graph)
     {
         // First, open the file.
         FILE* graphfile = this->OpenAndInitializeGraphFileForRead(filename);
         if (NULL == graphfile)
-            return EGraphFileResult::GraphFileResultErrorCannotOpenFile;
+            return EGraphResult::GraphResultErrorCannotOpenFile;
         
         // Initialize some graph metadata fields.
         graph.SetEdgeDataType<TEdgeData>();
@@ -189,7 +189,7 @@ namespace GraphTool
         // Allocate some buffers for read data.
         SEdge<TEdgeData>* bufs[] = { (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]), (SEdge<TEdgeData>*)(new uint8_t[kGraphReadBufferSize]) };
         if (NULL == bufs[0] || NULL == bufs[1])
-            return EGraphFileResult::GraphFileResultErrorNoMemory;
+            return EGraphResult::GraphResultErrorNoMemory;
 
         // Define the graph read task.
         SGraphReadSpec<TEdgeData> readSpec;
@@ -202,7 +202,7 @@ namespace GraphTool
         readSpec.counts[0] = 0;
         readSpec.counts[1] = 0;
         readSpec.refreshDegreeBuf = NULL;
-        readSpec.readResult = EGraphFileResult::GraphFileResultSuccess;
+        readSpec.readResult = EGraphResult::GraphResultSuccess;
 
         // Define the parallelization strategy.
         SSpindleTaskSpec taskSpec[2];
@@ -220,15 +220,26 @@ namespace GraphTool
         taskSpec[1].smtPolicy = SpindleSMTPolicyPreferLogical;
 
         // Launch the graph read task.
-        if (0 != spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true))
-            return EGraphFileResult::GraphFileResultErrorUnknown;
+        const uint32_t spawnResult = spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
 
         // Clean up.
         fclose(graphfile);
         delete[] bufs[0];
         delete[] bufs[1];
-
-        return readSpec.readResult;
+        
+        if (0 != spawnResult)
+            return EGraphResult::GraphResultErrorUnknown;
+        
+        // Consistency checks.
+        if (EGraphResult::GraphResultSuccess == readSpec.readResult)
+        {
+            if (numEdgesInFile != graph.GetNumEdges())
+                return EGraphResult::GraphResultErrorFormat;
+            else
+                return EGraphResult::GraphResultSuccess;
+        }
+        else
+            return readSpec.readResult;
     }
 
 

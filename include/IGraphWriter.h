@@ -31,6 +31,6 @@ namespace GraphTool
         /// @param [in] graph Graph object to be written to the file.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
         /// @return Result of the write operation.
-        virtual EGraphFileResult WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false) = 0;
+        virtual EGraphResult WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false) = 0;
     };
 }

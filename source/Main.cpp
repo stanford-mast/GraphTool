@@ -36,6 +36,9 @@ namespace GraphTool
 
     /// Command-line option that specifies input file format.
     static const std::string kOptionInputFormat = "inputformat";
+    
+    /// Command-line option that specifies input weight type.
+    static const std::string kOptionInputWeights = "inputweights";
 
     /// Command-line option that specifies input processing options.
     static const std::string kOptionInputOptions = "inputoptions";
@@ -45,7 +48,10 @@ namespace GraphTool
 
     /// Command-line option that specifies output file format.
     static const std::string kOptionOutputFormat = "outputformat";
-
+    
+    /// Command-line option that specifies output weight type.
+    static const std::string kOptionOutputWeights = "outputweights";
+    
     /// Command-line option that specifies output vertex grouping.
     static const std::string kOptionOutputGrouping = "outputgroup";
     
@@ -58,13 +64,21 @@ namespace GraphTool
     /// Application version information string.
     static const std::string applicationVersionString = __PROGRAM_NAME " v" __PROGRAM_VERSION " for " __PLATFORM_NAME ", compiled on " __DATE__ " at " __TIME__ ".\n";
     
+    /// Holds a mapping from edge data type to string.
+    static const std::map<EEdgeDataType, std::string> edgeDataTypeStrings = {
+        { EEdgeDataType::EdgeDataTypeVoid,                                  "unweighted" },
+        { EEdgeDataType::EdgeDataTypeInteger,                               "integer-weighted" },
+        { EEdgeDataType::EdgeDataTypeFloatingPoint,                         "floating-point-weighted" },
+    };
+    
     /// Holds a mapping from graph file result code to error string.
-    static const std::map<EGraphFileResult, std::string> graphErrorStrings = {
-        { EGraphFileResult::GraphFileResultSuccess,                         "Success" },
-        { EGraphFileResult::GraphFileResultErrorNoMemory,                   "Failed to allocate memory" },
-        { EGraphFileResult::GraphFileResultErrorCannotOpenFile,             "Unable to open file" },
-        { EGraphFileResult::GraphFileResultErrorIO,                         "I/O error" },
-        { EGraphFileResult::GraphFileResultErrorUnknown,                    "Unknown error" },
+    static const std::map<EGraphResult, std::string> graphErrorStrings = {
+        { EGraphResult::GraphResultSuccess,                                 "Success" },
+        { EGraphResult::GraphResultErrorNoMemory,                           "Failed to allocate memory" },
+        { EGraphResult::GraphResultErrorCannotOpenFile,                     "Unable to open file" },
+        { EGraphResult::GraphResultErrorIO,                                 "I/O error" },
+        { EGraphResult::GraphResultErrorFormat,                             "Graph format error" },
+        { EGraphResult::GraphResultErrorUnknown,                            "Unknown error" },
     };
     
     /// Lists the command-line options that can be used to request help.
@@ -92,13 +106,26 @@ namespace GraphTool
     static const std::map<std::string, int64_t> cmdlineEdgeDataTypeStrings = {
         { "void",                                                           EEdgeDataType::EdgeDataTypeVoid },
         { "none",                                                           EEdgeDataType::EdgeDataTypeVoid },
+        { "unweighted",                                                     EEdgeDataType::EdgeDataTypeVoid },
+        { "Void",                                                           EEdgeDataType::EdgeDataTypeVoid },
+        { "None",                                                           EEdgeDataType::EdgeDataTypeVoid },
+        { "Unweighted",                                                     EEdgeDataType::EdgeDataTypeVoid },
 
         { "int",                                                            EEdgeDataType::EdgeDataTypeInteger },
         { "integer",                                                        EEdgeDataType::EdgeDataTypeInteger },
         { "uint",                                                           EEdgeDataType::EdgeDataTypeInteger },
+        { "Int",                                                            EEdgeDataType::EdgeDataTypeInteger },
+        { "Integer",                                                        EEdgeDataType::EdgeDataTypeInteger },
+        { "Uint",                                                           EEdgeDataType::EdgeDataTypeInteger },
+        { "UInt",                                                           EEdgeDataType::EdgeDataTypeInteger },
 
         { "float",                                                          EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "floatingpoint",                                                  EEdgeDataType::EdgeDataTypeFloatingPoint },
         { "double",                                                         EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "Float",                                                          EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "Floatingpoint",                                                  EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "FloatingPoint",                                                  EEdgeDataType::EdgeDataTypeFloatingPoint },
+        { "Double",                                                         EEdgeDataType::EdgeDataTypeFloatingPoint },
     };
     
     /// Holds a mapping from command-line option string to output edge grouping value.
@@ -130,9 +157,11 @@ namespace GraphTool
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
         { kOptionInputFile,                                                 new OptionContainer(EOptionValueType::OptionValueTypeString) },
         { kOptionInputFormat,                                               new EnumOptionContainer(*(GraphReaderFactory::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionInputWeights,                                              new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, 1) },
         { kOptionInputOptions,                                              new OptionContainer("") },
         { kOptionOutputFile,                                                new OptionContainer(EOptionValueType::OptionValueTypeString, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputFormat,                                              new EnumOptionContainer(*(GraphWriterFactory::GetGraphWriterStrings()), OptionContainer::kUnlimitedValueCount) },
+        { kOptionOutputWeights,                                             new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputGrouping,                                            new EnumOptionContainer(cmdlineOutputGroupingEnum, 0ll, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputOptions,                                             new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
     };
@@ -265,6 +294,23 @@ namespace GraphTool
         
         docstring += "  ";
         docstring += cmdlinePrefixStrings[0];
+        docstring += kOptionInputWeights;
+        docstring += "=<input-weights-string>\n";
+        docstring += "        Type of weights, if any, to be read from the input file.\n";
+        docstring += "        Optional; may be specified at most once.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
+        
+        docstring += "  ";
+        docstring += cmdlinePrefixStrings[0];
+        docstring += kOptionOutputGrouping;
+        docstring += "=<output-vertex-grouping-string>\n";
+        docstring += "        Output edge grouping mode.\n";
+        docstring += "        Specifies that edges should be grouped by source or destination vertex.\n";
+        docstring += "        Optional; may be specified at most once per output file.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
+        
+        docstring += "  ";
+        docstring += cmdlinePrefixStrings[0];
         docstring += kOptionOutputOptions;
         docstring += "=<output-options-string>\n";
         docstring += "        Comma-delimited list of output graph options and values.\n";
@@ -274,10 +320,9 @@ namespace GraphTool
         
         docstring += "  ";
         docstring += cmdlinePrefixStrings[0];
-        docstring += kOptionOutputGrouping;
-        docstring += "=<output-vertex-grouping>\n";
-        docstring += "        Output edge grouping mode.\n";
-        docstring += "        Specifies that edges should be grouped by source or destination vertex.\n";
+        docstring += kOptionOutputWeights;
+        docstring += "=<output-weights-string>\n";
+        docstring += "        Type of weights, if any, to be written to the input file.\n";
         docstring += "        Optional; may be specified at most once per output file.\n";
         docstring += "        See documentation for supported values and defaults.\n";
         
@@ -289,7 +334,7 @@ namespace GraphTool
     /// @param [in] filename Filename to display in the string.
     /// @param [in] code Error code that should be printed.
     /// @param [in] operationIsRead `true` to show that an error occurred during read, `false` to show that it happened during write.
-    void PrintGraphFileError(const char* const cmdline, const char* const filename, const EGraphFileResult code, const bool operationIsRead)
+    void PrintGraphFileError(const char* const cmdline, const char* const filename, const EGraphResult code, const bool operationIsRead)
     {
         fprintf(stderr, "%s: Error %s %s: %s.\n", cmdline, (operationIsRead ? "reading" : "writing"), filename, graphErrorStrings.at(code).c_str());
     }
@@ -342,6 +387,15 @@ int main(const int argc, const char* const argv[])
             return __LINE__;
     }
 
+    // Figure out the input edge data type.
+    optionValues = commandLineOptions.GetOptionValues(kOptionInputWeights);
+    if (NULL == optionValues)
+        return __LINE__;
+    
+    int64_t readerEdgeDataTypeEnum;
+    if (!(optionValues->QueryValue(readerEdgeDataTypeEnum)))
+        return __LINE__;
+    
     // Create the graph reader object.
     optionValues = commandLineOptions.GetOptionValues(kOptionInputFormat);
     if (NULL == optionValues)
@@ -351,35 +405,48 @@ int main(const int argc, const char* const argv[])
     if (!(optionValues->QueryValue(optionGraphFormatEnum)))
         return __LINE__;
 
-    IGraphReader* reader = GraphReaderFactory::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
+    IGraphReader* reader = GraphReaderFactory::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum, (EEdgeDataType)readerEdgeDataTypeEnum);
     if (NULL == reader)
         return __LINE__;
 
-    // Create the graph writer objects.
+    // Figure out the output edge data types and create the graph writer objects.
     optionValues = commandLineOptions.GetOptionValues(kOptionOutputFormat);
     if (NULL == optionValues)
         return __LINE__;
 
     std::vector<IGraphWriter*> writers(optionValues->GetValueCount());
-
-    for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+    std::vector<EEdgeDataType> writersEdgeDataType(optionValues->GetValueCount());
+    
     {
-        if (!(optionValues->QueryValueAt(i, optionGraphFormatEnum)))
+        const OptionContainer* optionValuesOutputEdgeDataType = commandLineOptions.GetOptionValues(kOptionOutputWeights);
+        if (NULL == optionValuesOutputEdgeDataType)
             return __LINE__;
-
-        IGraphWriter* writer = GraphWriterFactory::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
-        if (NULL == writer)
-            return __LINE__;
-
-        writers[i] = writer;
+        
+        for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+        {
+            int64_t writerEdgeDataTypeEnum;
+            
+            if (!(optionValuesOutputEdgeDataType->QueryValueAt(i, writerEdgeDataTypeEnum)))
+                return __LINE__;
+            
+            if (!(optionValues->QueryValueAt(i, optionGraphFormatEnum)))
+                return __LINE__;
+    
+            IGraphWriter* writer = GraphWriterFactory::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum, (EEdgeDataType)writerEdgeDataTypeEnum);
+            if (NULL == writer)
+                return __LINE__;
+    
+            writers[i] = writer;
+            writersEdgeDataType[i] = (EEdgeDataType)writerEdgeDataTypeEnum;
+        }
     }
     
     // Figure out the correct grouping mode for each writer.
-    std::vector<bool> writerGroupByDestination(writers.size());
-    
     optionValues = commandLineOptions.GetOptionValues(kOptionOutputGrouping);
     if (NULL == optionValues)
         return __LINE__;
+    
+    std::vector<bool> writerGroupByDestination(writers.size());
     
     for (size_t i = 0; i < writers.size(); ++i)
     {
@@ -424,9 +491,9 @@ int main(const int argc, const char* const argv[])
     
     // Read the input graph.
     Graph graph;
-    EGraphFileResult fileResult = reader->ReadGraphFromFile(inputGraphFile.c_str(), graph);
+    EGraphResult fileResult = reader->ReadGraphFromFile(inputGraphFile.c_str(), graph);
     
-    if (EGraphFileResult::GraphFileResultSuccess != fileResult)
+    if (EGraphResult::GraphResultSuccess != fileResult)
     {
         PrintGraphFileError(argv[0], inputGraphFile.c_str(), fileResult, true);
         return __LINE__;
@@ -444,13 +511,13 @@ int main(const int argc, const char* const argv[])
     for (size_t i = 0; i < writers.size(); ++i)
     {
         fileResult = writers[i]->WriteGraphToFile(outputGraphFiles[i].c_str(), graph, writerGroupByDestination[i]);
-        if (EGraphFileResult::GraphFileResultSuccess != fileResult)
+        if (EGraphResult::GraphResultSuccess != fileResult)
         {
             PrintGraphFileError(argv[0], outputGraphFiles[i].c_str(), fileResult, false);
         }
         else
         {
-            printf("Wrote %s-grouped graph %s.\n", (writerGroupByDestination[i] ? "destination" : "source"), outputGraphFiles[i].c_str());
+            printf("Wrote %s-grouped %s graph %s.\n", (writerGroupByDestination[i] ? "destination" : "source"), edgeDataTypeStrings.at(writersEdgeDataType[i]).c_str(), outputGraphFiles[i].c_str());
         }
     }
     

@@ -59,6 +59,29 @@ namespace GraphTool
     
     // --------
     
+    template <> bool Graph::DoesEdgeDataTypeMatch<void>(void) const
+    {
+        // A graph with any type of edge data automatically matches the unweighted case.
+        // This is because weights can simply be ignored, thus making the graph effectively unweighted.
+        return true;
+    }
+    
+    // --------
+    
+    template <> bool Graph::DoesEdgeDataTypeMatch<uint64_t>(void) const
+    {
+        return (EEdgeDataType::EdgeDataTypeInteger == edgeDataType);
+    }
+    
+    // --------
+    
+    template <> bool Graph::DoesEdgeDataTypeMatch<double>(void) const
+    {
+        return (EEdgeDataType::EdgeDataTypeFloatingPoint == edgeDataType);
+    }
+    
+    // --------
+    
     template <> void Graph::SetEdgeDataType<void>(void)
     {
         edgeDataType = EEdgeDataType::EdgeDataTypeVoid;

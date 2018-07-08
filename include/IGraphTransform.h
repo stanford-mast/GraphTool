@@ -6,8 +6,8 @@
  * Department of Electrical Engineering, Stanford University
  * Copyright (c) 2016-2017
  *************************************************************************//**
- * @file IGraphReader.h
- *   Declaration of the interface to objects that read graphs from files.
+ * @file IGraphTransform.h
+ *   Declaration of the interface to objects that transform graphs.
  *****************************************************************************/
 
 #pragma once
@@ -20,16 +20,16 @@ namespace GraphTool
     class Graph;
 
     
-    /// Interface for objects that read graphs from files.
-    class IGraphReader
-    {   
+    /// Interface for objects that apply transformations to graphs.
+    class IGraphTransform
+    {
     public:
         // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
-        
-        /// Reads a graph from the specified file.
-        /// @param [in] filename File name of the file to be read.
-        /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
-        /// @return Result of the read operation.
-        virtual EGraphResult ReadGraphFromFile(const char* const filename, Graph& graph) = 0;
+
+        /// Applies a transformation to the specified graph object.
+        /// The exact transformation operation is subclass-specific.
+        /// @param [in] graph Graph object to be transformed.
+        /// @return Result of the transformation operation.
+        virtual EGraphResult ApplyTransformation(Graph& graph) = 0;
     };
 }

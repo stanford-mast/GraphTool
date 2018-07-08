@@ -94,6 +94,6 @@ namespace GraphTool
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "IGraphReader.h" for documentation.
         
-        virtual EGraphFileResult ReadGraphFromFile(const char* const filename, Graph& graph);
+        virtual EGraphResult ReadGraphFromFile(const char* const filename, Graph& graph);
     };
 }

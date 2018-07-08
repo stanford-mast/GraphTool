@@ -59,6 +59,11 @@ namespace GraphTool
 
         // -------- INSTANCE METHODS --------------------------------------- //
         
+        /// Verifies that the edge data format in the graph matches the template argument.
+        /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+        /// @return `true` if so, `false` otherwise.
+        template <typename TEdgeData> bool DoesEdgeDataTypeMatch(void) const;
+        
         /// Performs a simple and fast insertion of the specified edge into the destination-grouped data structure.
         /// Does not update any internal counters for vectors or edges, nor does it automatically maintain consistency.
         /// Can be invoked from multiple threads, so long as each thread updates a different top-level vertex.
