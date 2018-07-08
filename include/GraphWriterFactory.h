@@ -21,7 +21,7 @@
 
 namespace GraphTool
 {
-    template <typename TEdgeData> class GraphWriter;
+    class IGraphWriter;
 
 
     /// Enumerates known GraphWriter object types.
@@ -53,7 +53,7 @@ namespace GraphTool
         /// @param [in] type Type of GraphWriter object to create.
         /// @param [in] edgedatatype Type of data that the GraphWriter object should write for each edge.
         /// @return Pointer to the GraphWriter object, or `NULL` in the event of an error.
-        static GraphWriter<void>* CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype);
+        static IGraphWriter* CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype);
 
         /// Returns a pointer to a mapping from strings to EGraphWriterType enumerators.
         /// @return Pointer to the enumerator mapping.

@@ -11,8 +11,8 @@
  *****************************************************************************/
 
 #include "BinaryEdgeListReader.h"
-#include "GraphReader.h"
 #include "GraphReaderFactory.h"
+#include "IGraphReader.h"
 #include "TextEdgeListReader.h"
 #include "Types.h"
 
@@ -44,9 +44,9 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     /// @param [in] type Type of GraphReader object to create.
     /// @return Pointer to the GraphReader object, or `NULL` in the event of an error.
-    template <typename TEdgeData> static GraphReader<TEdgeData>* CreateGraphReaderInternal(EGraphReaderType type)
+    template <typename TEdgeData> static IGraphReader* CreateGraphReaderInternal(EGraphReaderType type)
     {
-        GraphReader<TEdgeData>* result = NULL;
+        IGraphReader* result = NULL;
 
         switch (type)
         {
@@ -68,9 +68,9 @@ namespace GraphTool
     // -------- CLASS METHODS ---------------------------------------------- //
     // See "GraphReaderFactory.h" for documentation.
 
-    GraphReader<void>* GraphReaderFactory::CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype)
+    IGraphReader* GraphReaderFactory::CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype)
     {
-        GraphReader<void>* result = NULL;
+        IGraphReader* result = NULL;
         
         switch (edgedatatype)
         {
@@ -79,11 +79,11 @@ namespace GraphTool
             break;
         
         case EEdgeDataType::EdgeDataTypeInteger:
-            result = CreateGraphReaderInternal<void>(type);
+            result = CreateGraphReaderInternal<uint64_t>(type);
             break;
             
         case EEdgeDataType::EdgeDataTypeFloatingPoint:
-            result = CreateGraphReaderInternal<void>(type);
+            result = CreateGraphReaderInternal<double>(type);
             break;
             
         default:

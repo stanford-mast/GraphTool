@@ -7,12 +7,13 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphWriter.h
- *   Declaration of the common interface to objects capable of producing
+ *   Declaration of the common functionality for objects capable of producing
  *   graph files of various formats.
  *****************************************************************************/
 
 #pragma once
 
+#include "IGraphWriter.h"
 #include "Types.h"
 
 #include <cstddef>
@@ -28,7 +29,7 @@ namespace GraphTool
     /// Objects in this hierarchy consume graph objects and produce files.
     /// Some common functionality is implemented directly in the base class.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class GraphWriter
+    template <typename TEdgeData> class GraphWriter : public IGraphWriter
     {
     private:
         // -------- CONSTANTS ---------------------------------------------- //
@@ -84,13 +85,9 @@ namespace GraphTool
         
         
     public:
-        // -------- INSTANCE METHODS --------------------------------------- //
-
-        /// Writes a graph to the specified file.
-        /// @param [in] filename File name of the file to be written.
-        /// @param [in] graph Graph object to be written to the file.
-        /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
-        /// @return `true` if the graph was written successfully, `false` otherwise.
-        bool WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false);
+        // -------- CONCRETE INSTANCE METHODS ------------------------------ //
+        // See "IGraphWriter.h" for documentation.
+        
+        virtual bool WriteGraphToFile(const char* const filename, const Graph& graph, const bool groupedByDestination = false);
     };
 }

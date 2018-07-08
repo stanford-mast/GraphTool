@@ -11,10 +11,10 @@
 *****************************************************************************/
 
 #include "Graph.h"
-#include "GraphReader.h"
 #include "GraphReaderFactory.h"
-#include "GraphWriter.h"
 #include "GraphWriterFactory.h"
+#include "IGraphReader.h"
+#include "IGraphWriter.h"
 #include "OptionContainer.h"
 #include "Options.h"
 #include "VersionInfo.h"
@@ -22,7 +22,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
-#include <immintrin.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -92,7 +91,6 @@ namespace GraphTool
 
     /// Holds all specified command-line options, mapped from the strings used to identify them.
     static std::map<std::string, OptionContainer*> cmdlineSpecifiedOptions = {
-        //{ kOptionEdgeData,                          new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, 1) },
         { kOptionInputFile,                         new OptionContainer(EOptionValueType::OptionValueTypeString) },
         { kOptionInputFormat,                       new EnumOptionContainer(*(GraphReaderFactory::GetGraphReaderStrings()), OptionContainer::kUnlimitedValueCount) },
         { kOptionInputOptions,                      new OptionContainer("") },
@@ -296,7 +294,7 @@ int main(int argc, const char* argv[])
     if (!(optionValues->QueryValue(optionGraphFormatEnum)))
         return __LINE__;
 
-    GraphReader<void>* reader = GraphReaderFactory::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
+    IGraphReader* reader = GraphReaderFactory::CreateGraphReader((EGraphReaderType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
     if (NULL == reader)
         return __LINE__;
 
@@ -305,14 +303,14 @@ int main(int argc, const char* argv[])
     if (NULL == optionValues)
         return __LINE__;
 
-    std::vector<GraphWriter<void>*> writers(optionValues->GetValueCount());
+    std::vector<IGraphWriter*> writers(optionValues->GetValueCount());
 
     for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
     {
         if (!(optionValues->QueryValueAt(i, optionGraphFormatEnum)))
             return __LINE__;
 
-        GraphWriter<void>* writer = GraphWriterFactory::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
+        IGraphWriter* writer = GraphWriterFactory::CreateGraphWriter((EGraphWriterType)optionGraphFormatEnum, EEdgeDataType::EdgeDataTypeVoid);
         if (NULL == writer)
             return __LINE__;
 

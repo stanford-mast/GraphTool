@@ -7,12 +7,13 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphReader.h
- *   Declaration of the common interface to objects capable of interpreting
- *   graph files of various formats.
+ *   Declaration of the common functionality for objects capable of
+ *   interpreting graph files of various formats.
  *****************************************************************************/
 
 #pragma once
 
+#include "IGraphReader.h"
 #include "Types.h"
 
 #include <cstddef>
@@ -28,7 +29,7 @@ namespace GraphTool
     /// Objects in this hierarchy load graph data from a file and produce one of the graph objects.
     /// Some common functionality is implemented directly in the base class.
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
-    template <typename TEdgeData> class GraphReader
+    template <typename TEdgeData> class GraphReader : public IGraphReader
     {   
     private:
         // -------- CONSTANTS ---------------------------------------------- //
@@ -90,12 +91,9 @@ namespace GraphTool
         
 
     public:
-        // -------- INSTANCE METHODS --------------------------------------- //
+        // -------- CONCRETE INSTANCE METHODS ------------------------------ //
+        // See "IGraphReader.h" for documentation.
         
-        /// Reads a graph from the specified file.
-        /// @param [in] filename File name of the file to be read.
-        /// @param [out] graph Graph object to be filled. Not modified if an error occurs during reading.
-        /// @return `true` on successful read, `false` on error.
-        bool ReadGraphFromFile(const char* const filename, Graph& graph);
+        virtual bool ReadGraphFromFile(const char* const filename, Graph& graph);
     };
 }

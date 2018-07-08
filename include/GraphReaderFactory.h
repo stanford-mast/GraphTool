@@ -21,7 +21,7 @@
 
 namespace GraphTool
 {
-    template <typename TEdgeData> class GraphReader;
+    class IGraphReader;
 
 
     /// Enumerates known GraphReader object types.
@@ -50,7 +50,7 @@ namespace GraphTool
         /// @param [in] type Type of GraphReader object to create.
         /// @param [in] edgedatatype Type of data that the GraphReader object should read for each edge.
         /// @return Pointer to the GraphReader object, or `NULL` in the event of an error.
-        static GraphReader<void>* CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype);
+        static IGraphReader* CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype);
 
         /// Returns a pointer to a mapping from strings to EGraphReaderType enumerators.
         /// @return Pointer to the enumerator mapping.

@@ -11,8 +11,8 @@
  *****************************************************************************/
 
 #include "BinaryEdgeListWriter.h"
-#include "GraphWriter.h"
 #include "GraphWriterFactory.h"
+#include "IGraphWriter.h"
 #include "TextAdjacencyListWriter.h"
 #include "TextEdgeListWriter.h"
 #include "Types.h"
@@ -59,9 +59,9 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     /// @param [in] type Type of GraphWriter object to create.
     /// @return Pointer to the GraphWriter object, or `NULL` in the event of an error.
-    template <typename TEdgeData> static GraphWriter<TEdgeData>* CreateGraphWriterInternal(EGraphWriterType type)
+    template <typename TEdgeData> static IGraphWriter* CreateGraphWriterInternal(EGraphWriterType type)
     {
-        GraphWriter<TEdgeData>* result = NULL;
+        IGraphWriter* result = NULL;
 
         switch (type)
         {
@@ -92,9 +92,9 @@ namespace GraphTool
     // -------- CLASS METHODS ---------------------------------------------- //
     // See "GraphWriterFactory.h" for documentation.
 
-    GraphWriter<void>* GraphWriterFactory::CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype)
+    IGraphWriter* GraphWriterFactory::CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype)
     {
-        GraphWriter<void>* result = NULL;
+        IGraphWriter* result = NULL;
         
         switch (edgedatatype)
         {
@@ -103,11 +103,11 @@ namespace GraphTool
             break;
         
         case EEdgeDataType::EdgeDataTypeInteger:
-            result = CreateGraphWriterInternal<void>(type);
+            result = CreateGraphWriterInternal<uint64_t>(type);
             break;
             
         case EEdgeDataType::EdgeDataTypeFloatingPoint:
-            result = CreateGraphWriterInternal<void>(type);
+            result = CreateGraphWriterInternal<double>(type);
             break;
             
         default:
