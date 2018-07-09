@@ -14,37 +14,52 @@
     <ClInclude Include="include\Atomic.h" />
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
+    <ClInclude Include="include\EdgeDataTransform.h" />
     <ClInclude Include="include\EdgeList.h" />
-    <ClInclude Include="include\VertexIndex.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\GraphReader.h" />
     <ClInclude Include="include\GraphReaderFactory.h" />
+    <ClInclude Include="include\GraphTransform.h" />
+    <ClInclude Include="include\GraphTransformFactory.h" />
     <ClInclude Include="include\GraphWriter.h" />
     <ClInclude Include="include\GraphWriterFactory.h" />
+    <ClInclude Include="include\HashEdgeDataTransform.h" />
+    <ClInclude Include="include\IGraphReader.h" />
+    <ClInclude Include="include\IGraphTransform.h" />
+    <ClInclude Include="include\IGraphWriter.h" />
+    <ClInclude Include="include\NullEdgeDataTransform.h" />
     <ClInclude Include="include\OptionContainer.h" />
     <ClInclude Include="include\Options.h" />
     <ClInclude Include="include\PlatformFunctions.h" />
+    <ClInclude Include="include\TextAdjacencyListWriter.h" />
     <ClInclude Include="include\TextEdgeListReader.h" />
     <ClInclude Include="include\TextEdgeListWriter.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\VersionInfo.h" />
+    <ClInclude Include="include\VertexIndex.h" />
     <ClInclude Include="include\XStreamWriter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\BinaryEdgeListReader.cpp" />
     <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
+    <ClCompile Include="source\EdgeDataTransform.cpp" />
     <ClCompile Include="source\EdgeList.cpp" />
     <ClCompile Include="source\Graph.cpp" />
-    <ClCompile Include="source\VertexIndex.cpp" />
     <ClCompile Include="source\GraphReader.cpp" />
     <ClCompile Include="source\GraphReaderFactory.cpp" />
+    <ClCompile Include="source\GraphTransform.cpp" />
+    <ClCompile Include="source\GraphTransformFactory.cpp" />
     <ClCompile Include="source\GraphWriter.cpp" />
     <ClCompile Include="source\GraphWriterFactory.cpp" />
+    <ClCompile Include="source\HashEdgeDataTransform.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\NullEdgeDataTransform.cpp" />
     <ClCompile Include="source\OptionContainer.cpp" />
     <ClCompile Include="source\Options.cpp" />
+    <ClCompile Include="source\TextAdjacencyListWriter.cpp" />
     <ClCompile Include="source\TextEdgeListReader.cpp" />
     <ClCompile Include="source\TextEdgeListWriter.cpp" />
+    <ClCompile Include="source\VertexIndex.cpp" />
     <ClCompile Include="source\XStreamWriter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -101,7 +116,7 @@
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Silo-Debug.lib;Spindle-Debug.lib;Topo-Debug.lib;libhwloc-5-debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Parutil-Debug.lib;Silo-Debug.lib;Spindle-Debug.lib;Topo-Debug.lib;libhwloc-5-debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,7 +137,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Silo.lib;Spindle.lib;Topo.lib;libhwloc-5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Parutil.lib;Silo.lib;Spindle.lib;Topo.lib;libhwloc-5.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -190,13 +190,6 @@ namespace GraphTool
             docstring += " ";
             docstring += cmdlinePrefixStrings[0];
             docstring += cmdlineHelpStrings[0];
-            
-            for (size_t i = 1; i < cmdlineHelpStrings.size(); ++i)
-            {
-                docstring += "|";
-                docstring += cmdlineHelpStrings[i];
-            }
-            
             docstring += "\n";
         }
         
@@ -207,13 +200,6 @@ namespace GraphTool
             docstring += " ";
             docstring += cmdlinePrefixStrings[0];
             docstring += cmdlineVersionStrings[0];
-            
-            for (size_t i = 1; i < cmdlineVersionStrings.size(); ++i)
-            {
-                docstring += "|";
-                docstring += cmdlineVersionStrings[i];
-            }
-            
             docstring += "\n";
         }
         
@@ -261,13 +247,6 @@ namespace GraphTool
             docstring += "  ";
             docstring += cmdlinePrefixStrings[0];
             docstring += cmdlineHelpStrings[0];
-            
-            for (size_t i = 1; i < cmdlineHelpStrings.size(); ++i)
-            {
-                docstring += "|";
-                docstring += cmdlineHelpStrings[i];
-            }
-            
             docstring += "\n";
             docstring += "        Prints this information and exits.\n";
         }
@@ -278,13 +257,6 @@ namespace GraphTool
             docstring += "  ";
             docstring += cmdlinePrefixStrings[0];
             docstring += cmdlineVersionStrings[0];
-            
-            for (size_t i = 1; i < cmdlineVersionStrings.size(); ++i)
-            {
-                docstring += "|";
-                docstring += cmdlineVersionStrings[i];
-            }
-            
             docstring += "\n";
             docstring += "        Prints version information and exits.\n";
         }
