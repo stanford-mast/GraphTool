@@ -28,6 +28,7 @@ namespace GraphTool
     /// Each corresponds to a different graph transformation that can be applied.
     enum EGraphTransformType : int64_t
     {
+        GraphTransformTypeHashEdgeData,                                     ///< HashEdgeDataTransform
         GraphTransformTypeNullIntEdgeData,                                  ///< NullEdgeDataTransform<uint64_t>
         GraphTransformTypeNullFloatEdgeData,                                ///< NullEdgeDataTransform<double>
     };

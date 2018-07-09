@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "GraphTransformFactory.h"
+#include "HashEdgeDataTransform.h"
 #include "IGraphTransform.h"
 #include "NullEdgeDataTransform.h"
 #include "Types.h"
@@ -27,6 +28,10 @@ namespace GraphTool
 
     /// Maps strings to the internal edge list type.
     static const std::map<std::string, int64_t> graphTransformStrings = {
+        { "hashedgedata",                                                   EGraphTransformType::GraphTransformTypeHashEdgeData },
+        { "hashEdgeData",                                                   EGraphTransformType::GraphTransformTypeHashEdgeData },
+        { "HashEdgeData",                                                   EGraphTransformType::GraphTransformTypeHashEdgeData },
+        
         { "nullintedgedata",                                                EGraphTransformType::GraphTransformTypeNullIntEdgeData },
         { "nullIntEdgeData",                                                EGraphTransformType::GraphTransformTypeNullIntEdgeData },
         { "NullIntEdgeData",                                                EGraphTransformType::GraphTransformTypeNullIntEdgeData },
@@ -46,6 +51,10 @@ namespace GraphTool
 
         switch (type)
         {
+        case EGraphTransformType::GraphTransformTypeHashEdgeData:
+            result = new HashEdgeDataTransform;
+            break;
+            
         case EGraphTransformType::GraphTransformTypeNullIntEdgeData:
             result = new NullEdgeDataTransform<uint64_t>;
             break;
