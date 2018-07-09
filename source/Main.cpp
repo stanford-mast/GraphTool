@@ -541,6 +541,5 @@ int main(const int argc, const char* const argv[])
     
     // Print final messages and exit.
     printf("Exiting.\n");
-
-    return 0;
+    exit(0);
 }
