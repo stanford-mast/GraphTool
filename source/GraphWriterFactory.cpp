@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphWriterFactory.cpp
- *   Factory for creating GraphWriter objects of various types.
+ *   Factory for creating IGraphWriter objects of various types.
  *****************************************************************************/
 
 #include "BinaryEdgeListWriter.h"
@@ -66,19 +66,19 @@ namespace GraphTool
         switch (type)
         {
         case EGraphWriterType::GraphWriterTypeBinaryEdgeList:
-            result = new BinaryEdgeListWriter<TEdgeData>();
+            result = new BinaryEdgeListWriter<TEdgeData>;
             break;
 
         case EGraphWriterType::GraphWriterTypeTextAdjacencyList:
-            result = new TextAdjacencyListWriter<TEdgeData>();
+            result = new TextAdjacencyListWriter<TEdgeData>;
             break;
         
         case EGraphWriterType::GraphWriterTypeTextEdgeList:
-            result = new TextEdgeListWriter<TEdgeData>();
+            result = new TextEdgeListWriter<TEdgeData>;
             break;
 
         case EGraphWriterType::GraphWriterTypeXStream:
-            result = new XStreamWriter<TEdgeData>();
+            result = new XStreamWriter<TEdgeData>;
             break;
 
         default:

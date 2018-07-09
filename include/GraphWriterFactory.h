@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphWriterFactory.h
- *   Factory for creating GraphWriter objects of various types.
+ *   Factory for creating IGraphWriter objects of various types.
  *****************************************************************************/
 
 #pragma once
@@ -24,7 +24,7 @@ namespace GraphTool
     class IGraphWriter;
 
 
-    /// Enumerates known GraphWriter object types.
+    /// Enumerates known graph writer object types.
     /// Each corresponds to a different graph file format that can be written.
     enum EGraphWriterType : int64_t
     {
@@ -34,8 +34,7 @@ namespace GraphTool
         GraphWriterTypeXStream,                                             ///< XStreamWriter
     };
 
-    /// Factory for creating GraphWriter objects of various types.
-    /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
+    /// Factory for creating IGraphWriter objects of various types.
     class GraphWriterFactory
     {
     private:
@@ -49,10 +48,10 @@ namespace GraphTool
     public:
         // -------- CLASS METHODS ------------------------------------------ //
 
-        /// Creates and returns a pointer to a GraphWriter object of the specified type.
-        /// @param [in] type Type of GraphWriter object to create.
-        /// @param [in] edgedatatype Type of data that the GraphWriter object should write for each edge.
-        /// @return Pointer to the GraphWriter object, or `NULL` in the event of an error.
+        /// Creates and returns a pointer to an IGraphWriter object of the specified type.
+        /// @param [in] type Type of IGraphWriter object to create.
+        /// @param [in] edgedatatype Type of data that the IGraphWriter object should write for each edge.
+        /// @return Pointer to the IGraphWriter object, or `NULL` in the event of an error.
         static IGraphWriter* CreateGraphWriter(EGraphWriterType type, EEdgeDataType edgedatatype);
 
         /// Returns a pointer to a mapping from strings to EGraphWriterType enumerators.

@@ -33,6 +33,9 @@ namespace GraphTool
         /// Alias for read-only iterators over indexed vertices.
         typedef typename VertexIndex::VertexIterator VertexIterator;
         
+        /// Alias for writable iterators over indexed vertices.
+        typedef typename VertexIndex::WritableVertexIterator WritableVertexIterator;
+        
         
     private:
         // -------- INSTANCE VARIABLES ------------------------------------- //
@@ -239,6 +242,15 @@ namespace GraphTool
             return edgesByDestination.BeginIterator() + vertex;
         }
         
+        /// Obtains a writable random-access iterator to the specified vertex within the destination-grouped vertex index.
+        /// Intended for use by transformation objects.
+        /// @param [in] vertex Position within the vertex index.
+        /// @return Writable iterator to the specified vertex within the index.
+        inline VertexIterator VertexIteratorDestinationAtWritable(TVertexID vertex)
+        {
+            return edgesByDestination.BeginIteratorWritable() + vertex;
+        }
+        
         /// Obtains a read-only random-access iterator to the beginning of the destination-grouped vertex index.
         /// @return Read-only iterator to the beginning of the vertex index.
         inline VertexIterator VertexIteratorDestinationBegin(void) const
@@ -259,6 +271,15 @@ namespace GraphTool
         inline VertexIterator VertexIteratorSourceAt(TVertexID vertex) const
         {
             return edgesBySource.BeginIterator() + vertex;
+        }
+        
+        /// Obtains a writable random-access iterator to the specified vertex within the source-grouped vertex index.
+        /// Intended for use by transformation objects.
+        /// @param [in] vertex Position within the vertex index.
+        /// @return Writable iterator to the specified vertex within the index.
+        inline VertexIterator VertexIteratorSourceAtWritable(TVertexID vertex)
+        {
+            return edgesBySource.BeginIteratorWritable() + vertex;
         }
 
         /// Obtains a read-only random-access iterator to the beginning of the source-grouped vertex index.

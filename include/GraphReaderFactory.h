@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphReaderFactory.h
- *   Factory for creating GraphReader objects of various types.
+ *   Factory for creating IGraphReader objects of various types.
  *****************************************************************************/
 
 #pragma once
@@ -24,7 +24,7 @@ namespace GraphTool
     class IGraphReader;
 
 
-    /// Enumerates known GraphReader object types.
+    /// Enumerates known graph reader object types.
     /// Each corresponds to a different graph file format that can be read.
     enum EGraphReaderType : int64_t
     {
@@ -32,7 +32,7 @@ namespace GraphTool
         GraphReaderTypeTextEdgeList,                                        ///< TextEdgeListReader
     };
     
-    /// Factory for creating GraphReader objects of various types.
+    /// Factory for creating IGraphReader objects of various types.
     class GraphReaderFactory
     {
     private:
@@ -46,10 +46,10 @@ namespace GraphTool
     public:
         // -------- CLASS METHODS ------------------------------------------ //
         
-        /// Creates and returns a pointer to a GraphReader object of the specified type.
-        /// @param [in] type Type of GraphReader object to create.
-        /// @param [in] edgedatatype Type of data that the GraphReader object should read for each edge.
-        /// @return Pointer to the GraphReader object, or `NULL` in the event of an error.
+        /// Creates and returns a pointer to an IGraphReader object of the specified type.
+        /// @param [in] type Type of IGraphReader object to create.
+        /// @param [in] edgedatatype Type of data that the IGraphReader object should read for each edge.
+        /// @return Pointer to the IGraphReader object, or `NULL` in the event of an error.
         static IGraphReader* CreateGraphReader(EGraphReaderType type, EEdgeDataType edgedatatype);
 
         /// Returns a pointer to a mapping from strings to EGraphReaderType enumerators.

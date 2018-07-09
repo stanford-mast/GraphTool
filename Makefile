@@ -16,7 +16,7 @@
 PROJECT_NAME                = graphtool
 PLATFORM_NAME               = linux
 
-LIBRARY_DEPENDENCIES        = libspindle libsilo libtopo libhwloc libpthread libnuma libpciaccess libxml2
+LIBRARY_DEPENDENCIES        = libparutil libspindle libsilo libtopo libhwloc libpthread libnuma libpciaccess libxml2
 
 SOURCE_DIR                  = source
 INCLUDE_DIR                 = include

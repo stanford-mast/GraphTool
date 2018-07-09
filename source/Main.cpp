@@ -12,8 +12,10 @@
 
 #include "Graph.h"
 #include "GraphReaderFactory.h"
+#include "GraphTransformFactory.h"
 #include "GraphWriterFactory.h"
 #include "IGraphReader.h"
+#include "IGraphTransform.h"
 #include "IGraphWriter.h"
 #include "OptionContainer.h"
 #include "Options.h"
@@ -57,6 +59,9 @@ namespace GraphTool
     
     /// Command-line option that specifies output processing options.
     static const std::string kOptionOutputOptions = "outputoptions";
+    
+    /// Command-line option that specifies a graph transformation operation.
+    static const std::string kOptionTransform = "transform";
 
 
     // -------- LOCALS ----------------------------------------------------- //
@@ -164,6 +169,7 @@ namespace GraphTool
         { kOptionOutputWeights,                                             new EnumOptionContainer(cmdlineEdgeDataTypeStrings, EEdgeDataType::EdgeDataTypeVoid, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputGrouping,                                            new EnumOptionContainer(cmdlineOutputGroupingEnum, 0ll, OptionContainer::kUnlimitedValueCount) },
         { kOptionOutputOptions,                                             new OptionContainer("", OptionContainer::kUnlimitedValueCount) },
+        { kOptionTransform,                                                 new EnumOptionContainer(*(GraphTransformFactory::GetGraphTransformStrings()), INT64_MAX, OptionContainer::kUnlimitedValueCount) },
     };
     
     /// Dynamically builds the documentation string to use to display help to the user.
@@ -326,6 +332,15 @@ namespace GraphTool
         docstring += "        Optional; may be specified at most once per output file.\n";
         docstring += "        See documentation for supported values and defaults.\n";
         
+        docstring += "  ";
+        docstring += cmdlinePrefixStrings[0];
+        docstring += kOptionTransform;
+        docstring += "=<transform-string>\n";
+        docstring += "        Transformation operation to be applied.\n";
+        docstring += "        Transformation operations are applied in command-line order.\n";
+        docstring += "        Optional; may be specified as many times as needed.\n";
+        docstring += "        See documentation for supported values and defaults.\n";
+        
         return docstring;
     }
     
@@ -462,6 +477,23 @@ int main(const int argc, const char* const argv[])
     if (!(writers.size() == outputGraphFiles.size()))
         return __LINE__;
 
+    // Create transformation objects.
+    optionValues = commandLineOptions.GetOptionValues(kOptionTransform);
+    if (NULL == optionValues)
+        return __LINE__;
+    
+    std::vector<IGraphTransform*> transforms(optionValues->GetValueCount());
+    
+    for (size_t i = 0; i < optionValues->GetValueCount(); ++i)
+    {
+        int64_t transformTypeEnum;
+        
+        if (!(optionValues->QueryValueAt(i, transformTypeEnum)))
+            return __LINE__;
+        
+        transforms[i] = GraphTransformFactory::CreateGraphTransform((EGraphTransformType)transformTypeEnum);
+    }
+    
     // Submit input and output options to all of the readers and writers, respectively.
     optionValues = commandLineOptions.GetOptionValues(kOptionInputOptions);
     if (NULL == optionValues)
@@ -505,7 +537,21 @@ int main(const int argc, const char* const argv[])
     }
 
     // Perform transformations.
-    // TODO
+    for (size_t i = 0; i < transforms.size(); ++i)
+    {
+        if (NULL != transforms[i])
+        {
+            const EGraphResult transformResult = transforms[i]->ApplyTransformation(graph);
+            
+            if (EGraphResult::GraphResultSuccess == transformResult)
+                puts("Applied transform.");
+            else
+            {
+                puts("Failed to apply transform.");
+                return __LINE__;
+            }
+        }
+    }
 
     // Write the output graphs.
     for (size_t i = 0; i < writers.size(); ++i)

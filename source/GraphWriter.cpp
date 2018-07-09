@@ -94,7 +94,7 @@ namespace GraphTool
         SGraphWriteSpec<TEdgeData>* writeSpec = (SGraphWriteSpec<TEdgeData>*)arg;
         uint32_t currentBufferIndex = 0;
         
-        const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<void>));
+        const size_t writeBufferCount = (kGraphWriteBufferSize / sizeof(SEdge<TEdgeData>));
         const VertexIndex& vertexIndex = (writeSpec->groupedByDestination ? writeSpec->graph->VertexIndexDestination() : writeSpec->graph->VertexIndexSource());
         
         TVertexID topLevelVertex = 0;

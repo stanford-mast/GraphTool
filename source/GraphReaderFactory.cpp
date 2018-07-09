@@ -7,7 +7,7 @@
  * Copyright (c) 2016-2017
  *************************************************************************//**
  * @file GraphReaderFactory.cpp
- *   Factory for creating GraphReader objects of various types.
+ *   Factory for creating IGraphReader objects of various types.
  *****************************************************************************/
 
 #include "BinaryEdgeListReader.h"
@@ -51,11 +51,11 @@ namespace GraphTool
         switch (type)
         {
         case EGraphReaderType::GraphReaderTypeBinaryEdgeList:
-            result = new BinaryEdgeListReader<TEdgeData>();
+            result = new BinaryEdgeListReader<TEdgeData>;
             break;
 
         case EGraphReaderType::GraphReaderTypeTextEdgeList:
-            result = new TextEdgeListReader<TEdgeData>();
+            result = new TextEdgeListReader<TEdgeData>;
             break;
 
         default:

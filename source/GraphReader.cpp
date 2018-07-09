@@ -153,7 +153,7 @@ namespace GraphTool
         while (true)
         {
             // Fill the buffer with edges.
-            readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdge<void>)));
+            readSpec->counts[currentBufferIndex] = readSpec->reader->ReadEdgesToBuffer(readSpec->file, readSpec->bufs[currentBufferIndex], (kGraphReadBufferSize / sizeof(SEdge<TEdgeData>)));
 
             // Check for any I/O errors.
             if (ferror(readSpec->file))

@@ -30,8 +30,11 @@ namespace GraphTool
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
-        /// Alias for the iterator type used by this class.
+        /// Alias for the read-only iterator type used by this class.
         typedef typename std::list<SIndexedEdge>::const_iterator EdgeIterator;
+        
+        /// Alias for the writable iterator type used by this class.
+        typedef typename std::list<SIndexedEdge>::iterator WritableEdgeIterator;
         
         
     private:
@@ -75,12 +78,28 @@ namespace GraphTool
         {
             return edgeList.cbegin();
         }
+        
+        /// Returns a writable iterator for the beginning of the edge list.
+        /// Intended for use by transformation objects.
+        /// @return Writable iterator to the beginning of the edge list.
+        inline WritableEdgeIterator BeginIteratorWritable(void)
+        {
+            return edgeList.begin();
+        }
 
         /// Returns a read-only iterator for the end of the edge list.
         /// @return Read-only iterator for the end of the edge list.
         inline EdgeIterator EndIterator(void) const
         {
             return edgeList.cend();
+        }
+        
+        /// Returns a writable iterator for the end of the edge list.
+        /// Intended for use by transformation objects.
+        /// @return Writable iterator to the end of the edge list.
+        inline WritableEdgeIterator EndIteratorWritable(void)
+        {
+            return edgeList.end();
         }
         
         /// Fills in an edge structure with information exported from the specified position in the edge list.

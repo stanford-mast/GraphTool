@@ -29,8 +29,11 @@ namespace GraphTool
     public:
         // -------- TYPE DEFINITIONS --------------------------------------- //
         
-        /// Alias for the iterator type used by this class.
+        /// Alias for the read-only iterator type used by this class.
         typedef typename std::vector<EdgeList*>::const_iterator VertexIterator;
+        
+        /// Alias for the writable iterator type used by this class.
+        typedef typename std::vector<EdgeList*>::const_iterator WritableVertexIterator;
         
         
     private:
@@ -78,12 +81,28 @@ namespace GraphTool
         {
             return vertexIndex.cbegin();
         }
+        
+        /// Returns a writable iterator for the beginning of the vertex index.
+        /// Intended for use by transformation objects.
+        /// @return Writable iterator to the beginning of the vertex index.
+        inline WritableVertexIterator BeginIteratorWritable(void)
+        {
+            return vertexIndex.begin();
+        }
 
         /// Returns a read-only iterator for the end of the vertex index.
         /// @return Read-only iterator for the end of the vertex index.
         inline VertexIterator EndIterator(void) const
         {
             return vertexIndex.cend();
+        }
+        
+        /// Returns a writable iterator for the end of the vertex index.
+        /// Intended for use by transformation objects.
+        /// @return Writable iterator to the end of the vertex index.
+        inline WritableVertexIterator EndIteratorWritable(void)
+        {
+            return vertexIndex.end();
         }
 
         /// Performs a simple and fast insertion of the specified edge into this data structure, using the destination as the top-level vertex.

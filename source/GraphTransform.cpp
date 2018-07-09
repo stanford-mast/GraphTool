@@ -104,8 +104,7 @@ namespace GraphTool
             taskSpec.smtPolicy = SpindleSMTPolicyPreferLogical;
             
             // Launch the graph transformation task.
-            if (0 != spindleThreadsSpawn(&taskSpec, sizeof(taskSpec), true))
-                return EGraphResult::GraphResultErrorUnknown;
+            const uint32_t spawnResult = spindleThreadsSpawn(&taskSpec, 1, true);
             
             // Collect the results.
             EGraphResult result = EGraphResult::GraphResultSuccess;
@@ -121,7 +120,11 @@ namespace GraphTool
             
             // Clean up.
             delete[] transformSpec.transformResult;
-            return result;
+            
+            if (0 != spawnResult)
+                return EGraphResult::GraphResultErrorUnknown;
+            else
+                return result;
         }
         else
         {
