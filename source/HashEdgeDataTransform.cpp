@@ -22,7 +22,7 @@ namespace GraphTool
     
     uint64_t HashEdgeDataTransform::GenerateEdgeData(const TVertexID sourceVertex, const TVertexID destinationVertex, const uint64_t oldEdgeData)
     {
-        // This method applies a varition of Knuth's multiplicative hash algorithm to source and destination vertex to determine the edge data value.
+        // This method applies a variation of Knuth's multiplicative hash algorithm to source and destination vertex to determine the edge data value.
         const uint64_t weightBase = (destinationVertex << 2ull) + destinationVertex + sourceVertex;
         const uint64_t weightHashed = weightBase * 2654435761ull;
         const uint64_t weightAdjusted = (weightHashed >> 25ull) & 32767ull;
