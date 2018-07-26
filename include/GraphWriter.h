@@ -65,6 +65,12 @@ namespace GraphTool
         
         // -------- ABSTRACT INSTANCE METHODS ------------------------------ //
 
+        /// Retrieves the number of passes over the graph required to generate the output file.
+        /// Subclass implementation is optional; default implementation returns 1.
+        /// Invoked by only a single thread.
+        /// @return Number of passes over the edges in the graph needed to generate the output file.
+        virtual unsigned int NumberOfPassesRequired(void);
+        
         /// Opens and performs any initial file reading tasks required to prepare the graph file for writing of graph data.
         /// Invoked by only a single thread, so it is safe to modify any needed state without synchronization.
         /// @param [in] filename File name of the file to be opened for writing.
@@ -80,8 +86,9 @@ namespace GraphTool
         /// @param [in] buf Buffer from which to read edge data.
         /// @param [in] count Number of edges in the buffer.
         /// @param [in] groupedByDestination Indicates that graph edges should be grouped by destination instead of by source.
+        /// @param [in] currentPass Zero-based index of the current writing pass.
         /// @return `true` if all edges were successfully written, `false` otherwise.
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination) = 0;
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination, const unsigned int currentPass) = 0;
         
         
     public:

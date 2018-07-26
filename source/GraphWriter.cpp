@@ -32,6 +32,7 @@ namespace GraphTool
     template <typename TEdgeData> struct SGraphWriteSpec
     {
         FILE* file;                                                         ///< File handle.
+        unsigned int currentPass;                                           ///< Zero-based index of the current pass of the graph write process.
         const Graph* graph;                                                 ///< Graph object being exported.
         GraphWriter<TEdgeData>* writer;                                     ///< Graph write object.
         SEdge<TEdgeData>* bufs[2];                                          ///< Edge data buffers.
@@ -76,7 +77,7 @@ namespace GraphTool
                 break;
 
             // Consume the buffer and write edges to the file.
-            writeSpec->writer->WriteEdgesToFile(writeSpec->file, *writeSpec->graph, writeSpec->bufs[currentBufferIndex], writeSpec->counts[currentBufferIndex], writeSpec->groupedByDestination);
+            writeSpec->writer->WriteEdgesToFile(writeSpec->file, *writeSpec->graph, writeSpec->bufs[currentBufferIndex], writeSpec->counts[currentBufferIndex], writeSpec->groupedByDestination, writeSpec->currentPass);
 
             // Check for any I/O errors.
             if (ferror(writeSpec->file))
@@ -144,7 +145,15 @@ namespace GraphTool
         }
     }
 
-
+    // -------- ABSTRACT INSTANCE METHODS ---------------------------------- //
+    // See "GraphWriter.h" for documentation.
+    
+    template <typename TEdgeData> unsigned int GraphWriter<TEdgeData>::NumberOfPassesRequired(void)
+    {
+        return 1;
+    }
+    
+    
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
@@ -193,17 +202,27 @@ namespace GraphTool
         taskSpec[1].smtPolicy = SpindleSMTPolicyPreferPhysical;
 
         // Launch the graph write task.
-        const uint32_t spawnResult = spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
+        const unsigned int numPasses = NumberOfPassesRequired();
+        
+        for (unsigned int i = 0; i < numPasses; ++i)
+        {
+            writeSpec.currentPass = i;
+            
+            const uint32_t spawnResult = spindleThreadsSpawn(taskSpec, sizeof(taskSpec) / sizeof(taskSpec[0]), true);
+            
+            if ((0 != spawnResult) || (EGraphResult::GraphResultSuccess != writeSpec.writeResult))
+            {
+                fclose(graphfile);
+                delete[] bufs[0];
+                delete[] bufs[1];
+                return (0 == spawnResult) ? writeSpec.writeResult : EGraphResult::GraphResultErrorUnknown;
+            }
+        }
 
-        // Clean up.
         fclose(graphfile);
         delete[] bufs[0];
         delete[] bufs[1];
-
-        if (0 != spawnResult)
-            return EGraphResult::GraphResultErrorUnknown;
-        else
-            return writeSpec.writeResult;
+        return writeSpec.writeResult;
     }
 
 

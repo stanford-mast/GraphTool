@@ -24,9 +24,39 @@
 
 namespace GraphTool
 {
+    // -------- LOCALS ----------------------------------------------------- //
+    
+    // File header for unweighted graphs.
+    static const char unweightedHeader[] = "AdjacencyGraph";
+    
+    // File header for weighted graphs.
+    static const char weightedHeader[] = "WeightedAdjacencyGraph";
+    
+    
+    // -------- CLASS VARIABLES -------------------------------------------- //
+    // See "TextAdjacencyListWriter.h" for documentation.
+    
+    template <typename TEdgeData> const char* const TextAdjacencyListWriter<TEdgeData>::outputFileHeader = weightedHeader;
+    template <> const char* const TextAdjacencyListWriter<void>::outputFileHeader = unweightedHeader;
+    
+    
     // -------- CONCRETE INSTANCE METHODS ---------------------------------- //
     // See "GraphWriter.h" for documentation.
 
+    template <typename TEdgeData> unsigned int TextAdjacencyListWriter<TEdgeData>::NumberOfPassesRequired(void)
+    {
+        return 2;
+    }
+    
+    // --------
+    
+    template <> unsigned int TextAdjacencyListWriter<void>::NumberOfPassesRequired(void)
+    {
+        return 1;
+    }
+    
+    // --------
+    
     template <typename TEdgeData> FILE* TextAdjacencyListWriter<TEdgeData>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
         // This class writes files in text mode.
@@ -35,7 +65,7 @@ namespace GraphTool
         if (NULL != graphfile)
         {
             // Write out the number of vertices and edges in the graph.
-            fprintf(graphfile, "AdjacencyGraph\n%llu\n%llu\n", (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
+            fprintf(graphfile, "%s\n%llu\n%llu\n", outputFileHeader, (long long unsigned int)graph.GetNumVertices(), (long long unsigned int)graph.GetNumEdges());
             
             // Write out the vertex index.
             const VertexIndex& vertexIndex = (groupedByDestination ? graph.VertexIndexDestination() : graph.VertexIndexSource());
@@ -52,21 +82,48 @@ namespace GraphTool
         return graphfile;
     }
     
-    template <> FILE* TextAdjacencyListWriter<uint64_t>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
-    {
-        // This format does not currently support weighted graphs.
-        return NULL;
-    }
+    // --------
     
     template <> FILE* TextAdjacencyListWriter<double>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
     {
-        // This format does not currently support weighted graphs.
+        // This format does not support weighted graphs.
         return NULL;
     }
 
     // --------
 
-    template <typename TEdgeData> void TextAdjacencyListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void TextAdjacencyListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination, const unsigned int currentPass)
+    {
+        switch (currentPass)
+        {
+        case 0:
+            // Write out each edge's topology information.
+            for (size_t i = 0; i < count; ++i)
+            {
+                // Write the source or destination vertex, depending on the grouping.
+                if (groupedByDestination)
+                    fprintf(graphfile, "%llu\n", (long long unsigned int)buf[i].sourceVertex);
+                else
+                    fprintf(graphfile, "%llu\n", (long long unsigned int)buf[i].destinationVertex);
+            }
+            break;
+            
+        case 1:
+            // Write out each edge's data.
+            for (size_t i = 0; i < count; ++i)
+            {
+                fprintf(graphfile, "%llu\n", (long long unsigned int)buf[i].edgeData);
+            }
+            break;
+            
+        default:
+            break;
+        }
+    }
+    
+    // --------
+    
+    template <> void TextAdjacencyListWriter<void>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<void>* buf, const size_t count, const bool groupedByDestination, const unsigned int currentPass)
     {
         // Write out each edge.
         for (size_t i = 0; i < count; ++i)

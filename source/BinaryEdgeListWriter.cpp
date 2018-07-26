@@ -42,7 +42,7 @@ namespace GraphTool
 
     // --------
 
-    template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination)
+    template <typename TEdgeData> void BinaryEdgeListWriter<TEdgeData>::WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination, const unsigned int currentPass)
     {
         fwrite((void*)buf, sizeof(const SEdge<TEdgeData>), count, graphfile);
     }

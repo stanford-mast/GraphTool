@@ -25,11 +25,19 @@ namespace GraphTool
     /// @tparam TEdgeData Specifies the type of data, such as a weight, to hold for each edge.
     template <typename TEdgeData> class TextAdjacencyListWriter : public GraphWriter<TEdgeData>
     {
+    private:
+        // -------- CLASS VARIABLES ---------------------------------------- //
+        
+        /// Pointer to the string to place at the header line of an output file.
+        static const char* const outputFileHeader;
+        
+    
     public:
         // -------- CONCRETE INSTANCE METHODS ------------------------------ //
         // See "GraphWriter.h" for documentation.
 
+        virtual unsigned int NumberOfPassesRequired(void);
         virtual FILE* OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination);
-        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination);
+        virtual void WriteEdgesToFile(FILE* const graphfile, const Graph& graph, const SEdge<TEdgeData>* buf, const size_t count, const bool groupedByDestination, const unsigned int currentPass);
     };
 }
