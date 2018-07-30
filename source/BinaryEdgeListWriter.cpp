@@ -33,8 +33,8 @@ namespace GraphTool
         if (NULL != graphfile)
         {
             // Write out the number of vertices and edges in the graph.
-            TVertexCount metadata[2] = { graph.GetNumVertices(), graph.GetNumEdges() };
-            fwrite((void*)metadata, sizeof(metadata[0]), sizeof(metadata) / sizeof(metadata[0]), graphfile);
+            const TVertexCount metadata[2] = { graph.GetNumVertices(), graph.GetNumEdges() };
+            fwrite((const void*)metadata, sizeof(metadata[0]), sizeof(metadata) / sizeof(metadata[0]), graphfile);
         }
 
         return graphfile;

@@ -24,6 +24,7 @@
     <ClCompile Include="source\GraphWriterFactory.cpp" />
     <ClCompile Include="source\HashEdgeDataTransform.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Matrix32Writer.cpp" />
     <ClCompile Include="source\NullEdgeDataTransform.cpp" />
     <ClCompile Include="source\OptionContainer.cpp" />
     <ClCompile Include="source\Options.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="include\IGraphReader.h" />
     <ClInclude Include="include\IGraphTransform.h" />
     <ClInclude Include="include\IGraphWriter.h" />
+    <ClInclude Include="include\Matrix32Writer.h" />
     <ClInclude Include="include\NullEdgeDataTransform.h" />
     <ClInclude Include="include\OptionContainer.h" />
     <ClInclude Include="include\Options.h" />

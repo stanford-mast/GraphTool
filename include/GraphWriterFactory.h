@@ -31,6 +31,7 @@ namespace GraphTool
         GraphWriterTypeBinaryEdgeList,                                      ///< BinaryEdgeListWriter
         GraphWriterTypeTextAdjacencyList,                                   ///< TextAdjacencyListWriter
         GraphWriterTypeTextEdgeList,                                        ///< TextEdgeListWriter
+        GraphWriterMatrix32,                                                ///< Matrix32Writer
         GraphWriterTypeXStream,                                             ///< XStreamWriter
     };
 
