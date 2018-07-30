@@ -81,14 +81,6 @@ namespace GraphTool
 
         return graphfile;
     }
-    
-    // --------
-    
-    template <> FILE* TextAdjacencyListWriter<double>::OpenAndInitializeGraphFileForWrite(const char* const filename, const Graph& graph, const bool groupedByDestination)
-    {
-        // This format does not support weighted graphs.
-        return NULL;
-    }
 
     // --------
 

@@ -34,11 +34,19 @@ namespace GraphTool
         { "binaryEdgeList",                                                 EGraphWriterType::GraphWriterTypeBinaryEdgeList },
         { "BinaryEdgeList",                                                 EGraphWriterType::GraphWriterTypeBinaryEdgeList },
 
+        { "grazelle",                                                       EGraphWriterType::GraphWriterTypeBinaryEdgeList },
+        { "Grazelle",                                                       EGraphWriterType::GraphWriterTypeBinaryEdgeList },
+
         { "adjacencygraph",                                                 EGraphWriterType::GraphWriterTypeTextAdjacencyList },
         { "AdjacencyGraph",                                                 EGraphWriterType::GraphWriterTypeTextAdjacencyList },
         { "textadjacencylist",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
         { "textAdjacencyList",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
         { "TextAdjacencyList",                                              EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        
+        { "ligra",                                                          EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "Ligra",                                                          EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "polymer",                                                        EGraphWriterType::GraphWriterTypeTextAdjacencyList },
+        { "Polymer",                                                        EGraphWriterType::GraphWriterTypeTextAdjacencyList },
 
         { "textedgelist",                                                   EGraphWriterType::GraphWriterTypeTextEdgeList },
         { "textEdgeList",                                                   EGraphWriterType::GraphWriterTypeTextEdgeList },

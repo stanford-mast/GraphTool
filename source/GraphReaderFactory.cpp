@@ -32,6 +32,9 @@ namespace GraphTool
         { "binaryEdgeList",                                                 EGraphReaderType::GraphReaderTypeBinaryEdgeList },
         { "BinaryEdgeList",                                                 EGraphReaderType::GraphReaderTypeBinaryEdgeList },
 
+        { "grazelle",                                                       EGraphReaderType::GraphReaderTypeBinaryEdgeList },
+        { "Grazelle",                                                       EGraphReaderType::GraphReaderTypeBinaryEdgeList },
+
         { "textedgelist",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },
         { "textEdgeList",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },
         { "TextEdgeList",                                                   EGraphReaderType::GraphReaderTypeTextEdgeList },

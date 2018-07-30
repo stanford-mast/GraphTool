@@ -11,7 +11,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Atomic.h" />
+    <ClCompile Include="source\BinaryEdgeListReader.cpp" />
+    <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
+    <ClCompile Include="source\EdgeDataTransform.cpp" />
+    <ClCompile Include="source\EdgeList.cpp" />
+    <ClCompile Include="source\Graph.cpp" />
+    <ClCompile Include="source\GraphReader.cpp" />
+    <ClCompile Include="source\GraphReaderFactory.cpp" />
+    <ClCompile Include="source\GraphTransform.cpp" />
+    <ClCompile Include="source\GraphTransformFactory.cpp" />
+    <ClCompile Include="source\GraphWriter.cpp" />
+    <ClCompile Include="source\GraphWriterFactory.cpp" />
+    <ClCompile Include="source\HashEdgeDataTransform.cpp" />
+    <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\NullEdgeDataTransform.cpp" />
+    <ClCompile Include="source\OptionContainer.cpp" />
+    <ClCompile Include="source\Options.cpp" />
+    <ClCompile Include="source\TextAdjacencyListWriter.cpp" />
+    <ClCompile Include="source\TextEdgeListReader.cpp" />
+    <ClCompile Include="source\TextEdgeListWriter.cpp" />
+    <ClCompile Include="source\VertexIndex.cpp" />
+    <ClCompile Include="source\XStreamWriter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="include\BinaryEdgeListReader.h" />
     <ClInclude Include="include\BinaryEdgeListWriter.h" />
     <ClInclude Include="include\EdgeDataTransform.h" />
@@ -38,29 +60,6 @@
     <ClInclude Include="include\VersionInfo.h" />
     <ClInclude Include="include\VertexIndex.h" />
     <ClInclude Include="include\XStreamWriter.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="source\BinaryEdgeListReader.cpp" />
-    <ClCompile Include="source\BinaryEdgeListWriter.cpp" />
-    <ClCompile Include="source\EdgeDataTransform.cpp" />
-    <ClCompile Include="source\EdgeList.cpp" />
-    <ClCompile Include="source\Graph.cpp" />
-    <ClCompile Include="source\GraphReader.cpp" />
-    <ClCompile Include="source\GraphReaderFactory.cpp" />
-    <ClCompile Include="source\GraphTransform.cpp" />
-    <ClCompile Include="source\GraphTransformFactory.cpp" />
-    <ClCompile Include="source\GraphWriter.cpp" />
-    <ClCompile Include="source\GraphWriterFactory.cpp" />
-    <ClCompile Include="source\HashEdgeDataTransform.cpp" />
-    <ClCompile Include="source\Main.cpp" />
-    <ClCompile Include="source\NullEdgeDataTransform.cpp" />
-    <ClCompile Include="source\OptionContainer.cpp" />
-    <ClCompile Include="source\Options.cpp" />
-    <ClCompile Include="source\TextAdjacencyListWriter.cpp" />
-    <ClCompile Include="source\TextEdgeListReader.cpp" />
-    <ClCompile Include="source\TextEdgeListWriter.cpp" />
-    <ClCompile Include="source\VertexIndex.cpp" />
-    <ClCompile Include="source\XStreamWriter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC2205EA-64C0-4D52-B147-8C193BB7046C}</ProjectGuid>
