@@ -61,6 +61,11 @@ Options that control the input may be specified at most once and in any order.  
 `--transform` selects one or more transformation operations to apply to the graph, in the order specified on the command-line, after the graph is read from input and before any outputs are produced.  Currently this can be used only for the purpose of generating edge weights.  Supported values are `nullintedgedata` (generate integer-typed edge data of value 0), `nullfloatedgedata` (generate float-typed edge data of value 0.0), and `hashedgedata` (generate integer-typed edge data using a multiplicative hash).
 
 
+# Modifying
+
+GraphTool uses a class hierarchy to encapsulate the format-specific logic for input, output, and graph transformations.  To add support for additional formats, simply introduce a class derived from a suitable base class (`GraphReader`, `GraphWriter`, or `GraphTransform`) and implement the required methods.
+
+
 # Source Code Documentation
 
 Documentation is available and can be built using Doxygen.
